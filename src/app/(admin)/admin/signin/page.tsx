@@ -1,11 +1,13 @@
 "use client"
+
 import React, { useState } from 'react';
 import { useTheme } from 'next-themes';
 import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import axios from "axios";
-import Alerts from '@/utils/Alerts';
+import { loginUser } from '@/services/Auth';
+import { useRouter } from "next/navigation";
+import Alert from '@/utils/Alert';
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -15,6 +17,7 @@ const loginSchema = z.object({
 
 const Signin = () => 
 {
+    const router = useRouter();
     const { systemTheme, theme, setTheme } = useTheme();
     const currentTheme = theme === 'system' ? systemTheme ?? 'light' : theme;
 
@@ -26,7 +29,7 @@ const Signin = () =>
         (self as HTMLInputElement).type = (self as HTMLInputElement).type == "password" ? "text" : "password";
     }
 
-    const {  register, handleSubmit, formState: { errors, isSubmitting },
+    const {  register, handleSubmit, formState: { errors, isSubmitting }
     } = useForm({
         resolver: zodResolver(loginSchema),
     });
@@ -35,8 +38,9 @@ const Signin = () =>
     const onSubmit = async (data: { email: string; password: string }) => {
         setServerError(null);
         try {
-            const response = await axios.get("http://localhost:3000/signin", { params: data });
-            console.log(response);
+            const user = await loginUser(data.email, data.password);
+            console.log("✅ Login Success:", user);
+            router.push("/admin");
         } catch {
             setStatus('error')
             setServerError("Login failed. Please try again.");
@@ -56,7 +60,7 @@ const Signin = () =>
                                 Enter your email and password to sign in!
                             </p>
                         </div>
-                        {serverError && <Alerts key={status} status="error" message={serverError}/>}
+                        {serverError && <Alert key={status} status="error" message={serverError}/>}
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <div className="space-y-5">
                                 <div>

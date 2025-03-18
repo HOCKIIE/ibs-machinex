@@ -10,18 +10,18 @@ import AddButton from '@/components/admin/Button/AddButton';
 import Format from '@/utils/Format';
 import ProductModal from '@/components/admin/Modal/ProductModal';
 import ConfirmModal from '@/components/admin/Modal/ConfirmModal';
-
+import { ProductProps } from '@/types/ProductProps';
 
 const show = [10, 50, 100];
 
-const Product = () => {
+const Product = () => 
+{
     const [mounted, setMounted] = useState(false);
-    const {
-        data, loading, skip,  limit, updateLimit, StatusTab, SearchBar, Paginate
+    const { data, loading, skip,  limit, updateLimit, StatusTab, SearchBar, Paginate
     } = usePagination({ initialLimit: show[0] });
     const [TitleModal, setTitleModal] = useState('')
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+    const [editingProduct, setEditingProduct] = useState<ProductProps | null>(null);
 
     const openCreateModal = () => {
         setEditingProduct(null); // Clear any previous product
@@ -29,13 +29,13 @@ const Product = () => {
         setTitleModal('Create Product')
     };
     
-    const openEditModal = (product: Product) => {
+    const openEditModal = (product: ProductProps) => {
         setEditingProduct(product);
         setIsModalOpen(true);
         setTitleModal('Edit Product')
     };
 
-    const handleSave = (product: Product) => {
+    const handleSave = (product: ProductProps) => {
         if (product.id) {
           // Update existing product
           setProducts((data) => data.map((p) => (p.id === product.id ? product : p)));
