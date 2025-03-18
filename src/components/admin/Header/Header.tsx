@@ -5,6 +5,7 @@ import { useTheme } from "next-themes";
 import Link from 'next/link';
 import { ThemeIcon } from '../Icon/ThemeIcon';
 import { ThemeIconType } from '@/types/ThemeIcon';
+import { logout } from '@/services/Auth';
 
 const Header = () => {
 
@@ -16,10 +17,6 @@ const Header = () => {
 
     const themeToggle = (set:string) => {
         setTheme(set);
-    }
-
-    const logoutHandle = (e: React.MouseEvent<HTMLButtonElement>) => {
-        console.log(e.currentTarget)
     }
     const userMenuHandle = () => { 
         setUserMenu(!userMenu);
@@ -104,7 +101,7 @@ const Header = () => {
                                     </li>
                                 </ul>
                                 <button 
-                                    onClick={logoutHandle}
+                                    onClick={logout}
                                     className="group mt-3 flex items-center gap-3 rounded-lg px-3 py-2 text-theme-sm font-medium text-gray-700 hover:bg-gray-100 hover:text-gray-700 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-gray-300"
                                 >
                                     <svg className="fill-gray-500 group-hover:fill-gray-700 dark:group-hover:fill-gray-300" width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

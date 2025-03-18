@@ -1,12 +1,15 @@
 "use client"
 
 import "@/styles/admin.scss";
-import React from "react";
+import React, { useEffect,useState } from "react";
 import { ThemeProvider } from "next-themes"
 import AdminContext from "@/contexts/AdminContaxt";
 import { Outfit } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { useTheme } from "next-themes"; 
+import { checkAuth } from "@/services/Auth";
+import { useRouter } from "next/navigation";
+import Loader from "@/components/admin/Loader";
 
 
 const outfit = Outfit({
@@ -17,7 +20,20 @@ const outfit = Outfit({
 
 export default function RootLayout({children}:{children: React.ReactNode})
 {
+    const router = useRouter();
+    const [loading, setLoading] = useState<boolean>(true);
     const { theme } = useTheme(); 
+    useEffect(()=>{
+        checkAuth().then((data) => {
+            if (!data) {
+                router.push("/admin/signin");
+                setLoading(false);
+                // return;
+            }else{
+                setLoading(false);
+            }
+        });
+    },[router])
     return (
         <html lang="en" suppressHydrationWarning={true}>
             <AdminContext>
@@ -43,7 +59,7 @@ export default function RootLayout({children}:{children: React.ReactNode})
                             },
                         }}
                     />
-                    {children}
+                    {loading ? <Loader /> : children}
                     </div>
                 </ThemeProvider>
                 </body>

@@ -4,8 +4,9 @@ import Link from 'next/link';
 import { FiBarChart2 } from "react-icons/fi";
 import { RxDashboard } from "react-icons/rx";
 import { BsCardText, BsPersonVcard, BsBox, BsMailbox  } from "react-icons/bs";
+import { TbUsers } from "react-icons/tb";
 
-type menuName = "Dashboard"|"Product"|"Blog"|"About"|"Contact";
+type menuName = "Dashboard"|"Product"|"Blog"|"About"|"Contact"|"User";
 interface IconProps { type: menuName }
 const Icon : React.FC<IconProps> = ({ type }) => {
     const iconMap : Record<menuName, JSX.Element> = {
@@ -13,7 +14,8 @@ const Icon : React.FC<IconProps> = ({ type }) => {
         Product:<BsBox fontSize={20}/>,
         Blog:<BsCardText fontSize={20}/>,
         About:<BsPersonVcard fontSize={20}/>,
-        Contact:<BsMailbox fontSize={20}/>
+        Contact:<BsMailbox fontSize={20}/>,
+        User: <TbUsers/>
     };
     return (iconMap[type])?<>{iconMap[type]}</>:<></>;
 };
@@ -23,7 +25,8 @@ const menuItem: { name: menuName, path: string }[] = [
     { name:"Product", path:"/admin/product" },
     { name:"Blog", path:"/admin/blog" },
     { name:"About", path:"/admin/about" },
-    { name:"Contact", path:"/admin/contact" }
+    { name:"Contact", path:"/admin/contact" },
+    { name:"User", path:"/admin/user" }
 ];
 
 const Sidebar = () => {
