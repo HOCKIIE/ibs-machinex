@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React from "react";
 import Sidebar from "../Sidebar/Sidebar";
 import Header from "../Header/Header";
 
@@ -9,7 +9,6 @@ export default function DefaultLayout({
   children: React.ReactNode;
 }) {
   
-    const [sidebarOpen, setSidebarOpen] = useState(false);
     return (
         <>
         <div className="flex h-screen">

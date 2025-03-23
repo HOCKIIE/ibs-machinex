@@ -7,7 +7,7 @@ import CancelButton from '../Button/CancelBotton';
 // import Image from 'next/image';
 import GalleryDropzone from '../Dropzon/GalleryDropzone';
 import ProfileImageUpload from "../Dropzon/ProfileImageUpload";
-import { ProductProps } from '@/types/ProductProps';
+import { ProductProps } from '@/types/ProductType';
 
 
   

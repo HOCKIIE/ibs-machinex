@@ -1,8 +1,6 @@
 "use client"
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
-import { GoChevronLeft, GoChevronRight } from "react-icons/go";
-import { IoSearchOutline } from "react-icons/io5";
 import { toast } from "react-hot-toast";
 
 interface UsePaginationProps {
@@ -85,9 +83,9 @@ const usePagination = ({ initialLimit = 10 }: UsePaginationProps) =>
     {
         if (page < 1 || page > totalPages) return;
         const newSkip = (page - 1) * limit;
-        setCurrentPage(page);
         setSkip(newSkip);
         updateTo(newSkip + limit);
+        setCurrentPage(page);
         setTimeout(() => {
             setMultipleParams({ skip: `${newSkip}`, limit: `${limit}` });
         }, 0);
@@ -95,7 +93,7 @@ const usePagination = ({ initialLimit = 10 }: UsePaginationProps) =>
     }, [limit, totalPages, updateTo, setMultipleParams]);
 
     const nextPage = useCallback(() => {
-        if (currentPage < totalPages) setPage(currentPage + 1); 
+        if (currentPage < totalPages) setPage(currentPage + 1);
     }, [currentPage, totalPages, setPage]);
 
     const prevPage = useCallback(() =>  {
@@ -166,64 +164,10 @@ const usePagination = ({ initialLimit = 10 }: UsePaginationProps) =>
         );
     };
 
-    const SearchBar = () => {
-        return (
-            <div className="relative">
-                <button className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400" title="Keyword">
-                    <IoSearchOutline fontSize={20}/>
-                </button>
-                <input type="text" 
-                    ref={searchRef}
-                    defaultValue={keyword}
-                    onKeyUp={handleSearch}
-                    x-model="search" placeholder="Search..." 
-                    className="pl-12 dark:bg-dark-900 shadow-theme-xs focus:ring-indigo-500 focus:border-indigo-500 dark:focus:border-indigo-800 h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:ring-3 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 focus:outline-none" 
-                />
-            </div>
-        )
-    }
-
-    const Paginate: React.FC = () => {
-        return (
-            <div className="flex justify-between px-6 py-2 bg-white dark:bg-gray-800">
-                <div className="flex items-center">
-                    <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
-                        Showing <span className="font-semibold text-gray-900 dark:text-white">{skip+1} - {to}</span> of <span className="font-semibold text-gray-900 dark:text-white">{totalItems}</span> Products
-                    </span>
-                </div>
-                <div className="flex items-center justify-center gap-1 xl:justify-end">
-                    <button 
-                        type="button" 
-                        onClick={prevPage}
-                        title="Prvious Page"
-                        className="py-1 px-3 h-full inline-flex justify-center items-center text-sm font-semibold rounded-md bg-white text-gray-500 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-hidden disabled:opacity-50 disabled:pointer-events-none"
-                    >
-                        <GoChevronLeft fontSize={20}/> Prev
-                    </button>
-                    <input 
-                        ref={pageRef}
-                        title="Current Page" 
-                        type="text" name="page" className="w-[3rem] dark:bg-dark-900 shadow-theme-xs focus:ring-indigo-500 focus:border-indigo-500 dark:focus:border-indigo-800 rounded-lg border border-gray-300 bg-transparent px-2 py-2 text-sm text-center text-gray-800 placeholder:text-gray-400 focus:ring-3 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 focus:outline-none" 
-                        defaultValue={currentPage} 
-                        onKeyUp={handlePageChange}
-                    />
-                    <button 
-                        type="button" 
-                        title="Next Page"
-                        onClick={nextPage}
-                        className="py-1 px-3 h-full inline-flex justify-center items-center text-sm font-semibold rounded-md bg-white text-gray-500 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 focus:outline-hidden disabled:opacity-50 disabled:pointer-events-none">
-                        Next <GoChevronRight fontSize={20}/>
-                    </button>
-                </div>
-
-            </div>
-        )
-    }
-
     return { 
         data, loading, skip, to, limit, currentPage, totalPages, totalItems, updateLimit, setMultipleParams,
-        keyword, pageRef, setPage, nextPage, prevPage, handlePageChange,
-        StatusTab, SearchBar, Paginate
+        keyword, handleSearch, pageRef, setPage, nextPage, prevPage, handlePageChange,
+        StatusTab
     };
 };
 

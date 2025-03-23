@@ -1,58 +1,63 @@
 "use client";
-// import Image from 'next/image';
+
 import React,{ useState,useEffect } from 'react';
+import Link from 'next/link';
 import { BiTrash } from "react-icons/bi";
-import { toast } from "react-hot-toast";
+// import { toast } from "react-hot-toast";
 import { LuPencil } from "react-icons/lu";
+import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
-import usePagination from '@/hooks/usePagination';
-import AddButton from '@/components/admin/Button/AddButton';
-import Format from '@/utils/Format';
-import ProductModal from '@/components/admin/Modal/ProductModal';
+import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import ConfirmModal from '@/components/admin/Modal/ConfirmModal';
-import { ProductProps } from '@/types/ProductProps';
+import AddButton from '@/components/admin/Button/AddButton';
+import { IoSearchOutline } from "react-icons/io5";
+import usePagination from '@/hooks/usePagination';
+import Format from '@/utils/Format';
+import { Paginate, LimitPerPage } from '@/components/admin/Paginate/Paginate';
+import SearchBar from '@/components/admin/Paginate/SearchBar';
 
 const show = [10, 50, 100];
 
 const Product = () => 
 {
     const [mounted, setMounted] = useState(false);
-    const { data, loading, skip,  limit, updateLimit, StatusTab, SearchBar, Paginate
+    const [selectDelete, setSelectDelete] = useState<boolean>(true)
+    const { 
+        data, loading, 
+        skip, limit, to, totalItems,  
+        prevPage, nextPage, currentPage,
+        updateLimit, StatusTab, keyword, handleSearch, handlePageChange
     } = usePagination({ initialLimit: show[0] });
-    const [TitleModal, setTitleModal] = useState('')
-    const [isModalOpen, setIsModalOpen] = useState(false);
-    const [editingProduct, setEditingProduct] = useState<ProductProps | null>(null);
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const isAllSelected = selectedIds.length > 0;
 
-    const openCreateModal = () => {
-        setEditingProduct(null); // Clear any previous product
-        setIsModalOpen(true);
-        setTitleModal('Create Product')
-    };
-    
-    const openEditModal = (product: ProductProps) => {
-        setEditingProduct(product);
-        setIsModalOpen(true);
-        setTitleModal('Edit Product')
-    };
-
-    const handleSave = (product: ProductProps) => {
-        if (product.id) {
-          // Update existing product
-          setProducts((data) => data.map((p) => (p.id === product.id ? product : p)));
-          toast.success("Product updated!");
-        } else {
-          // Create new product
-          const newProduct = { ...product, id: Date.now() };
-          setProducts((data) => [...data, newProduct]);
-          toast.success("Product created!");
+    const toggleSelectAll = () => {
+        if (isAllSelected) {
+            setSelectedIds([]);
+            setSelectDelete(true)
+        }else{
+            setSelectedIds(data.map((item) => item.id));
+            setSelectDelete(false)
         }
-      };
-    
-    const closeModal = () => {
-        setIsModalOpen(false);
     };
+    const toggleSelect = (id: number) => {
+        setSelectedIds((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+        );
+        if(selectedIds.length> 0) setSelectDelete(false);
+    };
+    interface SelectDeleteProps {
+        event: React.MouseEvent<HTMLButtonElement>;
+    }
 
-    
+    const SelectDelete: React.FC<SelectDeleteProps> = ({ event }) => {
+        useEffect(() => {
+            console.log(event.target);
+            console.log(selectedIds);
+        }, [event]);
+
+        return null;
+    };
 
     useEffect(() => {
         setMounted(true);
@@ -66,43 +71,41 @@ const Product = () =>
                 {/* <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"> */}
                     <div className="control-button mb-3">
                         <div className="flex justify-between">
-                            <div className="left">
+                            <div><Breadcrumb /></div>
+                            <div className="flex gap-3 right">
                                 <StatusTab status={["all", "active", "draft", "archived"]}/>
+                                <AddButton title="Add Product" />
                             </div>
-                            <div className="right">
-                                <AddButton title="Add Product" onCreate={openCreateModal}/>
-                            </div>
+                            
                         </div>
                     </div>
                     <div className="shadow-md sm:rounded-lg">
-                        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                            <caption className="p-5 text-md font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-                                <div className="flex justify-between w-full">
-                                    <div className="flex items-center gap-3">
-                                        <span className="text-gray-500 dark:text-gray-400"> Show </span>
-                                        <div className="relative bg-transparent">
-                                            <select 
-                                                title="Show entries"
-                                                onChange={(e) => updateLimit(Number(e.target.value))}
-                                                defaultValue={limit}
-                                                className="dark:bg-dark-900 h-9 w-full appearance-none rounded-lg border border-gray-300 bg-transparent bg-none py-2 pl-3 pr-8 text-sm text-gray-800 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-theme-xs placeholder:text-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 focus:outline-none"
-                                            >
-                                                {Array.from(show).map((v:number,k:number)=><option key={k} value={v} className="text-gray-500 dark:bg-gray-900 dark:text-gray-400">{v}</option>)}
-                                            </select>
-                                            <span className="absolute right-2 top-1/2 z-30 -translate-y-1/2 text-gray-500 dark:text-gray-400">
-                                                <svg className="stroke-current" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M3.8335 5.9165L8.00016 10.0832L12.1668 5.9165" stroke="" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"></path>
-                                                </svg>
-                                            </span>
-                                        </div>
-                                        <span className="text-gray-500 dark:text-gray-400"> entries </span>
-                                    </div>
-                                    <SearchBar/>
+                        <div className="p-5 text-md font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                            <div className="flex justify-between w-full">
+                                <div className='flex gap-3'>
+                                    <LimitPerPage show={show} limit={limit} updateLimit={updateLimit}/>
+                                    <button 
+                                        disabled={selectDelete}
+                                        onClick={(e) => <SelectDelete event={e} />}
+                                        title="Remove from select"
+                                        type="button"
+                                        className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-error-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"
+                                    ><BiTrash fontSize={24}/></button>
                                 </div>
-                            </caption>
+                                <div className='flex'>
+                                    <div className="relative">
+                                        <button className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400" title="Keyword">
+                                            <IoSearchOutline fontSize={20}/>
+                                        </button>
+                                        <SearchBar keyword={keyword} handleSearch={(e) => handleSearch(e)} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3" style={{width:'3%'}}>No.</th>
+                                    <th scope="col" className="px-6 py-3" style={{width:'3%'}}><AnimatedCheckbox checked={isAllSelected} onChange={toggleSelectAll}/></th>
                                     <th scope="col" className="px-6 py-3" style={{width:'60%'}}>Product name</th>
                                     <th scope="col" className="px-6 py-3">Brand</th>
                                     <th scope="col" className="px-6 py-3">Category</th>
@@ -116,17 +119,21 @@ const Product = () =>
                                 {data.length > 0 && data.map((product,index) => 
                                     <tr key={index} className={`bg-white dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-900 transition-all ease-in-out ${loading ? ' animate-pulse' : ''}`}>
                                         <td className="px-6 py-4">
-                                            {loading?<div className="h-2 bg-slate-700 rounded col-span-2"></div>:(skip>=10)?(skip+(index+1)):(index+1)}
+                                            {loading
+                                                ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded col-span-2"></div>
+                                                :<AnimatedCheckbox className="select" checked={selectedIds.includes(product.id)} onChange={()=>toggleSelect(product.id)}/>
+                                            }
                                         </td>
                                         <td className="px-6 py-4" width={720}>
                                             {loading?
-                                                <div className="flex space-x-4">
-                                                <div className="rounded-full bg-slate-700 h-10 w-10"></div>
+                                            <div className="flex space-x-4 h-[60px] justify-center items-center">
+                                                <div className="rounded-full bg-gray-300 dark:bg-slate-700 h-10 w-10"></div>
                                                 <div className="flex-1 space-y-6 py-1">
-                                                    <div className="space-y-3">
-                                                        <div className="h-2 bg-slate-700 rounded w-full"></div>
+                                                    <div className="space-y-3 h-[40px]">
+                                                        <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded w-[50%]"></div>
+                                                        <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded w-[85%]"></div>
                                                         <div className="grid grid-cols-3 gap-4">
-                                                            <div className="h-2 bg-slate-700 rounded w-full"></div>
+                                                            <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded w-full"></div>
                                                         </div>
                                                     </div>
                                                 </div>
@@ -143,9 +150,9 @@ const Product = () =>
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
                                                         {product.title}
                                                     </div>
-                                                    <div className="text-sm text-gray-500 dark:text-gray-400">
+                                                    <p className="text-sm text-gray-500 dark:text-gray-400 h-[40px] line-clamp-2">
                                                         {product.description}
-                                                    </div>
+                                                    </p>
                                                 </div>
                                             </div>
                                             }
@@ -156,7 +163,7 @@ const Product = () =>
                                             :
                                             <div className="flex-1 space-y-6 py-1">
                                                 <div className="space-y-3">
-                                                    <div className="h-2 bg-slate-700 rounded mt-0 pt-0"></div>
+                                                    <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded mt-0 pt-0"></div>
                                                     <div className="h-2 rounded mt-0 pt-0"></div>
                                                 </div>
                                             </div>
@@ -169,7 +176,7 @@ const Product = () =>
                                             :
                                                 <div className="flex-1 space-y-6 py-1">
                                                     <div className="space-y-3">
-                                                        <div className="h-2 bg-slate-700 rounded mt-0 pt-0"></div>
+                                                        <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded mt-0 pt-0"></div>
                                                         <div className="h-2 rounded mt-0 pt-0"></div>
                                                     </div>
                                                 </div>
@@ -181,7 +188,7 @@ const Product = () =>
                                             :
                                             <div className="flex-1 space-y-6 py-1">
                                                 <div className="space-y-3">
-                                                    <div className="h-2 bg-slate-700 rounded mt-0 pt-0"></div>
+                                                    <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded mt-0 pt-0"></div>
                                                     <div className="h-2 rounded mt-0 pt-0"></div>
                                                 </div>
                                             </div>}
@@ -196,7 +203,7 @@ const Product = () =>
                                             :
                                                 <div className="flex-1 space-y-6 py-1">
                                                     <div className="space-y-3">
-                                                        <div className="h-2 bg-slate-700 rounded mt-0 pt-0"></div>
+                                                        <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded mt-0 pt-0"></div>
                                                         <div className="h-2 rounded mt-0 pt-0"></div>
                                                     </div>
                                                 </div>
@@ -208,7 +215,7 @@ const Product = () =>
                                             :
                                                 <div className="flex-1 space-y-6 py-1">
                                                     <div className="space-y-3">
-                                                        <div className="h-2 bg-slate-700 rounded mt-0 pt-0"></div>
+                                                        <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded mt-0 pt-0"></div>
                                                         <div className="h-2 rounded mt-0 pt-0"></div>
                                                     </div>
                                                 </div>
@@ -218,23 +225,24 @@ const Product = () =>
                                             {!loading?
                                             <div className="flex gap-2">
                                                 <button 
+                                                    title="Delete"
                                                     onClick={()=>ConfirmModal('delete')}
                                                     className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
                                                     <BiTrash fontSize={24}/>
                                                 </button>
-                                                <button 
+                                                <Link 
                                                     type="button"
-                                                    onClick={()=>openEditModal(product)}
+                                                    href={`product/${product.id}`}
                                                     className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-500 dark:hover:text-white/90">
                                                     <LuPencil fontSize={20}/>
-                                                </button>                                                
+                                                </Link>                                                
                                             </div>
                                             :
                                             <div className="flex-1 space-y-6 py-1">
                                                 <div className="space-y-3">
                                                     <div className="grid grid-cols-2 gap-2">
-                                                        <div className="h-2 bg-slate-700 rounded"></div>
-                                                        <div className="h-2 bg-slate-700 rounded"></div>
+                                                        <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                                        <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
                                                     </div>
                                                     <div className="h-2 rounded mt-0 pt-0"></div>
                                                 </div>
@@ -252,13 +260,21 @@ const Product = () =>
                         </table>
                         <div className="dark:bg-gray-700 rounded-b-md overflow-hidden">
                             <div className="h-8 bg-gray-50 w-full dark:bg-gray-700 dark:text-gray-400"></div>
-                            <Paginate />
+                            <Paginate 
+                                skip={skip} 
+                                to={to} 
+                                totalItems={totalItems} 
+                                prevPage={prevPage} 
+                                currentPage={currentPage}
+                                handlePageChange={handlePageChange} 
+                                nextPage={nextPage} 
+                            />
                         </div>
                         
                     {/* </div> */}
                 </div>
             </div>
-            <ProductModal isOpen={isModalOpen} onClose={closeModal} onSave={handleSave} initialData={editingProduct} title={TitleModal} />
+            {/* <ProductModal isOpen={isModalOpen} onClose={closeModal} onSave={handleSave} initialData={editingProduct} title={TitleModal} /> */}
         </DefaultLayout>
     )
 }

@@ -4,7 +4,7 @@ import React,{ useState,useEffect, useCallback } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import AddButton from '@/components/admin/Button/AddButton';
 import toast from 'react-hot-toast';
-import UserProps from '@/types/UserProps';
+import UserProps from '@/types/UserType';
 // import AxiosInstance from '@/utils/AxiosInstance';
 import Api from '@/services/Api';
 

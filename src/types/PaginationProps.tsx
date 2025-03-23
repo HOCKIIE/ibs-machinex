@@ -1,9 +1,9 @@
-export interface PagionationProps {
+export interface PagionationType {
     currentPage: number | 1,
     prevPage: number,
     nextPage: number
 }
-export interface PaginateProps {
+export interface PaginateType {
     currentPage: number | 1,
     prevPage: number,
     nextPage: number

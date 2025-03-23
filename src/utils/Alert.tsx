@@ -2,12 +2,7 @@
 import React from 'react';
 import { IoClose, IoCheckmarkCircle, IoWarning, IoAlertCircle } from "react-icons/io5";
 
-type AlertType = "success" | "warning" | "error";
-
-interface AlertProps {
-    status: AlertType;
-    message: string;
-}
+import { AlertProps, AlertType } from '@/types/AlertType';
 
 const alertStyles: Record<AlertType, string> = {
     success: "text-green-800 bg-green-100 border-green-400 dark:text-green-400 dark:bg-green-950 dark:border-green-700",
