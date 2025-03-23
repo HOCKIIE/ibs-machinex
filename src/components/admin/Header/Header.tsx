@@ -7,6 +7,7 @@ import { ThemeIcon } from '../Icon/ThemeIcon';
 import { ThemeIconType } from '@/types/ThemeIcon';
 import { logout } from '@/services/Auth';
 
+
 const Header = () => {
 
     const { systemTheme, theme, setTheme } = useTheme();

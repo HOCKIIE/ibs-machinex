@@ -8,6 +8,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginUser } from '@/services/Auth';
 import { useRouter } from "next/navigation";
 import Alert from '@/utils/Alert';
+import { AlertType } from '@/types/AlertType';
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -33,17 +34,25 @@ const Signin = () =>
     } = useForm({
         resolver: zodResolver(loginSchema),
     });
-    const [serverError, setServerError] = useState<string | null>(null);
-    const [status, setStatus] = useState<string | null>(null);
+
+    const [status, setStatus] = useState<string | null>('error');
+    const [message , setMessage] = useState<string | null>(null);
     const onSubmit = async (data: { email: string; password: string }) => {
-        setServerError(null);
+        setMessage(null);
         try {
-            const user = await loginUser(data.email, data.password);
-            console.log("✅ Login Success:", user);
-            router.push("/admin");
+            const request = await loginUser(data.email, data.password);
+            console.log("✅ Login Success:", request);
+            if(request.status == 'success'){
+                setStatus('success')
+                setMessage('Success, The system is redirecting.')
+                router.push("/admin");
+            }else{
+                setStatus('error')
+                setMessage("Login failed. Please try again.");
+            }
         } catch {
             setStatus('error')
-            setServerError("Login failed. Please try again.");
+            setMessage("Login failed. Please try again.");
         }
     };
 
@@ -60,7 +69,8 @@ const Signin = () =>
                                 Enter your email and password to sign in!
                             </p>
                         </div>
-                        {serverError && <Alert key={status} status="error" message={serverError}/>}
+                        {message && status && status !== 'success' && <Alert key={status} status={status as AlertType} message={message}/>}
+                        {message && status && status === 'success' && <Alert key={status} status={status as AlertType} message={message} />}
                         <form onSubmit={handleSubmit(onSubmit)}>
                             <div className="space-y-5">
                                 <div>

@@ -1,4 +1,5 @@
-export default interface UserProps {
+export default interface UserType {
+    id:number;
     name:string;
     role:string;
     email:string;
