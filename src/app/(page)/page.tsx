@@ -1,11 +1,14 @@
 import Image from "next/image";
+import ContactSection from "@/components/main/section/Contact";
+import AboutMeSection from "@/components/main/section/AboutMe";
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        Main Page
-      </main>
-    </div>
-  );
+    return (
+        <div className="container mx-auto px-2 xl:px-0">
+            <div className="pt-20 pb-10">
+                <AboutMeSection />
+                <ContactSection />
+            </div>
+        </div>
+    );
 }
