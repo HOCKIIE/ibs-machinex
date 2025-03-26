@@ -1,28 +1,109 @@
-import React from 'react';
+"use client"
+import React,{ useEffect,useState } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
+import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
+import AddButton from '@/components/admin/Button/AddButton';
+import usePagination from '@/hooks/usePagination';
+import { Paginate, LimitPerPage } from '@/components/admin/Paginate/Paginate';
+import SearchBar from '@/components/admin/Paginate/SearchBar';
+import { IoSearchOutline } from "react-icons/io5";
+import { BiTrash } from "react-icons/bi";
 
+const show = [10, 25, 50, 100];
+interface Blog {
+    id: number;
+    name: string;
+    description: string;
+    image: string;
+    color: string;
+    category: string;
+    price: string;
+}
 const Blog = () => {
-    interface Blog {
-        id: number;
-        name: string;
-        description: string;
-        image: string;
-        color: string;
-        category: string;
-        price: string;
-    }
 
+    const [mounted, setMounted] = useState(false);
+    const [selectDelete, setSelectDelete] = useState<boolean>(true)
+    const { 
+        data, loading, 
+        skip, limit, to, totalItems,  
+        prevPage, nextPage, currentPage,
+        updateLimit, StatusTab, keyword, handleSearch, handlePageChange
+    } = usePagination({ initialLimit: show[0] });
+    const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const isAllSelected = selectedIds.length > 0;
+    const toggleSelectAll = () => {
+        if (isAllSelected) {
+            setSelectedIds([]);
+            setSelectDelete(true)
+        }else{
+            setSelectedIds(data.map((item) => item.id));
+            setSelectDelete(false)
+        }
+    };
+    const toggleSelect = (id: number) => {
+        setSelectedIds((prev) =>
+            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+        );
+        if(selectedIds.length> 0) setSelectDelete(false);
+    };
+    interface SelectDeleteProps {
+            event: React.MouseEvent<HTMLButtonElement>;
+        }
+    
+    const SelectDelete: React.FC<SelectDeleteProps> = ({ event }) => {
+        useEffect(() => {
+            console.log(event.target);
+            console.log(selectedIds);
+        }, [event]);
+
+        return null;
+    };
     const blogs: Blog[] = [];
+
+    useEffect(() => {
+        setMounted(true);
+    }, []);
+
+    if (!mounted) return null; // Prevent SSR mismatches
+
     return (
         <DefaultLayout>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="control-button mb-3">
+                    <div className="flex justify-between">
+                        <div><Breadcrumb /></div>
+                        <div className="flex gap-3 right">
+                            <StatusTab status={["all", "active", "draft", "archived"]}/>
+                            <AddButton title="Add Blog" />
+                        </div>
+                        
+                    </div>
+                </div>
                 {/* <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"> */}
-                    <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+                    <div className="relative overflow-x-auto shadow-md sm:rounded-lg border border-gray-200/60">
+                    <div className="p-5 text-md font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
+                            <div className="flex justify-between w-full">
+                                <div className='flex gap-3'>
+                                    <LimitPerPage show={show} limit={limit} updateLimit={updateLimit}/>
+                                    <button 
+                                        disabled={selectDelete}
+                                        onClick={(e) => <SelectDelete event={e} />}
+                                        title="Remove from select"
+                                        type="button"
+                                        className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-error-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"
+                                    ><BiTrash fontSize={24}/></button>
+                                </div>
+                                <div className='flex'>
+                                    <div className="relative">
+                                        <button className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400" title="Keyword">
+                                            <IoSearchOutline fontSize={20}/>
+                                        </button>
+                                        <SearchBar keyword={keyword} handleSearch={(e) => handleSearch(e)} />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-                            <caption className="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
-                                Our blogs
-                                <p className="mt-1 text-sm font-normal text-gray-500 dark:text-gray-400">Browse a list of Flowbite products designed to help you work and play, stay organized, get answers, keep in touch, grow your business, and more.</p>
-                            </caption>
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
                                     <th scope="col" className="px-6 py-3">No.</th>
@@ -83,6 +164,18 @@ const Blog = () => {
                                 }
                             </tbody>
                         </table>
+                        <div className="dark:bg-gray-700 rounded-b-md overflow-hidden">
+                            <div className="h-8 bg-gray-50 w-full dark:bg-gray-700 dark:text-gray-400"></div>
+                            <Paginate 
+                                skip={skip} 
+                                to={to} 
+                                totalItems={totalItems} 
+                                prevPage={prevPage} 
+                                currentPage={currentPage}
+                                handlePageChange={handlePageChange} 
+                                nextPage={nextPage} 
+                            />
+                        </div>
                     {/* </div> */}
                 </div>
             </div>

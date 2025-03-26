@@ -16,10 +16,11 @@ import Format from '@/utils/Format';
 import { Paginate, LimitPerPage } from '@/components/admin/Paginate/Paginate';
 import SearchBar from '@/components/admin/Paginate/SearchBar';
 
-const show = [10, 50, 100];
+const show = [10, 25, 50, 100];
 
 const Product = () => 
 {
+    const apiPath = ``
     const [mounted, setMounted] = useState(false);
     const [selectDelete, setSelectDelete] = useState<boolean>(true)
     const { 
@@ -79,7 +80,7 @@ const Product = () =>
                             
                         </div>
                     </div>
-                    <div className="shadow-md sm:rounded-lg">
+                    <div className="overflow-x-auto shadow-md sm:rounded-lg border border-gray-200/60">
                         <div className="p-5 text-md font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
                             <div className="flex justify-between w-full">
                                 <div className='flex gap-3'>
