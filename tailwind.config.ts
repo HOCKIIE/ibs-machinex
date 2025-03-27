@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-import defaultTheme from "tailwindcss/defaultTheme";
+// import defaultTheme from "tailwindcss/defaultTheme";
 import colors from "tailwindcss/colors";
 
 const config: Config = {
@@ -10,14 +10,21 @@ const config: Config = {
   ],
   darkMode: "class",
   theme: {
+    container: {
+      center: true,
+    },
     fontFamily: {
       satoshi: ["Satoshi", "sans-serif"],
     },
     screens: {
+      sm: '600px',
+      md: '728px',
+      lg: '984px',
+      xl: '1240px',
       "2xsm": "375px",
       xsm: "425px",
-      "3xl": "2000px",
-      ...defaultTheme.screens,
+      '2xl': '1496px'
+      // ...defaultTheme.screens,
     },
     extend: {
       colors: {
