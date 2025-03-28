@@ -1,6 +1,5 @@
 "use client"
 import React, { useEffect, useState, useRef } from 'react';
-import { GoDotFill } from "react-icons/go";
 import Image from 'next/image';
 
 const ContactSection = () => {
@@ -27,38 +26,9 @@ const ContactSection = () => {
     }, []);
   return (
     <div className='container px-2 xl:px-0'>
-        <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12">
-                <h3 className="text-blue-900 text-4xl font-semibold">Network</h3>
-                <p className="text-gray-800 text-sm md:text-base">Discover great opportunities, get expert career advice, and land your dream job fastrer!</p>
-            </div>
-            <div className="col-span-12 md:col-span-4 xl:col-span-4">
-                <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden">
-                    <Image 
-                        src="/images/network-image@2x.png" 
-                        fill
-                        className="object-cover h-[400]"
-                        alt="Network illustration"
-                    />
-                </div>
-            </div>
-            <div className="col-span-12 md:col-span-8 xl:col-span-8">
-                <ul className="text-black">
-                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>IBS Inc. Tokyo branch, Chubu branch, Osaka branch, Kyusu Office</div></div>
-                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>Shanhai IBS Trading CO,.LTD.</div></div>
-                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>Hong Kong IBS Export &Import CO,.LTD.</div></div>
-                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>IBS Machinex (Thailand) Co,.Ltd.</div></div>
-                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>IBS AMERICA INC.</div></div>
-                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>IBS MANUFACTURING VIETNAM CO.,LTD.</div></div>
-                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>KUMKHO F.A (Agency)</div></div>
-                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>SCH EQUIPMENT CO.,LTD. (Agency)</div></div>
-                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>PT IKEUCHI INDONESIA (Agency)</div></div>
-                </ul>
-            </div>
-        </div>
         <hr className="my-14" />
         <div className="grid grid-cols-12 gap-4">
-            <div className="col-span-12"><h3 className="text-black text-4xl font-semibold">Contact</h3></div>
+            <div className="col-span-12"><h3 className="text-black text-4xl font-bold">Contact</h3></div>
             
             <div className="col-span-12 xl:col-span-6">
                 <div className="grid gap-6">
@@ -96,7 +66,7 @@ const ContactSection = () => {
                 </div>
             </div>
             <div className="col-span-12 xl:col-span-6">
-                <div className="relative w-full h-full min-h-[488px] rounded-3xl overflow-hidden">
+                <div className="relative w-full h-full min-h-[488px] rounded-3xl overflow-hidden p-0">
                     <Image src="/images/central-business-district-singapore.png" fill objectFit="fit" className="object-cover" alt="Contact"/>
                 </div>
             </div>
@@ -104,21 +74,21 @@ const ContactSection = () => {
         <hr className="my-14" />
         <div className="grid grid-cols-12 gap-5">
             <div className="col-span-12 xl:col-span-4">
-                <div className="bg-white text-gray-800 rounded-2xl shadow-[0_0px_1px_2px_rgba(0,0,0,0.05)] p-4">
+                <div className="h-full bg-white text-gray-800 rounded-2xl shadow-[0_0px_1px_2px_rgba(0,0,0,0.05)] p-4">
                     <span className="font-semibold">Office</span>
                     <p className="mt-1">116/102 ถนน ณ ระนอง แขวงคลองเตย<br/>เขตคลองเตย กรุงเทพมหานคร 10110</p>
                     <p>Tax ID: 0105555072251</p>
                 </div>
             </div>
             <div className="col-span-12 xl:col-span-4">
-                <div className="bg-white text-gray-800 rounded-2xl shadow-[0_0px_1px_2px_rgba(0,0,0,0.05)] p-4">
+                <div className="h-full bg-white text-gray-800 rounded-2xl shadow-[0_0px_1px_2px_rgba(0,0,0,0.05)] p-4">
                     <span className="font-semibold">K.Bum (Sales)</span><br/>
                     <a className="mt-1" href="mailto:patznun@machinex.co.t"> patznun@machinex.co.th</a><br/>
                     <a href="tel:065-256-2226">065-256-2226</a><br/>
                 </div>
             </div>
             <div className="col-span-12 xl:col-span-4">
-                <div className="bg-white text-gray-800 rounded-2xl shadow-[0_0px_1px_2px_rgba(0,0,0,0.05)] p-4">
+                <div className="h-full bg-white text-gray-800 rounded-2xl shadow-[0_0px_1px_2px_rgba(0,0,0,0.05)] p-4">
                     <span className="font-semibold">Mr.Fujii (Sales Japanese)</span><br/>
                     <a className="mt-1" href="mailto:fujii@machinex.co.t"> fujii@machinex.co.th</a><br/>
                     <a href="tel:099-709-1624"> 099-709-1624</a>     

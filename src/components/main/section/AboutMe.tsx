@@ -1,17 +1,19 @@
-import React from 'react'
+import React from 'react';
+import Image from 'next/image';
+import { GoDotFill } from "react-icons/go";
 
 const AboutMeSection = () => {
   return (
-    <div className="container mx-auto px-2 xl:px-0">
-        <div className="grid grid-col-12 gap-5">
+    <div className="container px-2 xl:px-0">
+        <div className="grid grid-cols-12 gap-10">
             <div className="col-span-12">
-                <div className="text-black font-semibold text-xl xl:text-2xl">IBS Machinex (Thailand) Company Limited</div>
+                <div className="text-black font-bold text-xl xl:text-[36px]">IBS Machinex (Thailand) Company Limited</div>
             </div>
             <div className="col-span-12 xl:col-span-7">
-                <div className="p-4 border rounded-xl bg-white/50 backdrop-blur-md">
+                <div className="p-4 border rounded-2xl bg-white/60">
                     <p className="text-gray-700 font-light">IBS Machinex (thailand) Co.,Ltd. imports and distributes industrial machinery, tools. and equipment, providing complete solution from product to warehouse management. We specialize in packaging equipment and shelving systems, sourcing high-quality products from top manufacturers. Out expert team offers consultation, technical support, and efficient product sourcing to meet driverse industry needs.</p>
                 </div>
-                <div className="p-4 border rounded-xl bg-white/50 backdrop-blur-md mt-4">
+                <div className="p-4 border rounded-2xl bg-white/60 mt-5 shadow-1">
                     <h5 className="py-1 px-2 bg-blue-800 text-white rounded-md mb-2">Information</h5>
                     <div className="text-gray-700 text-sm">
                         <div className="grid grid-cols-12 gap-4 space-y-2">
@@ -42,36 +44,67 @@ const AboutMeSection = () => {
                 </div>
             </div>
             <div className="col-span-12 xl:col-span-5"></div>
+        </div>
+        <div className="grid grid-cols-12 gap-5 mt-10">
             <div className="col-span-6 md:col-span-4 xl:col-span-3">
-                <div className="p-4 border rounded-xl bg-white/50 backdrop-blur-md">
-                    <div></div>
-                    <div className="text-blue-800 font-semibold">Material Support</div>
+                <div className="p-4 border rounded-2xl bg-white/60">
+                    <div><Image alt="Material Support" width={69} height={69} src="/images/about/game-icons_materials-science.png"/></div>
+                    <div className="text-blue-800 font-semibold text-xl mt-6 mb-3">Material Support</div>
                     <div className="text-gray-700"><p className="text-sm mt-2">Providing essential resource, tools, and assistance to ensure smooth operations and efficiency.</p></div>
                 </div>
             </div>
             <div className="col-span-6 md:col-span-4 xl:col-span-3">
-                <div className="p-4 border rounded-xl bg-white/50 backdrop-blur-md">
-                    <div></div>
-                    <div className="text-blue-800 font-semibold">Production Support</div>
+                <div className="p-4 border rounded-2xl bg-white/60">
+                    <div><Image alt="Production Support" width={69} height={69} src="/images/about/game-icons_materials-science (2).png"/></div>
+                    <div className="text-blue-800 font-semibold text-xl mt-6 mb-3">Production Support</div>
                     <div className="text-gray-700"><p className="text-sm mt-2">Providing essential resource, tools, and assistance to ensure smooth operations and efficiency.</p></div>
                 </div>
             </div>
             <div className="col-span-6 md:col-span-4 xl:col-span-3">
-                <div className="p-4 border rounded-xl bg-white/50 backdrop-blur-md">
-                    <div></div>
-                    <div className="text-blue-800 font-semibold">Warehouse & Stock Support</div>
+                <div className="p-4 border rounded-2xl bg-white/60">
+                    <div><Image alt="Warehouse & Stock Support" width={69} height={69} src="/images/about/Group 48.png"/></div>
+                    <div className="text-blue-800 font-semibold text-xl mt-6 mb-3">Warehouse & Stock Support</div>
                     <div className="text-gray-700"><p className="text-sm mt-2">Providing essential resource, tools, and assistance to ensure smooth operations and efficiency.</p></div>
                 </div>
             </div>
             <div className="col-span-6 md:col-span-4 xl:col-span-3">
-                <div className="p-4 border rounded-xl bg-white/50 backdrop-blur-md">
-                    <div></div>
-                    <div className="text-blue-800 font-semibold">Sale & Marketing Support</div>
+                <div className="p-4 border rounded-2xl bg-white/60">
+                    <div><Image alt="Sale & Marketing Support" width={69} height={69} src="/images/about/game-icons_materials-science (1).png"/></div>
+                    <div className="text-blue-800 font-semibold text-xl mt-6 mb-3">Sale & Marketing Support</div>
                     <div className="text-gray-700"><p className="text-sm mt-2">Providing essential resource, tools, and assistance to ensure smooth operations and efficiency.</p></div>
                 </div>
             </div>
         </div>
-        <div className="my-5"></div>
+        <hr className="my-14" />
+        <div className="grid grid-cols-12 gap-4">
+            <div className="col-span-12">
+                <h3 className="text-blue-900 text-4xl font-bold">Network</h3>
+                <p className="text-gray-800 text-sm md:text-base">Discover great opportunities, get expert career advice, and land your dream job fastrer!</p>
+            </div>
+            <div className="col-span-12 md:col-span-4 xl:col-span-4">
+                <div className="relative w-full aspect-[16/9] rounded-3xl overflow-hidden">
+                    <Image 
+                        src="/images/network-image@2x.png" 
+                        fill
+                        className="object-cover"
+                        alt="Network illustration"
+                    />
+                </div>
+            </div>
+            <div className="col-span-12 md:col-span-8 xl:col-span-8">
+                <ul className="text-black">
+                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>IBS Inc. Tokyo branch, Chubu branch, Osaka branch, Kyusu Office</div></div>
+                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>Shanhai IBS Trading CO,.LTD.</div></div>
+                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>Hong Kong IBS Export &Import CO,.LTD.</div></div>
+                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>IBS Machinex (Thailand) Co,.Ltd.</div></div>
+                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>IBS AMERICA INC.</div></div>
+                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>IBS MANUFACTURING VIETNAM CO.,LTD.</div></div>
+                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>KUMKHO F.A (Agency)</div></div>
+                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>SCH EQUIPMENT CO.,LTD. (Agency)</div></div>
+                    <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>PT IKEUCHI INDONESIA (Agency)</div></div>
+                </ul>
+            </div>
+        </div>
     </div>
   )
 }

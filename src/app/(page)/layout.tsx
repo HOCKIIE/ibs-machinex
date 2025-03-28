@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
-import { Kanit } from "next/font/google";
+import { Inter } from "next/font/google";
 import "./globals.css";
 import { Header, Footer, Sidebar } from "@/components/main/layout/Layout";
 import PageSettingsContext from "@/contexts/PageSettingsContext";
 
-const kanit = Kanit({
+const inter = Inter({
     subsets: ["latin"],
     weight: ["100","200","300","400","500","600","700","800","900"],
     style: ["normal", "italic"],
-});
+})
 
 export const metadata : Metadata = {
     title: "IBS Machinex Co.,ltd.",
@@ -19,7 +19,7 @@ export default function RootLayout({children}:{children: React.ReactNode}) {
     return (
         <html lang="en">
             <PageSettingsContext>
-                <body className={`${kanit.className} antialiased bg-gray-100`}>
+                <body className={`${inter.className} antialiased bg-gray-100`}>
                     <Sidebar />
                     <main>
                         <Header />
