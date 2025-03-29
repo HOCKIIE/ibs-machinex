@@ -43,7 +43,30 @@ const AboutMeSection = () => {
                     </div>
                 </div>
             </div>
-            <div className="col-span-12 xl:col-span-5"></div>
+            <div className="col-span-12 xl:col-span-5 relative">
+                <div className="absolute top-0 left-0 bg-blue-800 rounded-2xl p-5 text-white">
+                    <div className="flex gap-3 font-bold text-4xl">
+                        <div>10</div>
+                        <div>Years</div>
+                    </div>
+                    <p className='text-2xl font-bold text-center'>Experience</p>
+                </div>
+                <div className="absolute top-0 right-0">
+                    <div className="w-[119px] h-[116px] rounded-2xl overflow-hidden">
+                        <img src="/images/about/image (1).png" alt="experience" className="w-full h-full object-cover !important"/>
+                    </div>
+                </div>
+                <div className="absolute top-[40%] left-5">
+                    <div className=" w-[119px] h-[116px] rounded-2xl overflow-hidden">
+                        <img src="/images/about/image.png" alt="experience" className="w-full h-full object-cover !important"/>
+                    </div>
+                </div>
+                <div className="absolute top-[30%] right-[30%]">
+                    <div className="w-[119px] h-[116px] rounded-2xl overflow-hidden">
+                        <img src="/images/about/image (3).png" alt="experience" className="w-full h-full object-cover !important"/>
+                    </div>
+                </div>
+            </div>
         </div>
         <div className="grid grid-cols-12 gap-5 mt-10">
             <div className="col-span-6 md:col-span-4 xl:col-span-3">
