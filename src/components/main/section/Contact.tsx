@@ -29,9 +29,13 @@ const ContactSection = () => {
         <hr className="my-14" />
         <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12"><h3 className="text-black text-4xl font-bold">Contact</h3></div>
-            
             <div className="col-span-12 xl:col-span-6">
-                <div className="grid gap-6">
+                <div className="relative bg-contain h-[488px] overflow-hidden">
+                    <Image src="/images/about/central-business-district-singapore 1.png" fill objectFit="fit" className="h-full object-contain" alt="Contact"/>
+                </div>
+            </div>
+            <div className="col-span-12 xl:col-span-6">
+                <div className="grid gap-7">
                     <div className="col-span-12 xl:col-span-6">
                         <div>
                             <label htmlFor="first_name" className="block mb-2 text-sm text-gray-900 dark:text-white">First name</label>
@@ -65,11 +69,6 @@ const ContactSection = () => {
                     </div>
                 </div>
             </div>
-            <div className="col-span-12 xl:col-span-6">
-                <div className="relative w-full h-full min-h-[488px] rounded-3xl overflow-hidden p-0">
-                    <Image src="/images/central-business-district-singapore.png" fill objectFit="fit" className="object-cover" alt="Contact"/>
-                </div>
-            </div>
         </div>
         <hr className="my-14" />
         <div className="grid grid-cols-12 gap-5">
@@ -95,7 +94,7 @@ const ContactSection = () => {
                 </div>
             </div>
         </div>
-        <div className="overflow-hidden rounded-2xl mt-5">
+        <div className="relative rounded-3xl overflow-hidden py-10">
             <iframe 
                 ref={iframeRef} 
                 className="w-full"
