@@ -1,7 +1,6 @@
 "use client";
 
 import MenuItem from "@/assets/Menu.json"
-import { FiChevronDown } from "react-icons/fi";
 import { BsTelephoneFill } from "react-icons/bs";
 import { HiMiniUserCircle } from "react-icons/hi2";
 import { RiCloseLargeFill } from "react-icons/ri";
@@ -9,21 +8,23 @@ import MenuToggle from "../button/MenuToggle";
 import BackToTop from "../button/BackToTop";
 import { useGlobal } from "@/contexts/PageSettingsContext";
 import { useEffect } from "react";
+import LanguageSwitcher from "../dropdown/LanguageSwitcher";
 
 export const Header = () => {
     const {ToggleSidebarHandle} = useGlobal();
     return <>
-        <div className="fixed w-full bg-white z-10 shadow-sm">
-            <div className="flex items-center justify-between px-2 md:px-8 lg:px-12 xl:px-20">
-                <div className="flex gap-10 items-center text-blue-900 text-sm h-12 lg:h-auto md:text-md xl:text-title-md md:font-semibold">IBS Machinex (Thailand) Company Limited</div>
+        <div className="fixed w-full bg-white z-20 shadow-sm">
+            <div className="container mx-auto flex items-center justify-between 2xl">
+                <div className="flex gap-1 items-center text-blue-900 text-sm h-12 lg:h-auto md:text-md xl:text-title-md md:font-semibold">
+                    <img src="/images/logo.png" alt="IBS Machinex (Thailand) Company Limited" />
+                    <div>IBS Machinex (Thailand) Company Limited</div>
+                </div>
                 <div className="hidden lg:flex items-center gap-20">
                     <ul className="flex md:text-sm xl:text-base">
                         {MenuItem.map((item, index) => <li key={index}><a className="block py-4 px-4 uppercase font-light text-black hover:bg-red-700 hover:text-white transition-all" href={item.href}>{item.title}</a></li>)}
                     </ul>
-                    <div className="">
-                        <div className="flex items-center gap-1 bg-blue-800 text-white font-light md:text-sm xl:text-base rounded-md ps-2 pe-1 py-[5px] cursor-pointer">
-                            <span>TH</span><FiChevronDown />
-                        </div>
+                    <div>
+                        <LanguageSwitcher/>
                     </div>
                 </div>
                 <div className="block lg:hidden">
@@ -37,7 +38,7 @@ export const Footer = () => {
     return <>
         <BackToTop />
         <div className="bg-blue-900 text-gray-300">
-            <div className="container mx-auto px-2 xl:px-0">
+            <div className="container px-2 xl:px-0">
                 <div className="grid grid-cols-12 gap-4 pt-10 pb-3">
                     <div className="col-span-12 md:col-span-7 lg:col-span-6">
                         <h5 className="mb-6">IBS Machinex(Thailand) Co.,Ltd.</h5>
