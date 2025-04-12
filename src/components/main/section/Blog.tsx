@@ -2,6 +2,7 @@
 
 import axios from 'axios'
 import React, { useEffect, useState } from 'react';
+import Link from 'next/link';
 
 interface blogsType {
     id:string;
@@ -26,7 +27,7 @@ const BlogSection = () => {
         return request;
     };
     return (
-        <div className="container px-2 lg:px-0">
+        <div className="container px-2 lg:px-0" id="blog">
             <div className="grid grid-cols-1">
                 <div className="text-center">
                     <div className="text-blue-800 text-5xl font-bold">Blog</div>
@@ -50,7 +51,7 @@ const BlogSection = () => {
                 : ``}
             </div>
             <div className="flex justify-center mt-10">
-                <button className="bg-red-700 px-[50px] py-3 rounded-md">View More</button>
+                <Link href={'/blog'} className="bg-red-700 px-[50px] py-3 rounded-md">View More</Link>
             </div>
             <hr className="my-10" />
         </div>

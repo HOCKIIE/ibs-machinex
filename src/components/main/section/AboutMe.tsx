@@ -4,7 +4,7 @@ import { GoDotFill } from "react-icons/go";
 
 const AboutMeSection = () => {
   return (
-    <div className="container px-2 xl:px-0">
+    <div className="container px-2 xl:px-0" id="about">
         <div className="grid grid-cols-12 gap-10">
             <div className="col-span-12 xl:mb-5">
                 <div className="text-black font-bold text-xl xl:text-[36px]">IBS Machinex (Thailand) Company Limited</div>
