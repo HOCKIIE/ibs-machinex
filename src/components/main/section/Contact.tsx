@@ -25,7 +25,7 @@ const ContactSection = () => {
         };
     }, []);
   return (
-    <div className='container px-2 xl:px-0'>
+    <div className='container px-2 xl:px-0' id="contact">
         <hr className="my-14" />
         <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12"><h3 className="text-black text-4xl font-bold">Contact</h3></div>

@@ -7,7 +7,6 @@ export default function LanguageSwitcher()
 {
     const lng = 'th'
     const languages = process.env.NEXT_PUBLIC_LANGUAGE?.split('|').filter((v)=>v!=lng);
-    console.log(languages)
     const [dropdown, setDropdown] = useState<boolean>(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const LanguageToggle = (set:string) => {

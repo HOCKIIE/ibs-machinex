@@ -10,8 +10,25 @@ import { useGlobal } from "@/contexts/PageSettingsContext";
 import { useEffect } from "react";
 import LanguageSwitcher from "../dropdown/LanguageSwitcher";
 
+
+
 export const Header = () => {
     const {ToggleSidebarHandle} = useGlobal();
+    interface ScrollToEvent extends React.MouseEvent<HTMLAnchorElement> {
+        currentTarget: HTMLAnchorElement;
+    }
+
+    const scrollTo = (el: ScrollToEvent): void => {
+        const offset = 80;
+        if (el.currentTarget.href.search(/#/) !== -1) {
+            el.preventDefault();
+            const ref = document.querySelector(el.currentTarget.hash) as HTMLElement | null;
+            if (ref) {
+                const y = ref.getBoundingClientRect().top + window.scrollY - offset;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+        }
+    };
     return <>
         <div className="fixed w-full bg-white z-20 shadow-sm">
             <div className="container mx-auto flex items-center justify-between 2xl">
@@ -21,7 +38,7 @@ export const Header = () => {
                 </div>
                 <div className="hidden lg:flex items-center gap-20">
                     <ul className="flex md:text-sm xl:text-base">
-                        {MenuItem.map((item, index) => <li key={index}><a className="block py-4 px-4 uppercase font-light text-black hover:bg-red-700 hover:text-white transition-all" href={item.href}>{item.title}</a></li>)}
+                        {MenuItem.map((item, index) => <li key={index}><a className="block py-4 px-4 uppercase font-light text-black hover:bg-red-700 hover:text-white transition-all" href={item.href} onClick={scrollTo}>{item.title}</a></li>)}
                     </ul>
                     <div>
                         <LanguageSwitcher/>
