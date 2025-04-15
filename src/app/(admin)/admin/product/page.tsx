@@ -75,7 +75,7 @@ const Product = () =>
                             <div><Breadcrumb /></div>
                             <div className="flex gap-3 right">
                                 <StatusTab status={["all", "active", "draft", "archived"]}/>
-                                <AddButton title="Add Product" />
+                                <AddButton title="Add Product" href="/admin/product/add"/>
                             </div>
                             
                         </div>

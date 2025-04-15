@@ -20,6 +20,7 @@ export interface ProductType {
 
 export interface ProductState {
 
+    
     items: ProductType[];
     isLoading: boolean;
     error: string | null;

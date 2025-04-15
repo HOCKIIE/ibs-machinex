@@ -6,7 +6,7 @@ import { IoChevronForwardOutline } from "react-icons/io5";
 
 const Breadcrumb = () => {
     const pathname = usePathname();
-    const pathSegments = pathname.split("/").filter((segment) => segment);
+    const pathSegments = pathname.split("/").filter((segment) => isNaN(Number(segment)));
 
     function UcFirst(str:string) {
         return str.charAt(0).toUpperCase() + str.slice(1);
