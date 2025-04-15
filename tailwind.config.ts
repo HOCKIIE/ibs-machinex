@@ -14,7 +14,8 @@ const config: Config = {
       center: true,
     },
     fontFamily: {
-      satoshi: ["Satoshi", "sans-serif"],
+      // satoshi: ["Satoshi", "sans-serif"],
+      inter: ['var(--font-inter)'],
     },
     screens: {
       // sm: '600px',
