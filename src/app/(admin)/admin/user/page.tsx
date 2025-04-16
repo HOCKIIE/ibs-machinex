@@ -1,6 +1,6 @@
 "use client"
 
-import React,{ useState,useEffect, useCallback, useRef } from 'react';
+import React,{ useState,useEffect, useCallback } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import ConfirmModal from '@/components/admin/Modal/ConfirmModal';
@@ -8,7 +8,7 @@ import AddButton from '@/components/admin/Button/AddButton';
 import { BiTrash } from "react-icons/bi";
 import { LuPencil } from "react-icons/lu";
 import { IoSearchOutline } from "react-icons/io5";
-import { UserType } from '@/types/UserType';
+// import { UserType } from '@/types/UserType';
 import toast from 'react-hot-toast';
 import Link from 'next/link';
 import Api from '@/services/Api';
@@ -19,26 +19,40 @@ import SearchBar from '@/components/admin/Paginate/SearchBar';
 import { useUserStore } from '@/store/useUserStore';
 
 const show = [10, 50, 100];
-interface SelectDeleteProps {
-    event: React.MouseEvent<HTMLButtonElement>;
-}
+const recordStatus = [
+    {value:"all", label:"All"},
+    {value:"true", label:"Active"},
+    {value:"false", label:"Not Active"}
+];
 
 const Users = () =>
 {
-    const { 
-        data, loading, 
-        skip, limit, to, totalItems,  
-        prevPage, nextPage, currentPage,
-        updateLimit, StatusTab, keyword, handleSearch, handlePageChange
-    } = usePagination({ initialLimit: show[0] });
-    const { isLoading, error, deleteUser, response, users } = useUserStore();
+    const {
+        keyword,
+        data,
+        meta,
+        loading,
+        limit,
+        updateLimit,
+        setLoading,
+        setPage,
+        nextPage,
+        prevPage,
+        fetchData,
+        handleSearch, 
+        handlePageChange, 
+        StatusTab
+    } = usePagination({ 
+        initialLimit: show[0],
+        endpoint: '/user'
+    });
+
+    const { isLoading, error, deleteUser, response } = useUserStore();
 
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [isAction, setAction] = useState<string>("delete");
-    const [mounted, setMounted] = useState(false);
-    const [user,setUser] = useState<UserType[]>([]);
-    const [id, setId] = useState<number | null>(null);
-    const [selectDelete, setSelectDelete] = useState<boolean>(true)
+
+    const [id, setId] = useState<number[] | null>(null);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
 
     const isAllSelected = selectedIds.length > 0;
@@ -46,10 +60,8 @@ const Users = () =>
     const toggleSelectAll = () => {
         if (isAllSelected) {
             setSelectedIds([]);
-            setSelectDelete(true)
         }else{
-            setSelectedIds(user.map((item) => item.id));
-            setSelectDelete(false)
+            setSelectedIds(data.map((item) => item.id));
         }
     };
     const toggleSelect = (id: number) => {
@@ -61,26 +73,17 @@ const Users = () =>
         });
     };
     
-
-
-
-    const fetchData = useCallback(async () => {
-        try {
-            const res = await Api.get('/user');
-            setUser(res.data || []);
-        } catch {
-            toast.error("Failed to load data.")
-        } finally {
-            console.log("Sucess!")
+    const setDeleteRecords = async() => {
+        if(selectedIds.length > 0){
+            setId(selectedIds)
         }
-        console.log(user)
-    }, []);
+    }
 
     const deleteRecord = async() => {
-        if (id !== null) {
-            await deleteUser(id);
-        } else {
-            toast.error("Invalid user ID.");
+        const ids = id?.join(',');
+        if (ids !== null) {
+            await deleteUser(`${ids}`);
+            successProgress();
         }
     }
     const successProgress = () => {
@@ -88,14 +91,6 @@ const Users = () =>
         response.message = null;
         setModalOpen(!isOpen);
     }
-
-    useEffect(() => {
-        fetchData();
-        setMounted(true);
-    }, [fetchData]);
-
-        
-    if (!mounted) return null; // Prevent SSR mismatches
 
     return (
         <DefaultLayout>
@@ -105,7 +100,7 @@ const Users = () =>
                     <div className="flex justify-between">
                         <div><Breadcrumb /></div>
                         <div className="flex gap-3 right">
-                            <StatusTab status={["all", "active", "not active"]}/>
+                            <StatusTab status={recordStatus}/>
                             <AddButton title="Add User" href="/admin/user/add"/>
                         </div>
                         
@@ -118,6 +113,7 @@ const Users = () =>
                                 <LimitPerPage show={show} limit={limit} updateLimit={updateLimit}/>
                                 <button 
                                     disabled={selectedIds.length > 0 ? false : true}
+                                    onClick={()=>{setAction("delete"); setDeleteRecords(); setModalOpen(!isOpen)}}
                                     title="Remove from select"
                                     type="button"
                                     className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-error-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"
@@ -146,25 +142,46 @@ const Users = () =>
                             </tr>
                         </thead>
                         <tbody>
-                            {user && user.map((v,k)=>
+                            {data && data.map((v,k)=>
                                 <tr key={k}>
                                     <td className="px-6 py-4">
                                         {loading
-                                            ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded col-span-2"></div>
+                                            ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
                                             :<AnimatedCheckbox className="select" checked={selectedIds.includes(v.id)} onChange={()=>toggleSelect(v.id)}/>
                                         }
                                     </td>
-                                    <td className="px-6 py-4">{v.name}</td>
-                                    <td className="px-6 py-4">{v.email}</td>
-                                    <td className="px-6 py-4">{v.role}</td>
-                                    <td className="px-6 py-4">status</td>
-                                    <td className="px-6 py-4">{v.created_at}</td>
+                                    <td className="px-6 py-4">
+                                        {loading
+                                            ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                            :(v.name)
+                                        }</td>
+                                    <td className="px-6 py-4">
+                                        {loading
+                                            ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                            :(v.email)
+                                        }</td>
+                                    <td className="px-6 py-4">
+                                        {loading
+                                            ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                            :(v.role)
+                                        }</td>
+                                    <td className="px-6 py-4">
+                                        {loading 
+                                            ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                            :(v.status == 1 ? 'Active':'Not Active')
+                                        }
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {loading
+                                            ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                            :(v.created_at.split('T')[0].toString())
+                                        }</td>
                                     <td className="px-6 py-4">
                                     {!loading?
                                         <div className="flex gap-2">
                                             <button 
                                                 title="Delete"
-                                                onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId(v.id)}}
+                                                onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([v.id])}}
                                                 className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
                                                 <BiTrash fontSize={24}/>
                                             </button>
@@ -193,15 +210,7 @@ const Users = () =>
                     </table>
                     <div className="dark:bg-gray-700 rounded-b-md overflow-hidden">
                         <div className="h-8 bg-gray-50 w-full dark:bg-gray-700 dark:text-gray-400"></div>
-                        <Paginate 
-                            skip={skip} 
-                            to={to} 
-                            totalItems={totalItems} 
-                            prevPage={prevPage} 
-                            currentPage={currentPage}
-                            handlePageChange={handlePageChange} 
-                            nextPage={nextPage} 
-                        />
+                        <Paginate meta={meta} prevPage={prevPage} handlePageChange={handlePageChange} nextPage={nextPage} />
                     </div>
                 </div>
             </div>
@@ -210,7 +219,7 @@ const Users = () =>
                 action={isAction}
                 toggleModal={successProgress}
                 onClose={() => setModalOpen(false)}
-                onAfterClose={() => fetchData() }
+                onAfterClose={()=>fetchData}
                 data={{
                     confirm: deleteRecord,
                     progress: isLoading,

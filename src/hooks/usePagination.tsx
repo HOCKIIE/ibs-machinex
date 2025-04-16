@@ -1,33 +1,29 @@
 "use client"
 import React, { useState, useEffect, useCallback, useRef } from "react";
-import { usePathname, useRouter, useSearchParams } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import Api from '@/services/Api';
 import { toast } from "react-hot-toast";
+import { PaginationMeta } from "@/types/PaginationProps";
 
 interface UsePaginationProps {
-  initialLimit?: number;
+    initialLimit?: number;
+    endpoint: string;
 }
-interface Product {
-    id: number;
-    title: string;
-    description: string;
-    price: number;
-}
-interface StatusTabProps {
-    status: string[];
-}
-
-const usePagination = ({ initialLimit = 10 }: UsePaginationProps) => 
+const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) => 
 {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+
     const [limit, setLimit] = useState(initialLimit);
-    const [skip, setSkip] = useState(0);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [totalItems, setTotalItems] = useState(0);
-    const [data, setData] = useState<Product[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [to, setTo] = useState<number>(initialLimit);
+
+    const [data, setData] = useState([]);
+    const [meta, setMeta] = useState<PaginationMeta | null>(null);
+    const [loading, setLoading] = useState<boolean>(false);
+    const [page, setPage] = useState<number>(1);
+    const [error, setError] = useState<string | null>(null);
+
+    // const [to, setTo] = useState<number>(initialLimit);
 
     const currentStatus = searchParams.get("status") || "all";
     const [activeStatus, setActiveStatus] = useState<string>(currentStatus);
@@ -36,8 +32,6 @@ const usePagination = ({ initialLimit = 10 }: UsePaginationProps) =>
     const [keyword, setKeyword] = useState<string>(currentKeyword);
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
     const searchRef = useRef<HTMLInputElement | null>(null);
-    const pageRef = useRef<HTMLInputElement | null>(null);
-
 
     const classNames = {
         active: "px-2 py-1 text-sm rounded-md bg-white dark:bg-gray-600 text-black-2 dark:text-gray-300",
@@ -45,67 +39,52 @@ const usePagination = ({ initialLimit = 10 }: UsePaginationProps) =>
     }
     const DEBOUNCE_DELAY = 800;
 
-    const setMultipleParams = useCallback((newParams: Record<string, string>) => 
-    {
-        const params = new URLSearchParams(searchParams.toString());
-        Object.keys(newParams).forEach((key) => {
-            params.set(key, newParams[key]);
-        });
-        router.push(`${pathname}?${params.toString()}`);
-    }, [router, pathname, searchParams]);
-
     const fetchData = useCallback(async () => {
         setLoading(true);
         try {
-            const apiPath = (keyword != '') ? 'https://dummyjson.com/products/search' : 'https://dummyjson.com/products';
-            const response = await fetch(`${apiPath}?limit=${limit}&skip=${skip}&status=${activeStatus}&q=${keyword}`);
-            const result = await response.json();
-            setData(result.products || []);
-            setTotalItems(result.total || 0);
+            const queryString = await searchParams.toString();
+            const res = await Api.get(`${endpoint}?${queryString}`);
+            setData(res.data.data);
+            setMeta(res.data.meta);
         } catch {
             toast.error("Failed to load data.")
         } finally {
             setLoading(false);
         }
 
-    }, [limit, skip, activeStatus, keyword]);
+    },[endpoint, searchParams]);
 
-    useEffect(() => {  fetchData(); }, [fetchData]);
-    
-    const totalPages = Math.ceil(totalItems / limit);
-
-    const updateTo = useCallback((to:number)=>
+    const handleClickPage = useCallback((action:string) => 
     {
-        setTo(to > totalItems ? totalItems : to);
-    },[totalItems])
+        const currentPage = parseInt(searchParams.get('page') || '1', 10);
+        let targetPage = currentPage;
 
-    const setPage = useCallback((page: number) => 
-    {
-        if (page < 1 || page > totalPages) return;
-        const newSkip = (page - 1) * limit;
-        setSkip(newSkip);
-        updateTo(newSkip + limit);
-        setCurrentPage(page);
-        setTimeout(() => {
-            setMultipleParams({ skip: `${newSkip}`, limit: `${limit}` });
-        }, 0);
-        
-    }, [limit, totalPages, updateTo, setMultipleParams]);
+        if (action === 'next' && meta && currentPage < meta.last_page) {
+            targetPage = currentPage + 1;
+            setPage((prev) => prev + 1);
+        }
 
-    const nextPage = useCallback(() => {
-        if (currentPage < totalPages) setPage(currentPage + 1);
-    }, [currentPage, totalPages, setPage]);
+        if (action === 'prev' && meta && currentPage > 1) {
+            targetPage = currentPage - 1;
+            setPage((prev) => prev - 1);
+        }
 
-    const prevPage = useCallback(() =>  {
-        if (currentPage > 1) setPage(currentPage - 1);
-    }, [currentPage, setPage]);   
+        if (targetPage !== currentPage) {
+            const params = new URLSearchParams(searchParams.toString());
+            params.set('page', targetPage.toString());
+            router.push(`?${params.toString()}`);
+        }
+    },[meta, setPage, searchParams, router]);
 
     const updateLimit = useCallback((newLimit: number) => 
     {
         setLimit(newLimit);
         setPage(1);
-        setMultipleParams({ skip: "0", limit: `${newLimit}`});
-    }, [setPage, setMultipleParams]);
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('limit', newLimit.toString());
+        router.push(`?${params.toString()}`);
+        // setMultipleParams({ skip: "0", limit: `${newLimit}`});
+    }, [searchParams, router]);
 
     const updateStatus = useCallback((status: string) => 
     {
@@ -113,24 +92,31 @@ const usePagination = ({ initialLimit = 10 }: UsePaginationProps) =>
         params.set("status", status);
         router.push(`${pathname}?${params.toString()}`);
         setActiveStatus(status);
-        setMultipleParams({ status:`${status}` });
-    }, [searchParams, router, pathname, setMultipleParams]);
+        // setMultipleParams({ status:`${status}` });
+    }, [searchParams, router, pathname]);
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => 
     {
         const self = (e.target as HTMLInputElement);
         if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
         const value = self.value;
-        debounceTimeout.current = setTimeout(()=>{
+        debounceTimeout.current = setTimeout(()=>
+        {
             setKeyword(value)
-            setMultipleParams({ keyword: value });
-            setPage(1);
+            const params = new URLSearchParams(searchParams.toString());
+            params.set('keyword', value);
+            params.set('page', '1');
+            router.push(`?${params.toString()}`);
+
         },DEBOUNCE_DELAY);
         if(searchRef.current) searchRef.current.focus();    
         
     };
 
     const handlePageChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if(meta?.last_page <= (meta?.current_page ?? 0)){
+            return;
+        }
         if (debounceTimeout.current) {
             clearTimeout(debounceTimeout.current);
         }
@@ -143,32 +129,53 @@ const usePagination = ({ initialLimit = 10 }: UsePaginationProps) =>
                 return;
             }
         },DEBOUNCE_DELAY);
-        if(pageRef.current){
-            pageRef.current.focus();
-        }
     }
 
-    const StatusTab: React.FC<StatusTabProps> = ({ status }) => {
+    useEffect(() => {
+        fetchData();
+      }, [fetchData]);
+
+    const StatusTab = ({ status }: { status: Array<{ label: string; value: string }> }) => {
         return (
             <div className="flex rounded-md overflow-hidden bg-gray-200 dark:bg-gray-900 p-[2px]">
-                {status.map((status: string) => (
+                {status.map((v,k) => {
+                    return (
                     <button
-                        key={status}
-                        onClick={() => updateStatus(status)}
-                        className={activeStatus === status ? classNames.active : classNames.default}
+                        key={k}
+                        onClick={() => updateStatus(v.value)}
+                        className={activeStatus === v.value ? classNames.active : classNames.default}
                     >
-                        {status.charAt(0).toUpperCase() + status.slice(1)}
+                        {v.label}
                     </button>
-                ))}
+                )
+                })}
             </div>
         );
     };
 
-    return { 
-        data, loading, skip, to, limit, currentPage, totalPages, totalItems, updateLimit, setMultipleParams,
-        keyword, handleSearch, pageRef, setPage, nextPage, prevPage, handlePageChange,
+    return {
+        keyword,
+        data,
+        meta,
+        loading,
+        limit,
+        error,
+        setPage,
+        setLoading,
+        nextPage: () => handleClickPage('next'),
+        prevPage: () => handleClickPage('prev'),
+        fetchData,
+        updateLimit,
+        handleSearch, 
+        handlePageChange, 
         StatusTab
     };
+
+    // return { 
+    //     data, setItems, loading, setLoading, skip, to, limit, currentPage, totalPages, totalItems, updateLimit, setMultipleParams,
+    //     keyword, handleSearch, pageRef, setPage, nextPage, prevPage, handlePageChange,
+    //     StatusTab
+    // };
 };
 
 export default usePagination;

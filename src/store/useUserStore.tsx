@@ -132,7 +132,7 @@ export const useUserStore = create<UserState>((set) => ({
     deleteUser: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            await Api.delete(`${apiPrefix}/destroy/${id}`);
+            await Api.delete(`${apiPrefix}/destroy`,{ data: { id:id } });
             set((state) => ({
                 users: state.users.filter((item) => item.id !== Number(id)),
                 isLoading: false,
@@ -153,6 +153,6 @@ export const useUserStore = create<UserState>((set) => ({
                 }
             });
         }
-    },
+    }
 
 }));
