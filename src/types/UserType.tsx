@@ -4,6 +4,7 @@ export interface UserType {
     role:string;
     name:string;
     title:string;
+    contact_sale:string;
     email:string;
     phone:string;
     status:string;
@@ -15,13 +16,15 @@ export interface ApiResponse {
     lastPage: number;
     currentPage: number;
     rows: UserType[];
-  }
+}
 export interface UsersFormProps {
     id: string;
     title: string;
+    contact_sale: string;
     role: string;
     name: string;
     phone: string;
+    status: string;
     email: string;
     password?: string;
 }

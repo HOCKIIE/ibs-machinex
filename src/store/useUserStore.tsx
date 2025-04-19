@@ -47,7 +47,7 @@ export const useUserStore = create<UserState>((set) => ({
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({ error: errorMessage, isLoading: false });
         }
-      },
+    },
     
     fetchUserById: async (id) => {
         set({ isLoading: true, error: null });

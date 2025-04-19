@@ -1,7 +1,9 @@
-.object{
-    &:hover{
-        outline: 1px solid rgb(99,102,241,0.5);
-        outline-offset: 5px;
+[contenteditable=true]{
+    &.object{
+        &:hover{
+            outline: 1px solid rgb(99,102,241,0.5);
+            outline-offset: 5px;
+        }
+    
     }
-
 }

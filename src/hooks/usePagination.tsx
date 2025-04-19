@@ -14,16 +14,12 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-
-    const [limit, setLimit] = useState(initialLimit);
-
+    
     const [data, setData] = useState([]);
+    const [limit, setLimit] = useState(initialLimit);
     const [meta, setMeta] = useState<PaginationMeta | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [page, setPage] = useState<number>(1);
-    const [error, setError] = useState<string | null>(null);
-
-    // const [to, setTo] = useState<number>(initialLimit);
 
     const currentStatus = searchParams.get("status") || "all";
     const [activeStatus, setActiveStatus] = useState<string>(currentStatus);
@@ -83,7 +79,6 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
         const params = new URLSearchParams(searchParams.toString());
         params.set('limit', newLimit.toString());
         router.push(`?${params.toString()}`);
-        // setMultipleParams({ skip: "0", limit: `${newLimit}`});
     }, [searchParams, router]);
 
     const updateStatus = useCallback((status: string) => 
@@ -92,7 +87,6 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
         params.set("status", status);
         router.push(`${pathname}?${params.toString()}`);
         setActiveStatus(status);
-        // setMultipleParams({ status:`${status}` });
     }, [searchParams, router, pathname]);
 
     const handleSearch = (e: React.KeyboardEvent<HTMLInputElement>) => 
@@ -114,9 +108,6 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
     };
 
     const handlePageChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if(meta?.last_page <= (meta?.current_page ?? 0)){
-            return;
-        }
         if (debounceTimeout.current) {
             clearTimeout(debounceTimeout.current);
         }
@@ -159,7 +150,7 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
         meta,
         loading,
         limit,
-        error,
+        page,
         setPage,
         setLoading,
         nextPage: () => handleClickPage('next'),

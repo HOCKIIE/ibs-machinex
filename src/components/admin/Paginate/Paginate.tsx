@@ -60,7 +60,6 @@ export const LimitPerPage:React.FC<LimitPerPageProps> = ({show,limit,updateLimit
 {
     const searchParams = useSearchParams();
     const getLimit = searchParams.get('limit');
-    console.log(getLimit)
     return <div className="flex items-center gap-3">
         <span className="text-gray-500 dark:text-gray-400"> Show </span>
         <div className="relative">
