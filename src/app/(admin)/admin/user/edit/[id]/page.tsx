@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, use  } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
@@ -16,9 +17,11 @@ const EditUser = ({ params }: { params:  Promise<{ id: string }> }) => {
         id: "",
         role: "",
         title: "",
+        contact_sale: "",
         name: "",
         phone: "",
         email: "",
+        status: ""
     });
     
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => 
@@ -53,10 +56,12 @@ const EditUser = ({ params }: { params:  Promise<{ id: string }> }) => {
           setUserState({
             id: String(users[0]?.id),
             title: users[0]?.title,
+            contact_sale: users[0]?.contact_sale,
             role: users[0]?.role,
             name: users[0]?.name,
             phone: users[0]?.phone,
             email: users[0]?.email,
+            status: users[0]?.status,
           });
         }
       }, [users]);

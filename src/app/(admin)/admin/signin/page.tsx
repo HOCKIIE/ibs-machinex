@@ -6,7 +6,7 @@ import { useForm } from "react-hook-form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginUser } from '@/services/Auth';
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Alert from '@/utils/Alert';
 import { AlertType } from '@/types/AlertType';
 
@@ -19,6 +19,8 @@ const loginSchema = z.object({
 const Signin = () => 
 {
     const router = useRouter();
+    const searchParams = useSearchParams();
+    const redirect = searchParams.get('redirect');
     const { systemTheme, theme, setTheme } = useTheme();
     const currentTheme = theme === 'system' ? systemTheme ?? 'light' : theme;
 
@@ -45,7 +47,8 @@ const Signin = () =>
             if(request.status == 'success'){
                 setStatus('success')
                 setMessage('Success, The system is redirecting.')
-                router.push("/admin");
+                const redirectTo = typeof redirect === 'string' ? redirect : '/admin';
+                router.push(redirectTo);
             }else{
                 setStatus('error')
                 setMessage("Login failed. Please try again.");

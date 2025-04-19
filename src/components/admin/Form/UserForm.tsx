@@ -1,7 +1,8 @@
 "use client";
 import React, { useRef, useEffect } from 'react';
-import { useForm } from "react-hook-form";
+import { useForm, Controller  } from "react-hook-form";
 // import { InputPassword } from './Inputs';
+import { FaCheck } from "react-icons/fa6";
 import CancelButton from '@/components/admin/Button/CancelBotton';
 import CreateButton from '@/components/admin/Button/CreateButton';
 import UpdateButton from '@/components/admin/Button/UpdateButton';
@@ -24,60 +25,68 @@ const UserForm = ({
         register,
         handleSubmit: handleSubmitForm,
         formState: { errors },
+        control,
         reset,
         watch
     } = useForm({
         defaultValues: {
             role: itemState.role || "",
+            contact_sale: false,
             title: itemState.title || "",
             name: itemState.name || "",
             phone: itemState.phone || "",
             email: itemState.email || "",
+            status: false,
             password: "",
             password_confirmation: ""
         },
     });
     password.current = watch("password", "");
-
     const create = type === "create";
     const edit = type === "edit";
-
 
     const onCreate = async (data: any) => {
         handleSubmit(data);
     };
+
     const onEdit = async (formData: any) => {
         const modifiedData = { ...formData };
         if (!formData?.password) {
-          delete modifiedData?.password;
+            delete modifiedData?.password;
         }
         delete modifiedData?.confirmPassword;
-    
         handleSubmit(modifiedData);
     };
 
     const invalidClass = "border-rose-300 text-rose-600 border-rose-300 focus:border-rose-500 focus:ring-rose-500/40 dark:border-rose dark:border-rose-500";
     const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
-    const roleList = [{value:"super",title:"Super Administrator"},{value:"admin",title:"Administrator"},{value:"user",title:"User"}]
+    const roleList = [{value:"super",title:"Super Administrator"},{value:"admin",title:"Administrator"},{value:"user",title:"User"}];
 
-    // useEffect(() => {
-    //     setTimeout(() => {
-    //         const allow = role === "super" || role === "admin" || userId === id;
-    //         !allow && router.push("/admin");
-    //     }, 1000);
-    // }, []);
-
-    useEffect(() => {
-        if (itemState.role) {
-          reset({ 
+    const CancelUpdate = () =>{
+        reset({ 
             role: itemState.role,
             title: itemState.title,
+            contact_sale: itemState.contact_sale,
             name: itemState.name,
             phone: itemState.phone,
             email: itemState.email,
+            status: itemState.status,
         });
+    }
+
+    useEffect(() => {
+        if (itemState.role) {
+            reset({ 
+                role: itemState.role,
+                title: itemState.title,
+                contact_sale: itemState.contact_sale,
+                name: itemState.name,
+                phone: itemState.phone,
+                email: itemState.email,
+                status: itemState.status,
+            });
         }
-    }, [itemState.role, itemState.title, itemState.name, itemState.phone, itemState.email, reset]);
+    }, [itemState.role, itemState.title, itemState.name, itemState.phone, itemState.email, itemState.contact_sale, itemState.status, reset]);
 
     if(!user) return;
 
@@ -85,7 +94,7 @@ const UserForm = ({
         <div>
             <form onSubmit={handleSubmitForm(type === "create" ? onCreate : onEdit)}>
                 <div className="p-5 grid grid-cols-12 gap-6">
-                    <div className="col-span-12">
+                    <div className="col-span-12 md:col-span-6">
                         <div className="space-y-3">
                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Role</label>
                             <select 
@@ -101,12 +110,54 @@ const UserForm = ({
                                 
                             </select>
                             {errors?.role?.type === "required" && (
-                                <p className="text-xs text-rose-600 dark:text-rose-700 dark:text-rose-800">
+                                <p className="text-xs text-rose-600 dark:text-rose-700">
                                     {create ? "This field is required." : "Recheck the field."}
                                 </p>
                             )}
 
                         </div>
+                    </div>
+                    <div className="col-span-12 md:col-span-6">
+                        <div className="grid gap-2 p-3 border rounded-md h-full">
+                            <Controller
+                                name="status"
+                                control={control}
+                                render={({field}) => (
+                                    <label className="inline-flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="peer absolute opacity-0 w-0 h-0"
+                                            checked={field.value}
+                                            onChange={(e) => field.onChange(e.target.checked)}
+                                            ref={field.ref}
+                                        />
+                                        <div className="w-5 h-5 border-2 border-gray-300 rounded-md flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition-colors">
+                                            <FaCheck fontSize={14} className={`text-white font-bold peer-checked:block`} />
+                                        </div>
+                                        <span className="text-gray-700">Status</span>
+                                    </label>
+                                )}
+                            />
+                            <Controller
+                                name="contact_sale"
+                                control={control}
+                                render={({field}) => (
+                                    <label className="inline-flex items-center gap-2 cursor-pointer">
+                                        <input
+                                            type="checkbox"
+                                            className="peer absolute opacity-0 w-0 h-0"
+                                            checked={field.value}
+                                            onChange={(e) => field.onChange(e.target.checked)}
+                                            ref={field.ref}
+                                        />
+                                        <div className="w-5 h-5 border-2 border-gray-300 rounded-md flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition-colors">
+                                            <FaCheck fontSize={14} className={`text-white font-bold peer-checked:block`} />
+                                        </div>
+                                        <span className="text-gray-700">Contact Sale</span>
+                                    </label>
+                                )}
+                            />
+                        </div>                        
                     </div>
                     <div className="col-span-12">
                         <div className="space-y-3">
@@ -226,7 +277,7 @@ const UserForm = ({
                 </div>
                 <div className="px-5 py-4 sm:px-6 sm:py-5">
                     <div className="flex justify-end gap-3">
-                        <CancelButton onClick={()=>router.push('/admin/user')}>Cancel</CancelButton>
+                        <CancelButton onClick={CancelUpdate}>Cancel</CancelButton>
                         {create && <CreateButton type="submit">Create</CreateButton>}
                         {edit && <UpdateButton>Update</UpdateButton>}
                     </div>

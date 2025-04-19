@@ -10,6 +10,7 @@ import { useRouter } from "next/navigation";
 import { getToken } from "@/services/Auth";
 import Loader from "@/components/admin/Loader";
 
+
 const outfit = Outfit({
     subsets: ["latin"],
     weight: ["100","200","300","400","500","600","700","800","900"],
@@ -26,7 +27,7 @@ export default function RootLayout({children}:{children: React.ReactNode})
             setLoading(true);
             const token = getToken();
             if (!token) {
-                router.push("/admin/signin");
+                router.push(`/admin/signin?redirect=${encodeURIComponent(window.location.pathname)}`);
                 setLoading(false);
                 return;
             }
