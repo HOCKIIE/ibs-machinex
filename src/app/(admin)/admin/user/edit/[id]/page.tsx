@@ -64,7 +64,7 @@ const EditUser = ({ params }: { params:  Promise<{ id: string }> }) => {
             status: users[0]?.status,
           });
         }
-      }, [users]);
+    }, [users]);
     return (
         <DefaultLayout>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">

@@ -1,17 +1,4 @@
 export interface ContactType {
-    id:string;
-    title:string;
-    address:string;
-    phone:string;
-    mobile:string;
-    email:string;
-    gmap:string;
-    created_at:string;
-    updated_at:string;
-}
-
-export interface ApiResponse {
-    id:string;
     title:string;
     address:string;
     phone:string;
@@ -20,6 +7,10 @@ export interface ApiResponse {
     gmap:string;
 }
 
+export type ResponseType = {
+    status: boolean;
+    message: string;
+};
 export interface ContactState {
     contact: ContactType | null;
     isLoading: boolean;
@@ -28,6 +19,7 @@ export interface ContactState {
 
     id: string;
     role: string;
-    response: { status: boolean | null; message: string | null };
-    fetchContact: () => void
+    response: { status: boolean | null; message: string | null; action:string | null; } | null;
+    getData: () => void
+    updateData: (data:ContactType) => void
 }

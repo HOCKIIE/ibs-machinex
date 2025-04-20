@@ -1,0 +1,151 @@
+"use client";
+import { inter } from "@/fonts/fonts";
+import React, { useState, useRef, useEffect, useCallback } from 'react';
+import sanitizeHtml from "sanitize-html";
+import { EditButton, CancelButton, SaveButton } from '@/components/main/button/Buttons';
+import { useForm  } from "react-hook-form";
+import toast from "react-hot-toast";
+import { AboutType } from "@/types/AboutType";
+import useAboutStore from "@/store/useAboutStore";
+import { DefaultTab } from "../Tabs/Tabs";
+
+const AboutForm = () => {
+
+    const editableRef = useRef<HTMLDivElement>(null);
+    const [isEditAbout, setEditAbout] = useState<boolean>(false);
+    const [setfont, setFontState] = useState<boolean>(true);
+    const [active, SetActive] = useState<string>('th');
+
+    const EditAbout = () => setEditAbout(!isEditAbout);
+    const toggle = () => setFontState(!setfont);
+
+    const [aboutData, setAboutData] = useState<AboutType>({
+        detail_th: "",
+        detail_en: "",
+        detail_ja: ""
+    });
+    const { about, getData, updateData, response } = useAboutStore();
+    const {
+        register,
+        reset,
+        formState: { errors },
+    } = useForm({
+        defaultValues: {
+            detail_th: sanitizeHtml(aboutData.detail_th),
+            detail_en: sanitizeHtml(aboutData.detail_en),
+            detail_ja: sanitizeHtml(aboutData.detail_ja)
+        },
+    });
+    const fetchData = useCallback(async () => {
+        await getData();
+    }, [getData]);
+
+    const tabToggle = async (language: string): Promise<void> => {
+        SetActive(language);
+    }
+
+    interface HandleChangeParams {
+        name: keyof AboutType;
+        value: string | null;
+    }
+    const handleChange = ({ name, value }: HandleChangeParams): void => 
+    {
+        setAboutData((prevState) => ({ ...prevState, [name]: value }));
+    }
+    const CalcelEdit = () => {
+        reset({
+            detail_th: about?.detail_th,
+            detail_en: about?.detail_en,
+            detail_ja: about?.detail_ja
+        });
+        EditAbout()
+    }
+    const saveChange = () => {
+
+    }
+
+    useEffect(()=>{ fetchData() },[fetchData]);
+    useEffect(() => {
+        if (about) {
+            const data = {
+                detail_th: about.detail_th,
+                detail_en: about.detail_en,
+                detail_ja: about.detail_ja,
+            };          
+            setAboutData(data);
+            reset(data); // ✅ sync form input กับค่าที่โหลดมา
+        }
+    }, [about, reset]);
+    useEffect(()=>{
+        if (response && response.status) {
+            if(response.action == "update"){
+                toast.success(response.message);
+                setTimeout(()=> { setEditAbout(false); },1000);
+            } else {
+                toast.error(response.message);
+            }
+        }
+    }, [response])
+    
+    return (
+        <>
+            
+            <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+                <div className="px-5 py-4 sm:px-6 sm:py-5">
+                    <h3 className="text-base font-medium text-gray-800 dark:text-white/90">About Data</h3>
+                </div>
+                <div className="space-y-6 border-t border-gray-100 p-5 sm:p-6 dark:border-gray-800">
+                    <div className="flex items-center gap-3 my-1">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400 px-3">Detail :</label>
+                        <button 
+                            onClick={toggle}
+                            className={`px-2 focus:ring-2 ${setfont?`border-indigo-300 bg-indigo-200 border text-indigo-500 focus:ring-gray-500/20`:`bg-gray-200 border border-gray-300 text-gray-500 focus:ring-indigo-500/20`} rounded-lg text-[12px]`} 
+                            defaultValue="inter">Inter Font
+                        </button>
+                    </div>
+                    <div className="border border-gray-100 rounded-lg focus:ring-1 focus:ring-indigo-300 focus:outline-none">
+                        <DefaultTab active={active} toggle={tabToggle}/>
+                        
+                        <div className="tabs">
+                            <div className={`tab-item${active=='th'?` active`:``}`} data-tab="th">
+                                <div 
+                                    ref={editableRef}
+                                    contentEditable={isEditAbout}
+                                    suppressContentEditableWarning={true}
+                                    onInput={(e) => {handleChange({ name: 'detail_th', value: e.currentTarget.innerHTML })}}
+                                    className={`p-3 min-h-[300px] ${setfont && inter.className}`}
+                                    dangerouslySetInnerHTML={{ __html: aboutData.detail_th }}
+                                ></div> 
+                            </div>
+                            <div className={`tab-item${active=='en'?` active`:``}`} data-tab="en">
+                                <div 
+                                    contentEditable={isEditAbout}
+                                    suppressContentEditableWarning={true}
+                                    onInput={(e) => {handleChange({ name: 'detail_en', value: e.currentTarget.innerHTML })}}
+                                    className={`p-3 min-h-[300px] ${setfont && inter.className}`}
+                                    dangerouslySetInnerHTML={{ __html: aboutData.detail_en }}
+                                ></div> 
+                            </div>
+                            <div className={`tab-item${active=='ja'?` active`:``}`} data-tab="ja">
+                                <div 
+                                    contentEditable={isEditAbout}
+                                    suppressContentEditableWarning={true}
+                                    onInput={(e) => {handleChange({ name: 'detail_ja', value: e.currentTarget.innerHTML })}}
+                                    className={`p-3 min-h-[300px] ${setfont && inter.className}`}
+                                    dangerouslySetInnerHTML={{ __html: aboutData.detail_ja }}
+                                ></div> 
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                <div className="flex justify-center gap-3 p-5">
+                    {!isEditAbout && <EditButton setEdit={EditAbout} />}
+                    {isEditAbout && <><CancelButton setEdit={CalcelEdit} /><SaveButton saveChange={saveChange} /></>}
+                </div>
+            </div>
+        </>
+    )
+}
+
+export default AboutForm
