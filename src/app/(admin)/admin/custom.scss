@@ -4,6 +4,14 @@
             outline: 1px solid rgb(99,102,241,0.5);
             outline-offset: 5px;
         }
-    
+    }
+    &:focus{
+        outline: none;;
+    }
+}
+.tab-item{
+    display: none;
+    &.active{
+        display: block;
     }
 }

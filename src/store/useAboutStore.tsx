@@ -1,30 +1,26 @@
 "use client";
+
 import Api from "@/services/Api";
 import { create } from "zustand";
 import toast from "react-hot-toast";
-import { ContactState, ContactType } from "@/types/ContactType";
+import { AboutType,AboutState } from "@/types/AboutType";
 
-const apiPrefix = '/contact';
-const prefix = '/admin/contact';
+const apiPrefix = '/about';
 
-export const useContactStore = create<ContactState>((set) => ({
-    contact: null,
-    isLoading: false,
-    response:{ status: null, message: null, action:null},
+const useAboutStore = create<AboutState>((set) => ({
+    about: null,
     error: null,
+    response:{ status:null,message:null, action:null},
     token: null,
     role: "",
     user: "",
     id: "",
     
     getData: async () => {
-        set({ isLoading: true, error: null });
+        set({ error: null });
         try {
-            const response = await Api.get<ContactType>(apiPrefix);
-            set({
-                contact: response.data,
-                isLoading: false,
-            });
+            const response = await Api.get<AboutType>(apiPrefix);
+            set({about: response.data});
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
@@ -32,12 +28,10 @@ export const useContactStore = create<ContactState>((set) => ({
         }
     },
     updateData: async (data) => {
-        set({ isLoading: true, error: null });
+        set({ error: null });
         try {
             const response = await Api.put(`${apiPrefix}/update`,data);
-            console.log(response.data)
             set({
-                isLoading: false,
                 response: {
                     action: "update",
                     status : response.data.status,
@@ -51,5 +45,6 @@ export const useContactStore = create<ContactState>((set) => ({
             toast.error(errorMessage);
         }
     },
-
 }));
+
+export default useAboutStore
