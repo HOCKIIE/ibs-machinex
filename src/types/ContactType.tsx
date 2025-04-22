@@ -21,5 +21,5 @@ export interface ContactState {
     role: string;
     response: { status: boolean | null; message: string | null; action:string | null; } | null;
     getData: () => void
-    updateData: (data:ContactType) => void
+    deleteData: (id: string) => void;
 }

@@ -7,7 +7,7 @@ import { ContactState, ContactType } from "@/types/ContactType";
 const apiPrefix = '/contact';
 const prefix = '/admin/contact';
 
-export const useContactStore = create<ContactState>((set) => ({
+const useContactStore = create<ContactState>((set) => ({
     contact: null,
     isLoading: false,
     response:{ status: null, message: null, action:null},
@@ -31,25 +31,25 @@ export const useContactStore = create<ContactState>((set) => ({
             toast.error(errorMessage);
         }
     },
-    updateData: async (data) => {
+    deleteData: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.put(`${apiPrefix}/update`,data);
-            console.log(response.data)
+            const response = await Api.delete(`${apiPrefix}/delete/${id}`);
             set({
                 isLoading: false,
                 response: {
-                    action: "update",
+                    action: "delete",
                     status : response.data.status,
                     message : response.data.message,
                 }
             });
-            
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
             toast.error(errorMessage);
         }
-    },
+    }
 
 }));
+
+export default useContactStore;
