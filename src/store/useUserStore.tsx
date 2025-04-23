@@ -8,7 +8,7 @@ import { UserType, UserState, ApiResponse } from "@/types/UserType";
 const apiPrefix = '/user';
 const prefix = '/admin/user';
 
-export const useUserStore = create<UserState>((set) => ({
+const useUserStore = create<UserState>((set) => ({
     users: [],
     isLoading: false,
     response:{ status:null,message:null},
@@ -156,3 +156,5 @@ export const useUserStore = create<UserState>((set) => ({
     }
 
 }));
+
+export default useUserStore;

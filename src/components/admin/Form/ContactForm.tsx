@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useForm  } from "react-hook-form";
 import { ContactType } from '@/types/ContactType';
 import { EditButton, CancelButton, SaveButton } from '@/components/main/button/Buttons';
-import { useContactStore } from '@/store/useContactStore';
+import useContactStore from '@/store/useContactStore';
 import toast from "react-hot-toast";
 
 

@@ -16,6 +16,8 @@ const AboutForm = () => {
     const [setfont, setFontState] = useState<boolean>(true);
     const [active, SetActive] = useState<string>('th');
 
+    const [content_th, setContentTH] = useState("");
+
     const EditAbout = () => setEditAbout(!isEditAbout);
     const toggle = () => setFontState(!setfont);
 
@@ -51,6 +53,7 @@ const AboutForm = () => {
     const handleChange = ({ name, value }: HandleChangeParams): void => 
     {
         setAboutData((prevState) => ({ ...prevState, [name]: value }));
+        setContentTH(value || "")
     }
     const CalcelEdit = () => {
         reset({
@@ -112,7 +115,12 @@ const AboutForm = () => {
                                     ref={editableRef}
                                     contentEditable={isEditAbout}
                                     suppressContentEditableWarning={true}
-                                    onInput={(e) => {handleChange({ name: 'detail_th', value: e.currentTarget.innerHTML })}}
+                                    onInput={(e) => {
+                                        const html = e.currentTarget.innerHTML;
+                                        if (html !== content_th) {
+                                            handleChange({ name: 'detail_th', value: e.currentTarget.innerHTML })
+                                        }
+                                    }}
                                     className={`p-3 min-h-[300px] ${setfont && inter.className}`}
                                     dangerouslySetInnerHTML={{ __html: aboutData.detail_th }}
                                 ></div> 
