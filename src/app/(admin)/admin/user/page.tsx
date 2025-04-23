@@ -16,7 +16,7 @@ import usePagination from '@/hooks/usePagination';
 import { Paginate, LimitPerPage } from '@/components/admin/Paginate/Paginate';
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
 import SearchBar from '@/components/admin/Paginate/SearchBar';
-import { useUserStore } from '@/store/useUserStore';
+import useUserStore from '@/store/useUserStore';
 
 const show = [10, 50, 100];
 const recordStatus = [

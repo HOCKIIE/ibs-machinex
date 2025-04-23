@@ -8,17 +8,16 @@ import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import ConfirmModal from '@/components/admin/Modal/ConfirmModal';
 import usePagination from '@/hooks/usePagination';
 import { BiTrash } from "react-icons/bi";
+import { LuPencil } from "react-icons/lu";
 import { IoSearchOutline } from "react-icons/io5";
 import SearchBar from '@/components/admin/Paginate/SearchBar';
 import useContactStore from '@/store/useContactStore';
+import Link from 'next/link';
 
 const show = [10, 25, 50, 100];
 
-const Contact = () => {
-
-    const [mounted, setMounted] = useState(false);
-    const [selectDelete, setSelectDelete] = useState<boolean>(true)
-
+const Contact = () => 
+{
     const {
         keyword,
         data,
@@ -32,15 +31,18 @@ const Contact = () => {
         prevPage,
         fetchData,
         handleSearch, 
-        handlePageChange, 
-        StatusTab
+        handlePageChange
     } = usePagination({ 
         initialLimit: show[0],
-        endpoint: '/user'
+        endpoint: '/contact'
     });
     const { isLoading, error, deleteData, response } = useContactStore();
 
+    const [id, setId] = useState<number[] | null>(null);
+    const [isOpen, setModalOpen] = useState<boolean>(false);
+    const [isAction, setAction] = useState<string>("delete");
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const [selectDelete, setSelectDelete] = useState<boolean>(true)
     const isAllSelected = selectedIds.length > 0;
 
     const toggleSelectAll = () => {
@@ -48,8 +50,10 @@ const Contact = () => {
             setSelectedIds([]);
             setSelectDelete(true)
         }else{
-            setSelectedIds(data.map((item) => item.id));
-            setSelectDelete(false)
+            if(data && data.length>0){
+                setSelectedIds(data.map((item) => item.id));
+                setSelectDelete(false)
+            }
         }
     };
     const toggleSelect = (id: number) => {
@@ -71,6 +75,19 @@ const Contact = () => {
         return null;
     };
 
+    const setDeleteRecords = async() => {
+        if(selectedIds.length > 0){
+            setId(selectedIds)
+        }
+    }
+
+    const deleteRecord = async() => {
+        const ids = id?.join(',');
+        if (ids !== null) {
+            await deleteData(`${ids}`);
+            successProgress();
+        }
+    }
     const successProgress = () => {
         response.status = null;
         response.message = null;
@@ -112,17 +129,75 @@ const Contact = () => {
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col" className="px-6 py-3" style={{width:'3%'}}><AnimatedCheckbox checked={isAllSelected} onChange={toggleSelectAll}/></th>
-                                <th scope="col" className="px-6 py-3" style={{width:'60%'}}>Product name</th>
-                                <th scope="col" className="px-6 py-3">Brand</th>
-                                <th scope="col" className="px-6 py-3">Category</th>
-                                <th scope="col" className="px-6 py-3">Price</th>
-                                <th scope="col" className="px-6 py-3">Status</th>
-                                <th scope="col" className="px-6 py-3" style={{width:'10%'}}>Created</th>
-                                <th scope="col" className="px-6 py-3">Action</th>
+                                <th scope="col" className="px-6 py-3" style={{width:'15%'}}>Forst name</th>
+                                <th scope="col" className="px-6 py-3" style={{width:'15%'}}>Last name</th>
+                                <th scope="col" className="px-6 py-3" style={{width:'15%'}}>Email</th>
+                                <th scope="col" className="px-6 py-3">MEssage</th>
                             </tr>
                         </thead>
                         <tbody>
-
+                            {data && data.map((v,k)=> 
+                                <tr key={k}>
+                                    <td className="px-6 py-4">
+                                        {loading
+                                            ? <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                            : <AnimatedCheckbox className="select" checked={selectedIds.includes(v.id)} onChange={()=>toggleSelect(v.id)}/>
+                                        }
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {loading
+                                            ? <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                            : v.firstName
+                                        }
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {loading
+                                            ? <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                            : v.lastName
+                                        }
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {loading
+                                            ? <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                            : v.email
+                                        }
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {loading
+                                            ? <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                            : v.message
+                                        }
+                                    </td>
+                                    <td>
+                                    {!loading?
+                                        <div className="flex gap-2">
+                                            <button 
+                                                title="Delete"
+                                                onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([v.id])}}
+                                                className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
+                                                <BiTrash fontSize={24}/>
+                                            </button>
+                                            <Link 
+                                                type="button"
+                                                href={`user/edit/${v.id}`}
+                                                className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-500 dark:hover:text-white/90">
+                                                <LuPencil fontSize={20}/>
+                                            </Link>                                                
+                                        </div>
+                                        :
+                                        <div className="flex-1 space-y-6 py-1">
+                                            <div className="space-y-3">
+                                                <div className="grid grid-cols-2 gap-2">
+                                                    <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                                    <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                                </div>
+                                                <div className="h-2 rounded mt-0 pt-0"></div>
+                                            </div>
+                                        </div>
+                                        }
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                     <div className="dark:bg-gray-700 rounded-b-md overflow-hidden">

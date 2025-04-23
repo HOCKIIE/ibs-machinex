@@ -1,4 +1,5 @@
 export interface ContactType {
+    id:string;
     title:string;
     address:string;
     phone:string;

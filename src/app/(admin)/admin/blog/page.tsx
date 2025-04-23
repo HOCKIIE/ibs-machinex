@@ -10,6 +10,11 @@ import { IoSearchOutline } from "react-icons/io5";
 import { BiTrash } from "react-icons/bi";
 
 const show = [10, 25, 50, 100];
+const recordStatus = [
+    {value:"all", label:"All"},
+    {value:"true", label:"Active"},
+    {value:"false", label:"Not Active"}
+];
 interface Blog {
     id: number;
     name: string;
@@ -73,8 +78,8 @@ const Blog = () => {
                     <div className="flex justify-between">
                         <div><Breadcrumb /></div>
                         <div className="flex gap-3 right">
-                            <StatusTab status={["all", "active", "draft", "archived"]}/>
-                            <AddButton title="Add Blog" />
+                            <StatusTab status={recordStatus}/>
+                            <AddButton title="Add Blog" href="/admin/blog/add"/>
                         </div>
                         
                     </div>

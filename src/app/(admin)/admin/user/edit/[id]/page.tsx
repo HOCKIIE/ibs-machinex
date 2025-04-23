@@ -5,7 +5,7 @@ import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import UserForm from '@/components/admin/Form/UserForm';
 import { UsersFormProps } from '@/types/UserType';
-import { useUserStore } from '@/store/useUserStore';
+import useUserStore from '@/store/useUserStore';
 import { useRouter } from "next/navigation";
 
 
