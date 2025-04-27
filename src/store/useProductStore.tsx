@@ -3,7 +3,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { ProductState } from "@/types/ProductType";
 
-export const ProductStore = create<ProductState>((set) => {
+const useProductStore = create<ProductState>((set) => {
     let errorMessage = "Something went wrong.";
     return {
         items: [],
@@ -13,7 +13,7 @@ export const ProductStore = create<ProductState>((set) => {
         lastPage: 0,
         currPage: 1,
 
-        fetchItems: async() => {
+        fetchData: async() => {
             try{
                 const response = await Api.get('/product');
                 set((state) => ({
@@ -52,14 +52,14 @@ export const ProductStore = create<ProductState>((set) => {
             }
           },
 
-        createItem: async (newItem) => {
+        createData: async (data) => {
             const formData = new FormData();
-            formData.append("title", newItem.title_en);
-            formData.append("link", newItem.link);
-            if (newItem.image) {
-                formData.append("image", newItem.image);
+            formData.append("title", data.title_en);
+            formData.append("link", data.link);
+            if (data.image) {
+                formData.append("image", data.image);
             }
-            formData.append("image_alt", newItem.image_alt);
+            formData.append("image_alt", data.image_alt);
             set({ isLoading: true, error: null });
     
             try {
@@ -80,10 +80,10 @@ export const ProductStore = create<ProductState>((set) => {
         },
     
 
-        updateItem: async (id, updatedProduct) => {
+        updateData: async (id, data) => {
             set({ isLoading: true, error: null });
             try {
-                const response = await Api.put(`/product/${id}`,updatedProduct);
+                const response = await Api.put(`/product/${id}`,data);
                 set((state) => ({
                     items: state.items.map((item) =>
                         item.id === id ? response.data : item
@@ -102,7 +102,7 @@ export const ProductStore = create<ProductState>((set) => {
             }
         },
 
-        deleteItem: async (id) => {
+        deleteData: async (id) => {
             set({ isLoading: true, error: null });
             try {
                 await Api.delete(`/product/${id}`);
@@ -122,4 +122,5 @@ export const ProductStore = create<ProductState>((set) => {
             }
         }
     }
-}) 
+});
+export default useProductStore;

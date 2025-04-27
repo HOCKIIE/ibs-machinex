@@ -2,8 +2,8 @@ export interface ConfirmModalProps {
     isOpen? : boolean;
     action? : string;
     onClose: () => void;
-    toggleModal : () => void;
     onAfterClose?: () => void;
+    closeModal: () => void;
     data : {
         confirm?: () => void;
         progress?:  boolean;

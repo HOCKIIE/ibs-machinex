@@ -23,8 +23,9 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
 
     const currentStatus = searchParams.get("status") || "all";
     const [activeStatus, setActiveStatus] = useState<string>(currentStatus);
-
+    
     const currentKeyword = searchParams.get('keyword') || "";
+    // const page = searchParams.get('page') || "";
     const [keyword, setKeyword] = useState<string>(currentKeyword);
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
     const searchRef = useRef<HTMLInputElement | null>(null);

@@ -1,22 +1,19 @@
 "use client"
 
-import React,{ useState,useEffect, useCallback } from 'react';
+import React,{ useState } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
-import ConfirmModal from '@/components/admin/Modal/ConfirmModal';
 import AddButton from '@/components/admin/Button/AddButton';
 import { BiTrash } from "react-icons/bi";
 import { LuPencil } from "react-icons/lu";
 import { IoSearchOutline } from "react-icons/io5";
-// import { UserType } from '@/types/UserType';
-import toast from 'react-hot-toast';
 import Link from 'next/link';
-import Api from '@/services/Api';
 import usePagination from '@/hooks/usePagination';
 import { Paginate, LimitPerPage } from '@/components/admin/Paginate/Paginate';
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
 import SearchBar from '@/components/admin/Paginate/SearchBar';
 import useUserStore from '@/store/useUserStore';
+import ActionModal from '@/components/admin/Modal/ActionModal';
 
 const show = [10, 50, 100];
 const recordStatus = [
@@ -47,7 +44,7 @@ const Users = () =>
         endpoint: '/user'
     });
 
-    const { isLoading, error, deleteUser, response } = useUserStore();
+    const {  isLoading, error, deleteUser, response } = useUserStore();
 
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [isAction, setAction] = useState<string>("delete");
@@ -81,17 +78,17 @@ const Users = () =>
 
     const deleteRecord = async() => {
         const ids = id?.join(',');
-        if (ids !== null) {
-            await deleteUser(`${ids}`);
-            successProgress();
-        }
+        if (ids !== null) await deleteUser(`${ids}`);
     }
-    const successProgress = () => {
+    const successProgress: () => void = () => {
         response.status = null;
         response.message = null;
-        setModalOpen(!isOpen);
+        fetchData()
     }
-
+    const closeModal = () => {
+        setModalOpen(false);
+        successProgress();
+    }
     return (
         <DefaultLayout>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -214,12 +211,12 @@ const Users = () =>
                     </div>
                 </div>
             </div>
-            <ConfirmModal 
+            <ActionModal 
                 isOpen={isOpen} 
                 action={isAction}
-                toggleModal={successProgress}
                 onClose={() => setModalOpen(false)}
                 onAfterClose={()=>fetchData}
+                closeModal={closeModal}
                 data={{
                     confirm: deleteRecord,
                     progress: isLoading,
