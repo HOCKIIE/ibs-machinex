@@ -11,25 +11,50 @@ import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import ConfirmModal from '@/components/admin/Modal/ConfirmModal';
 import AddButton from '@/components/admin/Button/AddButton';
 import { IoSearchOutline } from "react-icons/io5";
+import useProductStore from '@/store/useProductStore';
 import usePagination from '@/hooks/usePagination';
 import Format from '@/utils/Format';
 import { Paginate, LimitPerPage } from '@/components/admin/Paginate/Paginate';
 import SearchBar from '@/components/admin/Paginate/SearchBar';
+import ActionModal from '@/components/admin/Modal/ActionModal';
 
+interface SelectDeleteProps { event: React.MouseEvent<HTMLButtonElement>; }
 const show = [10, 25, 50, 100];
+const recordStatus = [
+    {value:"all", label:"All"},
+    {value:"true", label:"Active"},
+    {value:"false", label:"Not Active"}
+];
 
 const Product = () => 
 {
-    const apiPath = ``
-    const [mounted, setMounted] = useState(false);
-    const [selectDelete, setSelectDelete] = useState<boolean>(true)
     const { 
-        data, loading, 
-        skip, limit, to, totalItems,  
-        prevPage, nextPage, currentPage,
-        updateLimit, StatusTab, keyword, handleSearch, handlePageChange
-    } = usePagination({ initialLimit: show[0] });
+        keyword,
+        data,
+        meta,
+        loading,
+        limit,
+        updateLimit,
+        setLoading,
+        setPage,
+        nextPage,
+        prevPage,
+        fetchData,
+        handleSearch, 
+        handlePageChange,
+        StatusTab
+    } = usePagination({ 
+        initialLimit: show[0],
+        endpoint: '/product'
+    });
+
+    const { isLoading, error, deleteData, response } = useProductStore();
+
+    const [id, setId] = useState<number[] | null>(null);
+    const [isOpen, setModalOpen] = useState<boolean>(false);
+    const [isAction, setAction] = useState<string>("delete");
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
+    const [selectDelete, setSelectDelete] = useState<boolean>(true)
     const isAllSelected = selectedIds.length > 0;
 
     const toggleSelectAll = () => {
@@ -37,8 +62,10 @@ const Product = () =>
             setSelectedIds([]);
             setSelectDelete(true)
         }else{
-            setSelectedIds(data.map((item) => item.id));
-            setSelectDelete(false)
+            if(data && data.length>0){
+                setSelectedIds(data.map((item) => item.id));
+                setSelectDelete(false)
+            }
         }
     };
     const toggleSelect = (id: number) => {
@@ -47,9 +74,6 @@ const Product = () =>
         );
         if(selectedIds.length> 0) setSelectDelete(false);
     };
-    interface SelectDeleteProps {
-        event: React.MouseEvent<HTMLButtonElement>;
-    }
 
     const SelectDelete: React.FC<SelectDeleteProps> = ({ event }) => {
         useEffect(() => {
@@ -60,11 +84,24 @@ const Product = () =>
         return null;
     };
 
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const setDeleteRecords = async() => {
+        if(selectedIds.length > 0){
+            setId(selectedIds)
+        }
+    }
 
-    if (!mounted) return null; // Prevent SSR mismatches
+    const deleteRecord = async() => {
+        const ids = id?.join(',');
+        if (ids !== null) {
+            await deleteData(`${ids}`);
+            successProgress();
+        }
+    }
+    const successProgress = () => {
+        response.status = null;
+        response.message = null;
+        setModalOpen(!isOpen);
+    }
 
     return (
         <DefaultLayout>
@@ -74,7 +111,7 @@ const Product = () =>
                         <div className="flex justify-between">
                             <div><Breadcrumb /></div>
                             <div className="flex gap-3 right">
-                                <StatusTab status={["all", "active", "draft", "archived"]}/>
+                                <StatusTab status={recordStatus}/>
                                 <AddButton title="Add Product" href="/admin/product/add"/>
                             </div>
                             
@@ -117,7 +154,7 @@ const Product = () =>
                                 </tr>
                             </thead>
                             <tbody>
-                                {data.length > 0 && data.map((product,index) => 
+                                {data && data.map((product,index) => 
                                     <tr key={index} className={`bg-white dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-900 transition-all ease-in-out ${loading ? ' animate-pulse' : ''}`}>
                                         <td className="px-6 py-4">
                                             {loading
@@ -227,13 +264,13 @@ const Product = () =>
                                             <div className="flex gap-2">
                                                 <button 
                                                     title="Delete"
-                                                    onClick={()=>ConfirmModal('delete')}
+                                                    onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([v.id])}}
                                                     className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
                                                     <BiTrash fontSize={24}/>
                                                 </button>
                                                 <Link 
                                                     type="button"
-                                                    href={`product/${product.id}`}
+                                                    href={`user/edit/${v.id}`}
                                                     className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-500 dark:hover:text-white/90">
                                                     <LuPencil fontSize={20}/>
                                                 </Link>                                                
@@ -252,30 +289,39 @@ const Product = () =>
                                         </td>
                                     </tr>
                                 )}
-                                {data.length == 0 && 
+                                {!data && 
                                     <tr>
-                                        <td className="px-6 py-3 text-center" colSpan={5}>No item</td>
+                                        <td className="px-6 py-3 text-center" colSpan={8}>No record</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                         <div className="dark:bg-gray-700 rounded-b-md overflow-hidden">
                             <div className="h-8 bg-gray-50 w-full dark:bg-gray-700 dark:text-gray-400"></div>
-                            <Paginate 
-                                skip={skip} 
-                                to={to} 
-                                totalItems={totalItems} 
-                                prevPage={prevPage} 
-                                currentPage={currentPage}
-                                handlePageChange={handlePageChange} 
-                                nextPage={nextPage} 
-                            />
+                            <Paginate meta={meta} prevPage={prevPage} handlePageChange={handlePageChange} nextPage={nextPage} />
                         </div>
                         
                     {/* </div> */}
                 </div>
             </div>
-            {/* <ProductModal isOpen={isModalOpen} onClose={closeModal} onSave={handleSave} initialData={editingProduct} title={TitleModal} /> */}
+            <ConfirmModal 
+                isOpen={isOpen} 
+                action={isAction}
+                toggleModal={successProgress}
+                onClose={() => setModalOpen(false)}
+                onAfterClose={()=>fetchData}
+                data={{
+                    confirm: deleteRecord,
+                    progress: isLoading,
+                    successProgress: successProgress,
+                    response: { 
+                        status: typeof response?.status === 'boolean' ? response.status : null, 
+                        message: response?.message ? response?.message : null
+                    },
+                    error: error
+                }}
+            />
+            <ActionModal />
         </DefaultLayout>
     )
 }

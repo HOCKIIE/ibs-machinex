@@ -14,6 +14,7 @@ import SearchBar from '@/components/admin/Paginate/SearchBar';
 import useContactStore from '@/store/useContactStore';
 import Link from 'next/link';
 
+interface SelectDeleteProps { event: React.MouseEvent<HTMLButtonElement>; }
 const show = [10, 25, 50, 100];
 
 const Contact = () => 
@@ -62,9 +63,6 @@ const Contact = () =>
         );
         if(selectedIds.length> 0) setSelectDelete(false);
     };
-    interface SelectDeleteProps {
-        event: React.MouseEvent<HTMLButtonElement>;
-    }
 
     const SelectDelete: React.FC<SelectDeleteProps> = ({ event }) => {
         useEffect(() => {

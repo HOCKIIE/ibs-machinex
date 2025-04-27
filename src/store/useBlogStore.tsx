@@ -1,28 +1,18 @@
 "use client";
+
 import Api from "@/services/Api";
 import { create } from "zustand";
-import toast from "react-hot-toast";
-import { UserType, UserState, ApiResponse } from "@/types/UserType";
-// Removed incorrect import of setTimeout
+import { BlogType, BlogState, ApiResponse } from "@/types/BlogType";
 
-const apiPrefix = '/user';
-const prefix = '/admin/user';
+const apiPrefix = '/blog';
+const prefix = '/admin/blog';
 
-const useUserStore = create<UserState>((set) => ({
-    users: [],
-    isLoading: false,
-    response:{ status:null,message:null},
+const useBlogStore = create<BlogState>((set) => ({
+    data: [],
+    response: { status:null,message:null},
     error: null,
-    token: null,
-    role: "",
-    user: "",
-    id: "",
 
-    total: 0,
-    lastPage: 0,
-    currentPage: 1,
-
-    fetchUsers: async (page: number) => {
+    fetchData: async (page: number) => {
         set({ isLoading: true, error: null });
         try {
           const response = await Api.get<ApiResponse>(`${apiPrefix}?page=${page}`);
@@ -48,11 +38,11 @@ const useUserStore = create<UserState>((set) => ({
             set({ error: errorMessage, isLoading: false });
         }
     },
-    
-    fetchUserById: async (id) => {
+
+    fetchDataById: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.get<UserType>(`${apiPrefix}/show/${id}`);
+            const response = await Api.get<BlogType>(`${apiPrefix}/show/${id}`);
     
             set((state) => ({
                 ...state,
@@ -63,11 +53,12 @@ const useUserStore = create<UserState>((set) => ({
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({ error: errorMessage, isLoading: false });
         }
-      },
+    },
     
-      createUser: async (newUser, router) => {
+
+    createUser: async (newData, router) => {
         try {
-            const response = await Api.post(`${apiPrefix}/store`, newUser);
+            const response = await Api.post(`${apiPrefix}/store`, newData);
             set((state) => ({
                 users: [...state.users, response.data],
                 isLoading: false,
@@ -87,7 +78,7 @@ const useUserStore = create<UserState>((set) => ({
             toast.error(errorMessage);
         }
     },
-    
+
     updateUser: async (id, data, router) => {
         set({ isLoading: true, error: null });
         try {
@@ -156,4 +147,4 @@ const useUserStore = create<UserState>((set) => ({
 
 }));
 
-export default useUserStore;
+export default useBlogStore;

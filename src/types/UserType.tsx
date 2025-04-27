@@ -49,6 +49,7 @@ export interface UserState {
     // login: (email: string, password: string) => Promise<boolean>;
     // logout: () => Promise<void>;
     fetchUserById: (id: string) => Promise<void>;
+    fetchUsers: () => Promise<void>;
     createUser: (
         newUser: UsersFormProps, 
         router: ReturnType<typeof useRouter>
