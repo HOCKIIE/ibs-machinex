@@ -1,7 +1,21 @@
 "use client";
-import React, { useCallback, useMemo, useState } from 'react';
-import { createEditor, Descendant, Transforms, Text, BaseElement, BaseText, Element, Editor, Node } from 'slate';
-import { Slate, Editable, withReact, useSlate } from 'slate-react';
+import "./TextEditor.scss"
+import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
+import { 
+    createEditor, 
+    BaseElement, 
+    Descendant, 
+    Transforms, 
+    NodeEntry,
+    BaseText, 
+    Element, 
+    Editor, 
+    Text, 
+    Node,
+    Path
+} from 'slate';
+import { Slate, Editable, withReact, useSlate  } from 'slate-react';
+import { withHistory, HistoryEditor } from 'slate-history';
 
 import { 
     RiBold, RiItalic, RiUnderline, 
@@ -10,7 +24,7 @@ import {
     RiCodeSSlashFill, RiStrikethrough
 } from "react-icons/ri";
 import { LiaUndoSolid, LiaRedoSolid } from "react-icons/lia";
-import { LuLayoutTemplate, LuTable, LuAlignJustify } from "react-icons/lu";
+import { LuLayoutTemplate, LuTable, LuAlignJustify, LuChevronDown } from "react-icons/lu";
 import { BsBorderBottom } from "react-icons/bs";
 
 import { PiTextIndentBold } from "react-icons/pi";
@@ -100,12 +114,124 @@ const Button: React.FC<{ format: string; action?: 'mark' | 'block'; align?: stri
         }
     };
     return (
-        <button onMouseDown={handleMouseDown} className="hover:bg-gray-200 text-black dark:text-gray-300 dark:hover:bg-gray-700 p-2 rounded-md" title={title}>
+        <button onMouseDown={handleMouseDown} className="hover:bg-gray-200 text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 p-2 rounded-md" title={title}>
             {label}
         </button>
     );
 };
 
+const DropdownButton: React.FC<{ format: string; action?: 'mark' | 'block'; label: any; title?:string }> = ({format, label, title}) => {
+
+    const [open, setOpen] = useState(false);
+    const menuRef = useRef(null);
+
+    const editor = useSlate();
+
+    async function replaceChildren(
+        editor: Editor,
+        parentPath: Path,
+        newChildren: Node[]
+    ) {
+        const parentNode = Node.get(editor, parentPath);
+        if (!('children' in parentNode)) return;
+      
+        const childrenCount = parentNode.children.length;
+
+        for (let i = 0; i < childrenCount; i++) {
+            Transforms.removeNodes(editor, { at: parentPath.concat(0) });
+        }
+        Transforms.insertNodes(editor, newChildren, { at: parentPath.concat(0) });
+    }
+    const handleSelectionChange = useCallback(async(select:number) => {
+        const { selection } = editor;
+        if (!selection) return;
+
+        const colDefault = [
+            {col:1, className:"col-span-12 p-2"},
+            {col:2, className:"col-span-12 md:col-span-6 p-2"},
+            {col:3, className:"col-span-12 md:col-span-4 p-2"},
+            {col:4, className:"col-span-12 md:col-span-3 p-2"},
+        ];
+        const className = colDefault.find((v) => v.col == select);
+        const entry = Editor.above(editor, {
+            match: n => !Editor.isEditor(n) && typeof n === 'object' && n.type === 'grid-column'
+        }) as NodeEntry;
+        if (!entry) return;
+
+        const [node , path] = entry;
+        const innerText = node.children[0].children[0].text;
+        const parentEntry = Editor.parent(editor, path);
+        const [, parentPath] = parentEntry;
+        const newChild = Array.from({ length: select }, (_, i) => ({
+            type: 'grid-column',
+            className: className?.className,
+            children: [{
+                type: 'paragraph',
+                children: [{ text: innerText }],
+            }],
+        }));
+        
+        await replaceChildren(editor, parentPath, newChild);
+        console.log('new child',newChild);
+        setTimeout(()=>{ setOpen(false); },500);
+    }, [editor]);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (menuRef.current && !menuRef.current.contains(event.target)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, []);
+    return (
+        <div className="inline-flex rounded-md relative" ref={menuRef}>
+            <button 
+                type="button" 
+                className="rounded-s-md p-2 hover:bg-gray-200 text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700" 
+                title={title}
+            >{label}
+            </button>
+            <button
+                onClick={() => setOpen(!open)}
+                className="rounded-e-md  px-[1px] hover:bg-gray-200 text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700"
+                title="More columns"
+            ><LuChevronDown />
+            </button>
+            {open && (
+                <div className={`absolute z-10 top-full right-0 w-48 bg-white border rounded shadow-lg ease-in-out duration-500`}>
+                    <ul className="text-sm text-gray-700">
+                        <li>
+                            <button
+                                onClick={()=>handleSelectionChange(1)}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                            >1 Column</button>
+                        </li>
+                        <li>
+                            <button
+                                onClick={()=>handleSelectionChange(2)}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                            >2 Column</button>
+                        </li>
+                        <li>
+                            <button
+                                onClick={()=>handleSelectionChange(3)}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-100"
+                            >3 Column</button>
+                        </li>
+                        <li>
+                            <button
+                                onClick={()=>handleSelectionChange(4)}
+                                className="w-full text-left px-4 py-2 hover:bg-gray-100 text-red-600"
+                            >4 Column</button>
+                        </li>
+                    </ul>
+                </div>
+            )}
+        </div>
+    )
+}
 
 const Paragraph: React.FC = () => {
     const editor = useSlate();
@@ -113,11 +239,13 @@ const Paragraph: React.FC = () => {
         const value = e.target.value;
         toggleBlock(editor, value);
     };
+    const currentType = getCurrentElementType(editor) ?? 'paragraph';
     return (
         <select 
+            value={currentType}
             onChange={handleChange} 
             title="Paragraph Style"
-            className="text-sm p-2 rounded-md bg-transparent hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            className="text-sm px-2 py-[6px] rounded-md bg-transparent hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
         >
             <option hidden>Heading</option>
             <option value="paragraph">Paragraph</option>
@@ -164,10 +292,23 @@ declare module 'slate' {
         Text: CustomText;
     }
 }
+const getCurrentElementType = (editor: Editor): string | null => {
+    const [match] = Editor.nodes(editor, {
+      match: n => !Editor.isEditor(n) && Element.isElement(n) && !!n.type,
+      mode: 'lowest', // ตรวจสอบ block ต่ำสุดใน path
+    });
+  
+    if (match) {
+      const [node] = match;
+      return (node as Element).type as string;
+    }
+  
+    return null;
+  };
 
 const TextEditor: React.FC = () => {
 
-    const editor = useMemo(() => withReact(createEditor()), []);
+    const editor = useMemo(() => withHistory(withReact(createEditor())), []);
     const [status, setStatus] = useState<string>('p')
     const [value, setValue] = useState<Descendant[]>([
         {
@@ -227,21 +368,19 @@ const TextEditor: React.FC = () => {
                 );
             case 'table':
                 return (
-                    <table {...attributes} className="border-collapse border border-gray-200" style={{textAlign:alignStyle}}>
-                    <tbody>{children}</tbody>
-                    </table>
+                    <table 
+                        {...attributes} 
+                        className={`${element.className?`${element.className}`:`border-collapse border border-gray-200`}`} 
+                        style={{textAlign:alignStyle}}
+                    ><tbody>{children}</tbody></table>
                 );
             case 'grid':
                 return (
-                    <div {...attributes} className="grid grid-cols-12 gap-4 mb-4">
-                    {children}
-                    </div>
+                    <div {...attributes} className={`${element.className?`${element.className}`:`grid grid-cols-12 gap-4 mb-4`}`}>{children}</div>
                 );
             case 'grid-column':
                 return (
-                    <div {...attributes} className="col-span-12 p-2 border border-gray-200 rounded-md">
-                    {children}
-                    </div>
+                    <div {...attributes} className={`${element.className?`${element.className}`:`col-span-12 p-2`}`}>{children}</div>
                 );
             default:
                 return <div {...attributes} style={{textAlign:alignStyle}}>{children}</div>;
@@ -251,23 +390,14 @@ const TextEditor: React.FC = () => {
     const renderLeaf = useCallback((props: any) => {
         const { attributes, children, leaf } = props;
         let el = children;
-        if (leaf.bold) {
-            el = <strong>{el}</strong>;
-        }
-        if (leaf.italic) {
-            el = <em>{el}</em>;
-        }
-        if (leaf.underline) {
-            el = <u>{el}</u>;
-        }
-        if (leaf.strikethrough) {
-            el = <s>{el}</s>;
-        }
-        if (leaf.fontSize) {
-            el = <span style={{ fontSize: `${leaf.fontSize}px` }}>{el}</span>;
-        }
+        if (leaf.bold)el = <strong>{el}</strong>;
+        if (leaf.italic) el = <em>{el}</em>;
+        if (leaf.underline) el = <u>{el}</u>; 
+        if (leaf.strikethrough) el = <s>{el}</s>;
+        if (leaf.fontSize) el = <span style={{ fontSize: `${leaf.fontSize}px` }}>{el}</span>;
         return <span {...attributes}>{el}</span>;
     }, []);
+    
     const handleKeyDown = (event: React.KeyboardEvent) => {
         if (event.key === 'Enter' && event.shiftKey) {
             const [match] = Editor.nodes(editor, {
@@ -292,6 +422,16 @@ const TextEditor: React.FC = () => {
         }
         if (!event.ctrlKey) return;
         switch (event.key) {
+            case 'y': {
+                event.preventDefault();
+                HistoryEditor.redo(editor);
+                break;
+            }
+            case 'z': {
+                event.preventDefault();
+                HistoryEditor.undo(editor);
+                break;
+            }
             case 'b': {
                 event.preventDefault();
                 toggleMark(editor, 'bold');
@@ -322,7 +462,7 @@ const TextEditor: React.FC = () => {
                 <Slate editor={editor} initialValue={value} onChange={newValue => setValue(newValue)}>
                     <div className="editor-tools p-2 inset-20 h-12 w-full shadow-[rgba(0,0,15,0.1)_0px_1px_5px_0px] dark:shadow-[rgba(255,255,255,0.3)_0px_1px_5px_0px]">
                         <div className="flex justify-between">
-                            <div className="flex divide-x">
+                            <div className="flex items-center divide-x">
                                 <div className="pe-1">
                                     <Button format="undo" action="block" label={<LiaUndoSolid/>} />
                                     <Button format="Redo" action="block" label={<LiaRedoSolid/>} />
@@ -356,13 +496,15 @@ const TextEditor: React.FC = () => {
                                     <Button format="table" action="block" title="Insert table" label={<LuTable />} />
                                 </div>
                                 
-                                <div className="px-1">
-                                    <button title="Image" className="hover:bg-gray-200 text-black dark:text-gray-300 dark:hover:bg-gray-700 p-2 rounded-md"><RiImageFill /></button>
-                                    <Button format="grid-template" action="block" title="Grid template" label={<LuLayoutTemplate/>} />
+                                <div className="px-1 flex">
+                                    <Button format="table" action="block" title="Image" label={<RiImageFill />} />
+                                    {/* <button title="Image" className="hover:bg-gray-200 text-black dark:text-gray-300 dark:hover:bg-gray-700 p-2 rounded-md"><RiImageFill /></button> */}
+                                    <DropdownButton format="grid-template" action="block" title="Grid template" label={<LuLayoutTemplate/>}/>
+                                    {/* <Button format="grid-template" action="block" title="Grid template" label={<LuLayoutTemplate/>} /> */}
                                     
                                 </div>
                             </div>
-                            <div>
+                            <div className="flex items-center">
                                 <button title="Source code" className="hover:bg-gray-200 text-black dark:text-gray-300 dark:hover:bg-gray-700 p-2 rounded-md"><RiCodeSSlashFill /></button>
                             </div>
                         </div>

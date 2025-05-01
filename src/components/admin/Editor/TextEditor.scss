@@ -1,0 +1,9 @@
+[data-slate-node=element].grid{
+    [class^=col-span]{
+        &:hover{
+            outline: 1px solid rgb(209, 208, 253);
+            outline-offset: -1px;
+            z-index: 0;
+        }
+    }
+}
