@@ -4,9 +4,9 @@ import { getToken } from "./Auth";
 const Api = axios.create({baseURL:"http://localhost:8000/api"});
 
 const publicRoutes = [
-    "/category/*",
+    "/categories/*",
     "/products/*", 
-    "/blog/*"
+    "/blogs/*"
 ];
 const isPublicRoute = (url: string | undefined): boolean => {
     if (!url) return false;

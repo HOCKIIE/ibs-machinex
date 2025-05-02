@@ -16,6 +16,7 @@ import {
 } from 'slate';
 import { Slate, Editable, withReact, useSlate  } from 'slate-react';
 import { withHistory, HistoryEditor } from 'slate-history';
+import { serialize, deserialize  } from '@/utils/slateHtmlConverter';
 
 import { 
     RiBold, RiItalic, RiUnderline, 
@@ -26,7 +27,6 @@ import {
 import { LiaUndoSolid, LiaRedoSolid } from "react-icons/lia";
 import { LuLayoutTemplate, LuTable, LuAlignJustify, LuChevronDown } from "react-icons/lu";
 import { BsBorderBottom } from "react-icons/bs";
-
 import { PiTextIndentBold } from "react-icons/pi";
 import { PiTextOutdentBold } from "react-icons/pi";
 
@@ -306,11 +306,11 @@ const getCurrentElementType = (editor: Editor): string | null => {
     return null;
   };
 
-const TextEditor: React.FC = () => {
+const TextEditor: React.FC<{ value: Descendant[]; onChange: (value: Descendant[]) => void }> = ({value, onChange}) => {
 
     const editor = useMemo(() => withHistory(withReact(createEditor())), []);
     const [status, setStatus] = useState<string>('p')
-    const [value, setValue] = useState<Descendant[]>([
+    const [editorValue, setEditorValue] = useState<Descendant[]>(value || [
         {
             type: 'grid',
             children: [{
@@ -457,9 +457,12 @@ const TextEditor: React.FC = () => {
     }
 
     return (
-        <div className="border border-gray-200 rounded-xl overflow-hidden">
+        <div className="border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden">
             <div className="editor">
-                <Slate editor={editor} initialValue={value} onChange={newValue => setValue(newValue)}>
+                <Slate editor={editor} initialValue={editorValue} onChange={(newValue) => {
+                    const html = serialize(newValue);
+                    onChange(html); // อัปเดต react-hook-form เป็น HTML string
+                }}>
                     <div className="editor-tools p-2 inset-20 h-12 w-full shadow-[rgba(0,0,15,0.1)_0px_1px_5px_0px] dark:shadow-[rgba(255,255,255,0.3)_0px_1px_5px_0px]">
                         <div className="flex justify-between">
                             <div className="flex items-center divide-x">
@@ -515,7 +518,7 @@ const TextEditor: React.FC = () => {
                             renderLeaf={renderLeaf}
                             onKeyDown={handleKeyDown}
                             placeholder="Type your message here..."
-                            style={{minHeight:'25rem', height:'25rem'}}
+                            style={{minHeight:'45rem', height:'45rem'}}
                             className="focus:outline-none overflow-y-auto"
                             onChange={(newValue) => {
                                 console.log("Editor content changed: ", newValue);
@@ -538,7 +541,6 @@ const TextEditor: React.FC = () => {
                     </div>
                 </Slate>
             </div>
-
         </div>
     )
 }

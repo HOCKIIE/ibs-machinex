@@ -5,14 +5,15 @@ export interface BlogType {
     image: string;
     title_th: string;
     title_en: string;
-    title_jp: string;
+    title_ja: string;
     description_th: string;
     description_en: string;
-    description_jp: string;
+    description_ja: string;
     detail_th: string;
     detail_en: string;
-    detail_jp: string;
+    detail_ja: string;
     status: boolean;
+    category: string;
     published_at: string;
     created_at: string;
     updated_at: string;
@@ -27,27 +28,33 @@ export interface ApiResponse {
 
 export interface BlogFormProps {
     id: string;
-    title: string;
-    contact_sale: string;
-    role: string;
-    name: string;
-    phone: string;
-    status: string;
-    email: string;
-    password?: string;
+    image: string;
+    title_th: string;
+    title_en: string;
+    title_ja: string;
+    description_th: string;
+    description_en: string;
+    description_ja: string;
+    detail_th: string;
+    detail_en: string;
+    detail_ja: string;
+    status: boolean;
+    category: number[];
 }
 
 export interface BlogState {
+    data: BlogType[];
     isLoading: boolean;
     error: string | null;
     token: string | null;
+
     id: string;
     total: number;
     lastPage: number;
     currentPage: number;
     response: { status: boolean | null; message: string | null };
 
-    fetchData: () => Promise<void>;
+    fetchData: (page: number) => Promise<void>;
     fetchDataById: (id: string) => Promise<void>;
     createData: (
         newUser: BlogFormProps, 

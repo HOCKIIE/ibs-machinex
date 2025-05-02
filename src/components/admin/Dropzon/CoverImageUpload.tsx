@@ -1,14 +1,16 @@
 import React from 'react';
 import { LiaTimesSolid } from "react-icons/lia";
-import { UseFormRegister, UseFormSetValue, UseFormWatch } from 'react-hook-form';
+import { UseFormRegister, UseFormSetValue, UseFormStateReturn, UseFormWatch } from 'react-hook-form';
+import { BlogFormProps } from '@/types/BlogType';
 
 type Props = {
-    register: UseFormRegister<any>;
-    watch: UseFormWatch<any>;
-    setValue: UseFormSetValue<any>;
-  };
+    register: UseFormRegister<BlogFormProps>;
+    watch: UseFormWatch<BlogFormProps>;
+    setValue: UseFormSetValue<BlogFormProps>;
+    errors: UseFormStateReturn<BlogFormProps>['errors'];
+};
 
-const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue }) => {
+const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue, errors }) => {
 
     const imageFile = watch('image');
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
@@ -24,13 +26,13 @@ const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue }) => {
           }
     }, [imageFile]);
 
-    const handleDrop = (e: DragEvent<HTMLDivElement>) => {
+    const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
         const file = e.dataTransfer.files?.[0];
         if (file && file.type.startsWith('image/')) {
-          setValue('image', [file]); // must be array
+            setValue('image', [file]); // must be array
         }
     };
 
@@ -41,9 +43,9 @@ const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue }) => {
 
     return (
         <div className="col-span-full">
-            <label className="block text-sm/6 font-medium text-gray-900">Cover Image</label>
+            <label className="block text-sm/6 font-medium text-gray-900 dark:text-gray-400">Cover Image</label>
             <div 
-                className={`mt-2 flex justify-center items-center rounded-lg border border-dashed dark:border-gray-400 border-gray-900/25 h-50${dragActive ? ' border-indigo-500 bg-indigo-50' : ' border-gray-300'}`}
+                className={`mt-2 flex justify-center items-center rounded-lg border border-dashed ${errors?.image?.type === "required" ? `border-red-400 dark:border-red-800` : `dark:border-gray-600 border-gray-900/25 h-50`} ${dragActive ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}`}
                 onDragOver={(e) => {
                     e.preventDefault();
                     setDragActive(true);
@@ -75,7 +77,7 @@ const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue }) => {
                                 <label htmlFor="file-upload" className="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500 focus:outline-none">
                                 <span>Upload a file</span>
                                 <input 
-                                    {...register('image')}
+                                    {...register('image',{required:true})}
                                     id="file-upload"
                                     type="file" 
                                     className="sr-only focus:outline-none" 
@@ -89,6 +91,7 @@ const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue }) => {
                     )}
                 </div>
             </div>
+            {errors?.image?.type === "required" && <p className="text-xs text-rose-600 dark:text-rose-700">This field is required.</p>}
         </div>
     )
 }
