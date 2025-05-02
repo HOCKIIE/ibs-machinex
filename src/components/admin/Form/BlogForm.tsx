@@ -1,14 +1,19 @@
 import Api from '@/services/Api';
-import React, { useState, useCallback, useEffect } from 'react';
-import { useFieldArray, useForm, Controller  } from "react-hook-form";
+import React, { useState, useCallback, useEffect, Children } from 'react';
+import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
+import { useForm, Controller  } from "react-hook-form";
 import { ApiResponse } from '@/types/CategoryType';
 import { BiSolidCategoryAlt } from "react-icons/bi";
 import { LiaLanguageSolid } from "react-icons/lia";
 import { FaCheck, FaMapPin } from 'react-icons/fa6';
+import { BlogFormProps } from '@/types/BlogType';
 import { MdRemoveRedEye } from "react-icons/md";
-import { IoMdPricetag, IoMdClose } from "react-icons/io";
 import CoverImageUpload from '../Dropzon/CoverImageUpload';
 import TextEditor from '../Editor/TextEditor';
+import { useFormWithDebouncedSetValue } from '@/utils/useFormWithDebouncedSetValue';
+
+import { IoMdPricetag, IoMdClose } from "react-icons/io";
+import { HiExclamation } from "react-icons/hi";
 
 const BlogForm = ({
     itemState,
@@ -25,20 +30,21 @@ const BlogForm = ({
     const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
     const create = type === "create";
     const edit = type === "edit";
-    const tags = [
-        {title:"Company",value:"company"},
-        {title:"Company",value:"company"}
-    ];
+
     const {
         register,
         handleSubmit: handleSubmitForm,
         formState: { errors },
         setValue,
         control,
+        trigger,
         watch,
         reset
-    } = useForm({
+    } = useForm<BlogFormProps>({
+        mode: 'onChange',
         defaultValues: {
+            id:itemState.id || "",
+            image:itemState.image || null,
             title_th: itemState.title_th || "",
             title_en: itemState.title_en || "",
             title_ja: itemState.title_ja || "",
@@ -48,14 +54,18 @@ const BlogForm = ({
             detail_th: itemState.detail_th || "",
             detail_en: itemState.detail_en || "",
             detail_ja: itemState.detail_ja || "",
-            category: [] as number[],
-            status: false,
+            category: itemState.category || [],
+            status: itemState.status || false,
         },
+        criteriaMode: 'all'
     });
-    const { fields, append, remove } = useFieldArray({
-        control,
-        name: "category",
-    });
+    const { setDebouncedValue } = useFormWithDebouncedSetValue(setValue, trigger);
+
+    const Exclamation = () => <HiExclamation className="text-rose-500" fontSize={18}/>;
+    const Errors = ({children}:{children:React.ReactNode}) => <p className="text-xs text-rose-600 dark:text-rose-700">{children}</p>
+    const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
+    const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
+    const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
 
     const statusHandler = () => {
 
@@ -63,6 +73,23 @@ const BlogForm = ({
     const search = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         console.log(value)
+    }
+
+    const onCreate = async (data: any) => {
+        handleSubmit(data);
+    };
+
+    const onEdit = async (formData: any) => {
+        const modifiedData = { ...formData };
+        if (!formData?.password) {
+            delete modifiedData?.password;
+        }
+        delete modifiedData?.confirmPassword;
+        handleSubmit(modifiedData);
+    };
+
+    const cancelAdd = () => {
+        
     }
 
     const fetchCategory = useCallback(async()=>{
@@ -76,62 +103,88 @@ const BlogForm = ({
 
     return (
         <div className="p-4">
+            <form onSubmit={handleSubmitForm(type === "create" ? onCreate : onEdit)}>
             <div className="flex gap-4">
-                <div className="grid gap-4 settings w-2/12">
-                    <div className="border p-2 rounded-lg">
+                <div className="grid-flow-col space-y-4 settings w-2/12">
+                    <div className="border border-gray-300 dark:border-gray-500 p-2 rounded-lg">
                         <div className="setting-content">
-                            <div className="setting-header border-b px-1 pb-2 flex items-center"><LiaLanguageSolid className='me-1' /> Languages </div> 
+                            <div className="setting-header border-b border-gray-300 dark:border-gray-500 px-1 pb-2 flex items-center">
+                                <LiaLanguageSolid className='me-1' /> Languages 
+                            </div> 
                             <div className="setting-body">
                                 <ul className='mt-2'>
-                                    <li><a className={`block rounded-lg text-sm overflow-hidden p-2 text-boxdark hover:bg-indigo-50 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800 ${activeLng}`} href="typescript:" onClick={()=>setLang('th')}>Thai</a></li>
-                                    <li><a className="block rounded-lg text-sm overflow-hidden p-2 text-boxdark hover:bg-indigo-50 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800" href="typescript:" onClick={()=>setLang('en')}>English</a></li>
-                                    <li><a className="block rounded-lg text-sm overflow-hidden p-2 text-boxdark hover:bg-indigo-50 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800" href="typescript:" onClick={()=>setLang('ja')}>Japanese</a></li>
+                                    <li>
+                                        <a className={`flex justify-between items-center rounded-lg text-sm overflow-hidden p-2 text-boxdark hover:bg-indigo-50 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800 ease-in-out duration-300 cursor-pointer ${lng=='th' && activeLng}`} onClick={()=>setLang('th')}>
+                                            Thai {hasThaiErrors && <Exclamation/>}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className={`flex justify-between items-center rounded-lg text-sm overflow-hidden p-2 text-boxdark hover:bg-indigo-50 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800 ease-in-out duration-300 cursor-pointer ${lng=='en' && activeLng}`} onClick={()=>setLang('en')}>
+                                            English {hasEnglishErrors && <Exclamation/>}
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a className={`flex justify-between items-center rounded-lg text-sm overflow-hidden p-2 text-boxdark hover:bg-indigo-50 hover:text-indigo-600 dark:text-gray-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800 ease-in-out duration-300 cursor-pointer ${lng=='ja' && activeLng}`} onClick={()=>setLang('ja')}>
+                                            Japanese  {hasJapaneseErrors && <Exclamation/>}
+                                        </a>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
-                    <div className="border p-2 rounded-lg">
+                    <div className="border border-gray-300 dark:border-gray-500 p-2 rounded-lg">
                         <div className="setting-content">
-                            <div className="setting-header border-b px-1 pb-2 flex items-center"><BiSolidCategoryAlt className="me-1"/> Category</div> 
+                            <div className="setting-header border-b border-gray-300 dark:border-gray-500 px-1 pb-2 flex items-center">
+                                <BiSolidCategoryAlt className="me-1"/> Category
+                            </div> 
                         </div>
                         <div className="setting-body grid">
-                            {category && category?.map((v,k)=>
-                                <Controller
-                                    key={k}
-                                    name="category"
-                                    control={control}
-                                    render={({field}) => {
-                                        const isChecked = Array.isArray(field.value) && field.value.includes(v.id);
+                            <Controller
+                                name="category"
+                                control={control}
+                                rules={{
+                                    validate: (value) => Array.isArray(value) && value.length > 0 || 'Please select at least 1 category.',
+                                }}
+                                render={({field}) => (
+                                    <>
+                                    {category?.map((v, k) => {
+                                        const isChecked = field.value?.includes(v.id);
                                         return (
-                                        <label className="inline-flex items-center gap-2 cursor-pointer space-y-2">
-                                            <input
-                                                type="checkbox"
-                                                className="peer absolute opacity-0 w-0 h-0"
-                                                value={v.id}
-                                                checked={isChecked}
-                                                onChange={(e) => {
-                                                    const checked = e.target.checked;
-                                                    if (checked) {
-                                                        field.onChange([...field.value, v.id]);
-                                                    } else {
-                                                        field.onChange(field.value.filter((id: number) => id !== v.id));
-                                                    }
-                                                }}
-                                                ref={field.ref}
-                                            />
-                                            <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-500 rounded-md flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition-colors">
-                                                <FaCheck fontSize={14} className={`${isChecked?`text-white`:`text-transparent`} font-bold peer-checked:${isChecked?'block':'hidden'}`} />
-                                            </div>
-                                            <span className="text-gray-700 dark:text-gray-400 text-sm">{v.title_en}</span>
-                                        </label>)
-                                    }}
-                                />
-                            )}
+                                            <label key={k} className="inline-flex items-center gap-2 cursor-pointer space-y-2">
+                                                <input
+                                                    type="checkbox"
+                                                    className="peer absolute opacity-0 w-0 h-0"
+                                                    value={v.id}
+                                                    checked={isChecked}
+                                                    onChange={(e) => {
+                                                        const checked = e.target.checked;
+                                                        if (checked) {
+                                                            field.onChange([...field.value, v.id]);
+                                                        } else {
+                                                            field.onChange(field.value.filter((id: number) => id !== v.id));
+                                                        }
+                                                    }}
+                                                />
+                                                <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-500 rounded-md flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition-colors">
+                                                    <FaCheck fontSize={14} className={`${isChecked?`text-white`:`text-transparent`} font-bold peer-checked:${isChecked?'block':'hidden'}`} />
+                                                </div>
+                                                <span className={`${errors.category?'text-rose-600 dark:text-rose-700':'text-gray-700 dark:text-gray-400'} text-sm`}>{v.title_en}</span>
+                                            </label>  
+                                        );
+                                    })}
+                                    </>
+                                )}           
+                            />
                         </div>
+                        {errors.category?.message && (
+                            <p className="text-xs text-rose-600 dark:text-rose-700 mt-3">{errors.category.message}</p>
+                        )}
                     </div>
-                    <div className="border p-2 rounded-lg">
+                    <div className="border border-gray-300 dark:border-gray-500 p-2 rounded-lg">
                         <div className="setting-content">
-                            <div className="setting-header border-b px-1 pb-2 flex items-center"><FaMapPin className='me-1' /> Status</div> 
+                            <div className="setting-header border-b border-gray-300 dark:border-gray-500 px-1 pb-2 flex items-center">
+                                <FaMapPin className='me-1' /> Status
+                            </div> 
                         </div>
                         <div className="setting-body mt-2">
                             <div className="flex items-center mb-4">
@@ -148,9 +201,10 @@ const BlogForm = ({
                             </div>
                         </div>
                     </div>
-                    <div className="border p-2 rounded-lg">
+                    <div className="border border-gray-300 dark:border-gray-500 p-2 rounded-lg">
                         <div className="setting-content">
-                            <div className="setting-header border-b px-1 pb-2 flex items-center"><MdRemoveRedEye className="me-1"/> Publish
+                            <div className="setting-header border-b border-gray-300 dark:border-gray-500 px-1 pb-2 flex items-center">
+                                <MdRemoveRedEye className="me-1"/> Publish
                             </div> 
                         </div>
                         <div className="setting-body mt-2">
@@ -162,9 +216,11 @@ const BlogForm = ({
                             
                         </div>
                     </div>
-                    <div className="border p-2 rounded-lg">
+                    <div className="border border-gray-300 dark:border-gray-500 p-2 rounded-lg">
                         <div className="setting-content">
-                            <div className="setting-header border-b px-1 pb-2 flex items-center"><IoMdPricetag className="me-1"/>Tag</div> 
+                            <div className="setting-header border-b border-gray-300 dark:border-gray-500 px-1 pb-2 flex items-center">
+                                <IoMdPricetag className="me-1"/>Tag
+                            </div> 
                         </div>
                         <div className="setting-body mt-2">   
                             <div className="flex gap-1">
@@ -179,74 +235,185 @@ const BlogForm = ({
                 </div>
                 <div className="w-10/12">
                     <div className="w-full">
-                        <div className="tabs">
-                            <div className="tab" data-tab="th">
+                        <div className="grid grid-cols-12">
+                            <div className="col-span-12">
+                                <CoverImageUpload register={register} watch={watch} setValue={setValue} errors={errors}/>
+                            </div>
+                        </div>
+                        <div className="tabs mt-3">
+                            <div className={`tab ease-in-out duration-300 ${lng=='th'?``:` hidden`}`} data-tab="th">
                                 <div className="grid grid-cols-12 gap-4">
-                                    <div className="col-span-12">
-                                        <CoverImageUpload register={register} watch={watch} setValue={setValue}/>
-                                    </div>
                                     <div className="col-span-12">
                                         <div className="space-y-3">
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label>
                                             <input 
-                                                {...register("title_th", { required: true })}
+                                                {...register("title_th", { 
+                                                    required: true,
+                                                    validate: (value) => value.trim().length > 0 || "This field is required."
+                                                })}
                                                 type="text" 
-                                                onChange={setData}
-                                                className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.name_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                                                placeholder="Title" />
-                                                {errors?.title_th?.type === "required" && (
-                                                    <p className="text-xs text-rose-600 dark:text-rose-700">
-                                                        {create
-                                                        ? "This field is required."
-                                                        : "Recheck the field."}
-                                                    </p>
-                                                )}
+                                                onChange={e => setData(e, setValue, trigger)}
+                                                className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                                                placeholder="Title" 
+                                            />
+                                            {errors?.title_th?.type === "required" && (
+                                                <Errors>{create? "This field is required.": "Recheck the field."}</Errors>
+                                            )}
                                         </div>
                                     </div>
-                                    
                                     <div className="col-span-12">
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
                                         <textarea 
+                                            {...register("description_th", { 
+                                                required: true,
+                                                validate: (value) => value.trim().length > 0 || "This field is required."
+                                            })}
                                             className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
                                             placeholder="Description"
-                                            name="" 
+                                            onChange={e => setData(e, setValue, trigger)}
                                             rows={5}
                                             id=""
                                         ></textarea>
                                         {errors?.description_th?.type === "required" && (
-                                            <p className="text-xs text-rose-600 dark:text-rose-700">
-                                                {create
-                                                ? "This field is required."
-                                                : "Recheck the field."}
-                                            </p>
+                                            <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
                                         )}
                                     </div>
                                     <div className="col-span-12">
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Detail</label>
-                                        <TextEditor />
-                                        {/* <textarea 
-                                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                                            placeholder="Detail"
-                                            name="" 
+                                        <Controller
+                                            name="detail_th"
+                                            control={control}
+                                            defaultValue=""
+                                            render={({ field:{value, onChange} }) => (
+                                                <TextEditor value={value} onChange={onChange}/>
+                                            )}
+                                        />                        
+                                        {errors?.detail_th?.type === "required" && (
+                                            <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                        )} 
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                            <div className={`tab ease-in-out duration-300 ${lng=='en'?``:` hidden`}`} data-tab="en">
+                                <div className="grid grid-cols-12 gap-4">
+                                    <div className="col-span-12">
+                                        <div className="space-y-3">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label>
+                                            <input 
+                                                {...register("title_en", { 
+                                                    required: true,
+                                                    validate: (value) => value.trim().length > 0 || "This field is required."
+                                                })}
+                                                type="text" 
+                                                onChange={e => setData(e, setValue, trigger)}
+                                                className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_en ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                                                placeholder="Title" />
+                                                {errors?.title_en?.type === "required" && (
+                                                    <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                                )}
+                                        </div>
+                                    </div>
+                                    <div className="col-span-12">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
+                                        <textarea 
+                                            {...register("description_en", { 
+                                                required: true,
+                                                validate: (value) => value.trim().length > 0 || "This field is required."
+                                             })}
+                                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_en ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                                            placeholder="Description"
+                                            onChange={e => setData(e, setValue, trigger)}
                                             rows={5}
                                             id=""
                                         ></textarea>
-                                        {errors?.description_th?.type === "required" && (
-                                            <p className="text-xs text-rose-600 dark:text-rose-700">
-                                                {create
-                                                ? "This field is required."
-                                                : "Recheck the field."}
-                                            </p>
-                                        )} */}
+                                        {errors?.description_en?.type === "required" && (
+                                            <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                        )}
+                                    </div>
+                                    <div className="col-span-12">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Detail</label>
+                                        <Controller
+                                            name="detail_en"
+                                            control={control}
+                                            defaultValue=""
+                                            render={({ field: { value, onChange } }) => (
+                                                <TextEditor value={value} onChange={onChange}/>
+                                          
+                                            )}
+                                        />                        
+                                        {errors?.detail_en?.type === "required" && (
+                                            <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                        )} 
                                     </div>
                                 </div>
                             </div>
-                            <div className="tab" data-tab="en"></div>
-                            <div className="tab" data-tab="ja"></div>
+                            <div className={`tab ease-in-out duration-300 ${lng=='ja'?``:` hidden`}`} data-tab="ja">
+                                <div className="grid grid-cols-12 gap-4">
+                                    <div className="col-span-12">
+                                        <div className="space-y-3">
+                                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label>
+                                            <input 
+                                                {...register("title_ja", { 
+                                                    required: true,
+                                                    validate: (value) => value.trim().length > 0 || "This field is required."
+                                                })}
+                                                type="text" 
+                                                onChange={e => setData(e, setValue, trigger)}
+                                                className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_ja ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                                                placeholder="Title" />
+                                                {errors?.title_ja?.type === "required" && (
+                                                    <Errors>{create? "This field is required.": "Recheck the field."}</Errors>
+                                                )}
+                                        </div>
+                                    </div>
+                                    <div className="col-span-12">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
+                                        <textarea 
+                                            {...register("description_ja", { 
+                                                required: true,
+                                                validate: (value) => value.trim().length > 0 || "This field is required."
+                                            })}
+                                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_ja ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                                            placeholder="Description"
+                                            onChange={e => setData(e, setValue, trigger)}
+                                            rows={5}
+                                            id=""
+                                        ></textarea>
+                                        {errors?.description_ja?.type === "required" && (
+                                            <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                        )}
+                                    </div>
+                                    <div className="col-span-12">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Detail</label>
+                                        <Controller
+                                            name="detail_ja"
+                                            control={control}
+                                            defaultValue=""
+                                            render={({ field: { value, onChange } }) => (
+                                                <TextEditor value={value} onChange={onChange}/>
+                                          
+                                            )}
+                                        />                        
+                                        {errors?.detail_ja?.type === "required" && (
+                                            <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                        )} 
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-12 mt-4">
+                            <div className="col-span-12">
+                                <div className="flex gap-4 items-center justify-center">
+                                    <CancelButton title="Cancel" setEdit={cancelAdd}/>
+                                    <SaveButton title="Add" saveChange={handleSubmit}/>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+            </form>
         </div>
     )
 }

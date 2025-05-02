@@ -1,19 +1,23 @@
 "use client";
 
-import React,{ useState } from 'react';
+import React,{ useState, useRef } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import BlogForm from '@/components/admin/Form/BlogForm';
 import { useRouter } from 'next/navigation';
 import useBlogStore from '@/store/useBlogStore';
+import { BlogFormProps } from '@/types/BlogType';
+import { UseFormSetValue, UseFormTrigger } from 'react-hook-form';
+import { debounce } from 'lodash';
 
 
-const page = () => {
+const Page = () => {
 
     const router = useRouter();
     const { createData } = useBlogStore();
-    const [userState, setUserState] = useState<UsersFormProps>({
+    const [userState, setUserState] = useState<BlogFormProps>({
         id: "",
+        image:"",
         title_th: "",
         title_en: "",
         title_ja: "",
@@ -23,29 +27,40 @@ const page = () => {
         detail_th: "",
         detail_en: "",
         detail_ja: "",
-        status: "",
-        category: "",
+        status: false,
+        category: [],
     });
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => 
-    {
+    const debouncedSetValueRef = useRef(
+        debounce((
+          name: keyof BlogFormProps,
+          value: string,
+          setValue: UseFormSetValue<BlogFormProps>,
+          trigger: UseFormTrigger<BlogFormProps>
+        ) => {
+          setValue(name, value, { shouldValidate: true });
+          trigger(name);
+        }, 1000)
+    );
+    const handleChange = (
+        event: React.ChangeEvent<HTMLInputElement>,
+        setValue: UseFormSetValue<BlogFormProps>,
+        trigger: UseFormTrigger<BlogFormProps>
+    ) => {
         const { name, value, files } = event.target;
         if (name === "image" && files && files[0]) {
-        setUserState((prevState) => ({
-            ...prevState,
-            image: files[0],
-        }));
+            const fileURL = URL.createObjectURL(files[0]);
+            setUserState((prev) => ({ ...prev, image: fileURL }));
+            setValue(name, files[0], { shouldValidate: true });
+            trigger(name);
         } else {
-        setUserState((prevState) => ({
-            ...prevState,
-            [name]: value,
-        }));
+            setUserState((prev) => ({ ...prev, [name]: value }));
+            debouncedSetValueRef.current(name as keyof BlogFormProps, value, setValue, trigger)
         }
     };
 
     const handleSubmit = async (data: any) => {
         await createData(data,router);
-        // router.push("/admin/user");
     };
 
     return (
@@ -75,4 +90,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page
