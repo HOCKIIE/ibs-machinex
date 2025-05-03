@@ -33,14 +33,14 @@ const Page = () => {
 
     const debouncedSetValueRef = useRef(
         debounce((
-          name: keyof BlogFormProps,
-          value: string,
-          setValue: UseFormSetValue<BlogFormProps>,
-          trigger: UseFormTrigger<BlogFormProps>
+            name: keyof BlogFormProps,
+            value: string,
+            setValue: UseFormSetValue<BlogFormProps>,
+            trigger: UseFormTrigger<BlogFormProps>
         ) => {
-          setValue(name, value, { shouldValidate: true });
-          trigger(name);
-        }, 300)
+            setValue(name, value, { shouldValidate: true });
+            trigger(name);
+        }, 500)
     );
     const handleChange = (
         event: React.ChangeEvent<HTMLInputElement>,
