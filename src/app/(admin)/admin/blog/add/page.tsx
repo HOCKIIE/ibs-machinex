@@ -40,7 +40,7 @@ const Page = () => {
         ) => {
           setValue(name, value, { shouldValidate: true });
           trigger(name);
-        }, 1000)
+        }, 300)
     );
     const handleChange = (
         event: React.ChangeEvent<HTMLInputElement>,
