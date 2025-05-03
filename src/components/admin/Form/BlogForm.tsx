@@ -10,7 +10,6 @@ import { BlogFormProps } from '@/types/BlogType';
 import { MdRemoveRedEye } from "react-icons/md";
 import CoverImageUpload from '../Dropzon/CoverImageUpload';
 import TextEditor from '../Editor/TextEditor';
-import { useFormWithDebouncedSetValue } from '@/utils/useFormWithDebouncedSetValue';
 
 import { IoMdPricetag, IoMdClose } from "react-icons/io";
 import { HiExclamation } from "react-icons/hi";
@@ -59,10 +58,10 @@ const BlogForm = ({
         },
         criteriaMode: 'all'
     });
-    const { setDebouncedValue } = useFormWithDebouncedSetValue(setValue, trigger);
+
 
     const Exclamation = () => <HiExclamation className="text-rose-500" fontSize={18}/>;
-    const Errors = ({children}:{children:React.ReactNode}) => <p className="text-xs text-rose-600 dark:text-rose-700">{children}</p>
+    const Errors = ({className,children}:{className?:string;children:React.ReactNode}) => <p className={`text-xs text-rose-600 dark:text-rose-700${className && ` ${className}`}`}>{children}</p>
     const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
     const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
     const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
@@ -165,10 +164,10 @@ const BlogForm = ({
                                                         }
                                                     }}
                                                 />
-                                                <div className="w-5 h-5 border-2 border-gray-300 dark:border-gray-500 rounded-md flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition-colors">
+                                                <div className={`w-5 h-5 border-2 ${errors.category? `border-rose-300 dark:border-rose-500`:`border-gray-300 dark:border-gray-500`} rounded-md flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition-colors`}>
                                                     <FaCheck fontSize={14} className={`${isChecked?`text-white`:`text-transparent`} font-bold peer-checked:${isChecked?'block':'hidden'}`} />
                                                 </div>
-                                                <span className={`${errors.category?'text-rose-600 dark:text-rose-700':'text-gray-700 dark:text-gray-400'} text-sm`}>{v.title_en}</span>
+                                                <span className={`text-gray-700 dark:text-gray-400 text-sm`}>{v.title_en}</span>
                                             </label>  
                                         );
                                     })}
@@ -176,8 +175,8 @@ const BlogForm = ({
                                 )}           
                             />
                         </div>
-                        {errors.category?.message && (
-                            <p className="text-xs text-rose-600 dark:text-rose-700 mt-3">{errors.category.message}</p>
+                        {errors?.category && (
+                            <Errors className="mt-2">{errors?.category.message}</Errors>
                         )}
                     </div>
                     <div className="border border-gray-300 dark:border-gray-500 p-2 rounded-lg">
@@ -247,14 +246,11 @@ const BlogForm = ({
                                         <div className="space-y-3">
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label>
                                             <input 
-                                                {...register("title_th", { 
-                                                    required: true,
-                                                    validate: (value) => value.trim().length > 0 || "This field is required."
-                                                })}
-                                                type="text" 
-                                                onChange={e => setData(e, setValue, trigger)}
+                                                type="text"
+                                                {...register("title_th", { required: true })}
+                                                defaultValue={itemState.title_th}
                                                 className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                                                placeholder="Title" 
+                                                placeholder="Title TH" 
                                             />
                                             {errors?.title_th?.type === "required" && (
                                                 <Errors>{create? "This field is required.": "Recheck the field."}</Errors>
@@ -264,15 +260,12 @@ const BlogForm = ({
                                     <div className="col-span-12">
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
                                         <textarea 
-                                            {...register("description_th", { 
-                                                required: true,
-                                                validate: (value) => value.trim().length > 0 || "This field is required."
-                                            })}
+                                            {...register("description_th", { required: true })}
+                                            defaultValue={itemState.description_th}
                                             className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                                            placeholder="Description"
+                                            placeholder="Description TH"
                                             onChange={e => setData(e, setValue, trigger)}
                                             rows={5}
-                                            id=""
                                         ></textarea>
                                         {errors?.description_th?.type === "required" && (
                                             <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
@@ -283,7 +276,7 @@ const BlogForm = ({
                                         <Controller
                                             name="detail_th"
                                             control={control}
-                                            defaultValue=""
+                                            defaultValue={itemState.detail_th}
                                             render={({ field:{value, onChange} }) => (
                                                 <TextEditor value={value} onChange={onChange}/>
                                             )}
@@ -301,14 +294,11 @@ const BlogForm = ({
                                         <div className="space-y-3">
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label>
                                             <input 
-                                                {...register("title_en", { 
-                                                    required: true,
-                                                    validate: (value) => value.trim().length > 0 || "This field is required."
-                                                })}
                                                 type="text" 
-                                                onChange={e => setData(e, setValue, trigger)}
+                                                {...register("title_en", { required: true })}
+                                                defaultValue={itemState.detail_th}
                                                 className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_en ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                                                placeholder="Title" />
+                                                placeholder="Title EN" />
                                                 {errors?.title_en?.type === "required" && (
                                                     <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
                                                 )}
@@ -317,15 +307,11 @@ const BlogForm = ({
                                     <div className="col-span-12">
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
                                         <textarea 
-                                            {...register("description_en", { 
-                                                required: true,
-                                                validate: (value) => value.trim().length > 0 || "This field is required."
-                                             })}
+                                            {...register("description_en", { required: true })}
+                                            defaultValue={itemState.description_en}
                                             className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_en ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                                            placeholder="Description"
-                                            onChange={e => setData(e, setValue, trigger)}
+                                            placeholder="Description EN"
                                             rows={5}
-                                            id=""
                                         ></textarea>
                                         {errors?.description_en?.type === "required" && (
                                             <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
@@ -336,7 +322,7 @@ const BlogForm = ({
                                         <Controller
                                             name="detail_en"
                                             control={control}
-                                            defaultValue=""
+                                            defaultValue={itemState.detail_en}
                                             render={({ field: { value, onChange } }) => (
                                                 <TextEditor value={value} onChange={onChange}/>
                                           
@@ -354,14 +340,11 @@ const BlogForm = ({
                                         <div className="space-y-3">
                                             <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label>
                                             <input 
-                                                {...register("title_ja", { 
-                                                    required: true,
-                                                    validate: (value) => value.trim().length > 0 || "This field is required."
-                                                })}
                                                 type="text" 
-                                                onChange={e => setData(e, setValue, trigger)}
+                                                {...register("title_ja", { required: true })}
+                                                defaultValue={itemState.title_ja}
                                                 className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_ja ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                                                placeholder="Title" />
+                                                placeholder="Title JA" />
                                                 {errors?.title_ja?.type === "required" && (
                                                     <Errors>{create? "This field is required.": "Recheck the field."}</Errors>
                                                 )}
@@ -370,15 +353,11 @@ const BlogForm = ({
                                     <div className="col-span-12">
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
                                         <textarea 
-                                            {...register("description_ja", { 
-                                                required: true,
-                                                validate: (value) => value.trim().length > 0 || "This field is required."
-                                            })}
+                                            {...register("description_ja", { required: true })}
+                                            defaultValue={itemState.description_ja}
                                             className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_ja ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                                            placeholder="Description"
-                                            onChange={e => setData(e, setValue, trigger)}
+                                            placeholder="Description JA"
                                             rows={5}
-                                            id=""
                                         ></textarea>
                                         {errors?.description_ja?.type === "required" && (
                                             <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
@@ -389,7 +368,7 @@ const BlogForm = ({
                                         <Controller
                                             name="detail_ja"
                                             control={control}
-                                            defaultValue=""
+                                            defaultValue={itemState.detail_ja}
                                             render={({ field: { value, onChange } }) => (
                                                 <TextEditor value={value} onChange={onChange}/>
                                           
