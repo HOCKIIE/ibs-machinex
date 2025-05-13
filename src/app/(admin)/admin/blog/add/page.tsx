@@ -6,8 +6,8 @@ import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import BlogForm from '@/components/admin/Form/BlogForm';
 import { useRouter } from 'next/navigation';
 import useBlogStore from '@/store/useBlogStore';
-import { BlogFormProps } from '@/types/BlogType';
-import { UseFormSetValue, UseFormTrigger } from 'react-hook-form';
+import { BlogFormProps, BlogType } from '@/types/BlogType';
+import { UseFormSetValue, UseFormTrigger, useForm } from 'react-hook-form';
 import { debounce } from 'lodash';
 
 
@@ -15,21 +15,26 @@ const Page = () => {
 
     const router = useRouter();
     const { createData } = useBlogStore();
-    const [userState, setUserState] = useState<BlogFormProps>({
+    const [userState, setUserState] = useState<BlogType>({
         id: "",
-        image:"",
+        image: "",
         title_th: "",
         title_en: "",
         title_ja: "",
         description_th: "",
         description_en: "",
         description_ja: "",
-        detail_th: "",
-        detail_en: "",
-        detail_ja: "",
+        detail_th: `<div class="grid grid-cols-12 gap-4"><div class="col-span-12 p-2"><p class="mb-3 text-center">Blog Image</p></div><div class="col-span-12"><p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p></div></div>`,
+        detail_en: `<div class="grid grid-cols-12 gap-4"><div class="col-span-12 p-2"><p class="mb-3 text-center">Blog Image</p></div><div class="col-span-12"><p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p></div></div>`,
+        detail_ja: `<div class="grid grid-cols-12 gap-4"><div class="col-span-12 p-2"><p class="mb-3 text-center">Blog Image</p></div><div class="col-span-12"><p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p></div></div>`,
         status: false,
-        category: [],
+        category: "",
+        created_at:"",
+        updated_at:"",
+        published_at:""
     });
+
+    const { formState: { errors } } = useForm()
 
     const debouncedSetValueRef = useRef(
         debounce((
@@ -47,19 +52,16 @@ const Page = () => {
         setValue: UseFormSetValue<BlogFormProps>,
         trigger: UseFormTrigger<BlogFormProps>
     ) => {
-        const { name, value, files } = event.target;
-        if (name === "image" && files && files[0]) {
-            const fileURL = URL.createObjectURL(files[0]);
-            setUserState((prev) => ({ ...prev, image: fileURL }));
-            setValue(name, files[0], { shouldValidate: true });
-            trigger(name);
-        } else {
-            setUserState((prev) => ({ ...prev, [name]: value }));
-            debouncedSetValueRef.current(name as keyof BlogFormProps, value, setValue, trigger)
-        }
+        const { name, value } = event.target;
+
+        setUserState((prev) => ({ ...prev, [name]: value }));
+        debouncedSetValueRef.current(name as keyof BlogFormProps, value, setValue, trigger)
+        
     };
 
     const handleSubmit = async (data: any) => {
+        console.log("errors", errors);
+        
         await createData(data,router);
     };
 
@@ -81,7 +83,7 @@ const Page = () => {
                     <BlogForm 
                         itemState={userState}
                         setItemState={handleChange}
-                        handleSubmit={handleSubmit}
+                        onSubmit={handleSubmit}
                         type="create"
                     />
                 </div>

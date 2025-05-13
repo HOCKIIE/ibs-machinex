@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 import { UserType, UserState, ApiResponse } from "@/types/UserType";
 // Removed incorrect import of setTimeout
 
-const apiPrefix = '/user';
 const prefix = '/admin/user';
 
 const useUserStore = create<UserState>((set) => ({
@@ -25,7 +24,7 @@ const useUserStore = create<UserState>((set) => ({
     fetchUsers: async (page: number) => {
         set({ isLoading: true, error: null });
         try {
-          const response = await Api.get<ApiResponse>(`${apiPrefix}?page=${page}`);
+          const response = await Api.get<ApiResponse>(`${prefix}?page=${page}`);
     
           const { total, lastPage, currentPage, rows } = response.data;
     
@@ -52,7 +51,7 @@ const useUserStore = create<UserState>((set) => ({
     fetchUserById: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.get<UserType>(`${apiPrefix}/show/${id}`);
+            const response = await Api.get<UserType>(`${prefix}/show/${id}`);
     
             set((state) => ({
                 ...state,
@@ -67,7 +66,7 @@ const useUserStore = create<UserState>((set) => ({
     
       createUser: async (newUser, router) => {
         try {
-            const response = await Api.post(`${apiPrefix}/store`, newUser);
+            const response = await Api.post(`${prefix}/store`, newUser);
             set((state) => ({
                 users: [...state.users, response.data],
                 isLoading: false,
@@ -91,7 +90,7 @@ const useUserStore = create<UserState>((set) => ({
     updateUser: async (id, data, router) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.put<UserType>(`${apiPrefix}/update/${id}`,data);
+            const response = await Api.put<UserType>(`${prefix}/update/${id}`,data);
             set((state) => ({
                 users: state.users.map((item) => item.id === Number(id) ? response.data : item  ),
                 isLoading: false,
@@ -109,7 +108,7 @@ const useUserStore = create<UserState>((set) => ({
     onChangeStatus: async (id, status) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.put<UserType>(`${apiPrefix}/status/${id}`,{ status });
+            const response = await Api.put<UserType>(`${prefix}/status/${id}`,{ status });
             set((state) => ({
                 banners: state.users.map((item) => item.id === Number(id) ? response.data : item ),
                 isLoading: false,
@@ -131,7 +130,7 @@ const useUserStore = create<UserState>((set) => ({
     deleteUser: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            await Api.delete(`${apiPrefix}/destroy`,{ data: { id:id } });
+            await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set((state) => ({
                 users: state.users.filter((item) => item.id !== Number(id)),
                 isLoading: false,

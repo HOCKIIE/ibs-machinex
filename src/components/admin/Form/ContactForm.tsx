@@ -108,7 +108,7 @@ const ContactForm = () =>
                 <div>
                     <div className="space-y-6 border-t border-gray-100 p-5 sm:p-6 dark:border-gray-800">
                         <div className="grid grid-cols-12 gap-5">
-                        <div className="col-span-12 space-y-3">
+                            <div className="col-span-12 xl:col-span-6 space-y-3">
                                 <div className="space-y-3">
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Company Name</label>
                                     <input 
@@ -116,6 +116,19 @@ const ContactForm = () =>
                                         type="text" 
                                         className="dark:bg-dark-900 shadow-theme-xs focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-700 placeholder:text-gray-400 focus:ring-3 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 disabled:bg-gray-50 disabled:border-gray-100 disabled:text-gray-500" 
                                         placeholder="Company Name"
+                                        disabled={!isEditContact}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+                            <div className="col-span-12 xl:col-span-6 space-y-3">
+                                <div className="space-y-3">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Email</label>
+                                    <input 
+                                        {...register('email',{required:true})}
+                                        type="text" 
+                                        className="dark:bg-dark-900 shadow-theme-xs focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-700 placeholder:text-gray-400 focus:ring-3 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 disabled:bg-gray-50 disabled:border-gray-100 disabled:text-gray-500" 
+                                        placeholder="Email"
                                         disabled={!isEditContact}
                                         onChange={handleChange}
                                     />

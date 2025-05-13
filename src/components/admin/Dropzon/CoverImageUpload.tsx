@@ -2,37 +2,42 @@ import React from 'react';
 import { LiaTimesSolid } from "react-icons/lia";
 import { UseFormRegister, UseFormSetValue, UseFormStateReturn, UseFormWatch } from 'react-hook-form';
 import { BlogFormProps } from '@/types/BlogType';
+import { ErrorMessage } from '@/components/admin/Form/Validation';
+import { set } from 'lodash';
 
 type Props = {
     register: UseFormRegister<BlogFormProps>;
     watch: UseFormWatch<BlogFormProps>;
     setValue: UseFormSetValue<BlogFormProps>;
+    defaultValue: BlogFormProps["image"] | null;
     errors: UseFormStateReturn<BlogFormProps>['errors'];
 };
 
-const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue, errors }) => {
+const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue, defaultValue, errors }) => {
 
-    const imageFile = watch('image');
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
     const [dragActive, setDragActive] = React.useState(false);
 
-    React.useEffect(() => {
-        if (imageFile?.[0]) {
-            const url = URL.createObjectURL(imageFile[0]);
-            setPreviewUrl(url);
-            return () => URL.revokeObjectURL(url);
-        } else {
-            setPreviewUrl(null);
-          }
-    }, [imageFile]);
+    const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            setPreviewUrl(URL.createObjectURL(file));
+            setValue("image", file, {
+                shouldValidate: true,
+                shouldTouch: true,
+                shouldDirty: true,
+            }); // ✅ make sure error gets cleared if valid
+        }
+    };
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
         e.preventDefault();
         e.stopPropagation();
         setDragActive(false);
         const file = e.dataTransfer.files?.[0];
-        if (file && file.type.startsWith('image/')) {
-            setValue('image', [file]); // must be array
+        if (file && file.type.startsWith("image/")) {
+            setPreviewUrl(URL.createObjectURL(file));
+            setValue("image", file, { shouldValidate: true });
         }
     };
 
@@ -45,7 +50,7 @@ const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue, errors }
         <div className="col-span-full">
             <label className="block text-sm/6 font-medium text-gray-900 dark:text-gray-400">Cover Image</label>
             <div 
-                className={`mt-2 flex justify-center items-center rounded-lg border border-dashed ${errors?.image?.type === "required" ? `border-red-400 dark:border-red-800` : `dark:border-gray-600 border-gray-900/25 h-50`} ${dragActive ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}`}
+                className={`mt-2 flex justify-center items-center rounded-lg border border-dashed ${errors?.image ? `border-red-400 dark:border-red-800` : `dark:border-gray-600 border-gray-900/25 h-50`} ${dragActive ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}`}
                 onDragOver={(e) => {
                     e.preventDefault();
                     setDragActive(true);
@@ -77,21 +82,36 @@ const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue, errors }
                                 <label htmlFor="file-upload" className="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500 focus:outline-none">
                                 <span>Upload a file</span>
                                 <input 
-                                    {...register('image',{required:true})}
-                                    id="file-upload"
                                     type="file" 
-                                    className="sr-only focus:outline-none" 
+                                    id="file-upload"
                                     accept="image/*"
+                                    className="sr-only focus:outline-none"
+                                    {...register("image", {
+                                        required: true,
+                                        validate: {
+                                            required: (value) => value ? true : "This field is required.",
+                                            fileType: (value) => {
+                                                const file = value instanceof FileList ? value[0] : null;
+                                                return file && file.type.startsWith("image/") || "Only image files are allowed.";
+                                            },
+                                            fileSize: (value) => {
+                                                const file = value instanceof FileList ? value[0] : null;
+                                                return file ? file.size <= 2 * 1024 * 1024 || "File size must be less than 2MB." : "This field is required.";
+                                            },
+                                        },
+
+                                    })}
+                                    onChange={handleImageChange}
                                 />
                                 </label>
                                 <p className="pl-1">or drag and drop</p>
                             </div>
-                            <p className="text-xs/5 text-gray-600 dark:text-gray-400">PNG, JPG, GIF up to 10MB</p>
+                            <p className="text-xs/5 text-gray-600 dark:text-gray-400">PNG, JPG, GIF up to 2MB</p>
                         </>
                     )}
                 </div>
             </div>
-            {errors?.image?.type === "required" && <p className="text-xs text-rose-600 dark:text-rose-700">This field is required.</p>}
+            {errors?.image && <ErrorMessage className="mt-1">This field is required.</ErrorMessage>}
         </div>
     )
 }

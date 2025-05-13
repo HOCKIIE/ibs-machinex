@@ -5,8 +5,9 @@ interface ButtonProps {
     setEdit: () => void;
 }
 interface SaveButtonProps {
+    type?:string;
     title?:string;
-    saveChange: () => void;
+    saveChange?: () => void;
 }
 
 export const EditButton = ({title,setEdit}: ButtonProps) => {
@@ -23,8 +24,9 @@ export const CancelButton = ({title,setEdit}: ButtonProps) => {
     >{title?`${title}`:`Cancel`}</button>
 }
 
-export const SaveButton = ({title,saveChange}: SaveButtonProps) => {
+export const SaveButton = ({type, title,saveChange}: SaveButtonProps) => {
     return <button 
+        type={type?type:`button`}
         onClick={saveChange}
         className="rounded-md px-5 py-2 dark:text-black min-w-30 max-w-35 bg-emerald-300 border border-emerald-400 hover:bg-emerald-400 focus:ring focus:ring-green-500/20"
     >{title?`${title}`:`Save`}</button>;
