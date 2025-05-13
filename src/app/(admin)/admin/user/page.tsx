@@ -41,7 +41,7 @@ const Users = () =>
         StatusTab
     } = usePagination({ 
         initialLimit: show[0],
-        endpoint: '/user'
+        endpoint: '/admin/user'
     });
 
     const {  isLoading, error, deleteUser, response } = useUserStore();
@@ -199,7 +199,7 @@ const Users = () =>
                                                 <div className="h-2 rounded mt-0 pt-0"></div>
                                             </div>
                                         </div>
-                                        }
+                                    }
                                     </td>
                                 </tr>
                             )}

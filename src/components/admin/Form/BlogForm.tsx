@@ -10,6 +10,7 @@ import { BlogFormProps } from '@/types/BlogType';
 import { MdRemoveRedEye } from "react-icons/md";
 import CoverImageUpload from '../Dropzon/CoverImageUpload';
 import TextEditor from '../Editor/TextEditor';
+import { ErrorMessage } from './Validation';
 
 import { IoMdPricetag, IoMdClose } from "react-icons/io";
 import { HiExclamation } from "react-icons/hi";
@@ -17,7 +18,7 @@ import { HiExclamation } from "react-icons/hi";
 const BlogForm = ({
     itemState,
     setItemState: setData,
-    handleSubmit,
+    onSubmit,
     type
 } : any) => {
 
@@ -42,8 +43,8 @@ const BlogForm = ({
     } = useForm<BlogFormProps>({
         mode: 'onChange',
         defaultValues: {
-            id:itemState.id || "",
-            image:itemState.image || null,
+            id: itemState.id || "",
+            image: itemState.image || null,
             title_th: itemState.title_th || "",
             title_en: itemState.title_en || "",
             title_ja: itemState.title_ja || "",
@@ -61,7 +62,6 @@ const BlogForm = ({
 
 
     const Exclamation = () => <HiExclamation className="text-rose-500" fontSize={18}/>;
-    const Errors = ({className,children}:{className?:string;children:React.ReactNode}) => <p className={`text-xs text-rose-600 dark:text-rose-700${className && ` ${className}`}`}>{children}</p>
     const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
     const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
     const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
@@ -75,21 +75,24 @@ const BlogForm = ({
     }
 
     const onCreate = async (data: any) => {
-        handleSubmit(data);
+        // console.log(typeof errors)
+        onSubmit(data);
     };
 
     const onEdit = async (formData: any) => {
+        console.log(errors)
         const modifiedData = { ...formData };
         if (!formData?.password) {
             delete modifiedData?.password;
         }
         delete modifiedData?.confirmPassword;
-        handleSubmit(modifiedData);
+        onSubmit(modifiedData);
     };
 
     const cancelAdd = () => {
         
     }
+
 
     const fetchCategory = useCallback(async()=>{
         const res = await Api.get('/category');
@@ -176,7 +179,7 @@ const BlogForm = ({
                             />
                         </div>
                         {errors?.category && (
-                            <Errors className="mt-2">{errors?.category.message}</Errors>
+                            <ErrorMessage className="mt-2">{errors?.category.message}</ErrorMessage>
                         )}
                     </div>
                     <div className="border border-gray-300 dark:border-gray-500 p-2 rounded-lg">
@@ -236,7 +239,7 @@ const BlogForm = ({
                     <div className="w-full">
                         <div className="grid grid-cols-12">
                             <div className="col-span-12">
-                                <CoverImageUpload register={register} watch={watch} setValue={setValue} errors={errors}/>
+                                <CoverImageUpload register={register} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
                             </div>
                         </div>
                         <div className="tabs mt-3">
@@ -253,7 +256,7 @@ const BlogForm = ({
                                                 placeholder="Title TH" 
                                             />
                                             {errors?.title_th?.type === "required" && (
-                                                <Errors>{create? "This field is required.": "Recheck the field."}</Errors>
+                                                <ErrorMessage>{create? "This field is required.": "Recheck the field."}</ErrorMessage>
                                             )}
                                         </div>
                                     </div>
@@ -268,7 +271,7 @@ const BlogForm = ({
                                             rows={5}
                                         ></textarea>
                                         {errors?.description_th?.type === "required" && (
-                                            <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                            <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )}
                                     </div>
                                     <div className="col-span-12">
@@ -277,12 +280,10 @@ const BlogForm = ({
                                             name="detail_th"
                                             control={control}
                                             defaultValue={itemState.detail_th}
-                                            render={({ field:{value, onChange} }) => (
-                                                <TextEditor value={value} onChange={onChange}/>
-                                            )}
+                                            render={({field}) => <TextEditor name={field.name} value={field.value} onChange={field.onChange} /> }
                                         />                        
                                         {errors?.detail_th?.type === "required" && (
-                                            <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                            <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )} 
                                     </div>
                                     
@@ -300,7 +301,7 @@ const BlogForm = ({
                                                 className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_en ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
                                                 placeholder="Title EN" />
                                                 {errors?.title_en?.type === "required" && (
-                                                    <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                                    <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                                 )}
                                         </div>
                                     </div>
@@ -314,7 +315,7 @@ const BlogForm = ({
                                             rows={5}
                                         ></textarea>
                                         {errors?.description_en?.type === "required" && (
-                                            <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                            <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )}
                                     </div>
                                     <div className="col-span-12">
@@ -323,13 +324,10 @@ const BlogForm = ({
                                             name="detail_en"
                                             control={control}
                                             defaultValue={itemState.detail_en}
-                                            render={({ field: { value, onChange } }) => (
-                                                <TextEditor value={value} onChange={onChange}/>
-                                          
-                                            )}
+                                            render={({field}) => (<TextEditor name={field.name} value={field.value} onChange={field.onChange} />) }
                                         />                        
                                         {errors?.detail_en?.type === "required" && (
-                                            <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                            <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )} 
                                     </div>
                                 </div>
@@ -346,7 +344,7 @@ const BlogForm = ({
                                                 className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_ja ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
                                                 placeholder="Title JA" />
                                                 {errors?.title_ja?.type === "required" && (
-                                                    <Errors>{create? "This field is required.": "Recheck the field."}</Errors>
+                                                    <ErrorMessage>{create? "This field is required.": "Recheck the field."}</ErrorMessage>
                                                 )}
                                         </div>
                                     </div>
@@ -360,7 +358,7 @@ const BlogForm = ({
                                             rows={5}
                                         ></textarea>
                                         {errors?.description_ja?.type === "required" && (
-                                            <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                            <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )}
                                     </div>
                                     <div className="col-span-12">
@@ -369,13 +367,10 @@ const BlogForm = ({
                                             name="detail_ja"
                                             control={control}
                                             defaultValue={itemState.detail_ja}
-                                            render={({ field: { value, onChange } }) => (
-                                                <TextEditor value={value} onChange={onChange}/>
-                                          
-                                            )}
+                                            render={({field}) => (<TextEditor name={field.name} value={field.value} onChange={field.onChange} />) }
                                         />                        
                                         {errors?.detail_ja?.type === "required" && (
-                                            <Errors>{create ? "This field is required." : "Recheck the field."}</Errors>
+                                            <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )} 
                                     </div>
                                 </div>
@@ -385,7 +380,7 @@ const BlogForm = ({
                             <div className="col-span-12">
                                 <div className="flex gap-4 items-center justify-center">
                                     <CancelButton title="Cancel" setEdit={cancelAdd}/>
-                                    <SaveButton title="Add" saveChange={handleSubmit}/>
+                                    <SaveButton type="submit" title="Add"/>
                                 </div>
                             </div>
                         </div>

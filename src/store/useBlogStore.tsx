@@ -5,11 +5,10 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { BlogType, BlogState, ApiResponse } from "@/types/BlogType";
 
-const apiPrefix = '/blog';
 const prefix = '/admin/blog';
 
 const useBlogStore = create<BlogState>((set) => ({
-    data: [],
+    data: [] as BlogType[],
     isLoading: false,
     error: null,
     token: null,
@@ -23,7 +22,7 @@ const useBlogStore = create<BlogState>((set) => ({
     fetchData: async (page: number) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.get<ApiResponse>(`${apiPrefix}?page=${page}`);
+            const response = await Api.get<ApiResponse>(`${prefix}?page=${page}`);
             const { total, lastPage, currentPage, rows } = response.data;
         
             set({
@@ -42,8 +41,8 @@ const useBlogStore = create<BlogState>((set) => ({
     fetchDataById: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.get<BlogType>(`${apiPrefix}/show/${id}`);
-    
+            const response = await Api.get<BlogType>(`${prefix}/show/${id}`);
+            console.log(response.data)
             set((state) => ({
                 ...state,
                 data: [response.data],
@@ -58,7 +57,19 @@ const useBlogStore = create<BlogState>((set) => ({
 
     createData: async (newData, router) => {
         try {
-            const response = await Api.post(`${apiPrefix}/store`, newData);
+            const formData = new FormData();
+            Object.entries(newData).forEach(([key, value]) => {
+                if (key === "category" && Array.isArray(value)) {
+                    value.forEach((val) => formData.append("category[]", val));
+                } else if (key === "image" && value instanceof File) {
+                    formData.append("image", value);
+                } else {
+                    formData.append(key, value as string);
+                }
+            });
+            const response = await Api.post(`${prefix}/store`, formData, {
+                headers: { "Content-Type": "multipart/form-data"}
+            });
             set((state) => ({
                 data: [...state.data, response.data],
                 isLoading: false,
@@ -82,7 +93,7 @@ const useBlogStore = create<BlogState>((set) => ({
     updateData: async (id, data, router) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.put<BlogType>(`${apiPrefix}/update/${id}`,data);
+            const response = await Api.put<BlogType>(`${prefix}/update/${id}`,data);
             set((state) => ({
                 users: state.data.map((item) => item.id === Number(id) ? response.data : item  ),
                 isLoading: false,
@@ -100,7 +111,7 @@ const useBlogStore = create<BlogState>((set) => ({
     onChangeStatus: async (id, status) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.put<BlogType>(`${apiPrefix}/status/${id}`,{ status });
+            const response = await Api.put<BlogType>(`${prefix}/status/${id}`,{ status });
             set((state) => ({
                 banners: state.data.map((item) => item.id === Number(id) ? response.data : item ),
                 isLoading: false,
@@ -121,7 +132,7 @@ const useBlogStore = create<BlogState>((set) => ({
     deleteData: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            await Api.delete(`${apiPrefix}/destroy`,{ data: { id:id } });
+            await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set((state) => ({
                 users: state.data.filter((item) => item.id !== Number(id)),
                 isLoading: false,

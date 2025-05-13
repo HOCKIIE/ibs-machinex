@@ -21,6 +21,7 @@ export interface ContactState {
     id: string;
     role: string;
     response: { status: boolean | null; message: string | null; action:string | null; } | null;
-    getData: () => void
+    getData: () => void;
+    updateData: ( data: ContactType ) => Promise<void>;
     deleteData: (id: string) => void;
 }

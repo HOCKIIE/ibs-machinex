@@ -4,7 +4,6 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { ContactState, ContactType } from "@/types/ContactType";
 
-const apiPrefix = '/contact';
 const prefix = '/admin/contact';
 
 const useContactStore = create<ContactState>((set) => ({
@@ -20,7 +19,7 @@ const useContactStore = create<ContactState>((set) => ({
     getData: async () => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.get<ContactType>(apiPrefix);
+            const response = await Api.get<ContactType>(prefix);
             set({
                 contact: response.data,
                 isLoading: false,
@@ -31,10 +30,30 @@ const useContactStore = create<ContactState>((set) => ({
             toast.error(errorMessage);
         }
     },
+
+    updateData: async (data) => {
+        set({ error: null });
+        try {
+            const response = await Api.put(`${prefix}/update`,data);
+            set({
+                response: {
+                    action: "update",
+                    status : response.data.status,
+                    message : response.data.message,
+                }
+            });
+            
+        } catch (error: unknown) {
+            const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
+            const errorMessage = response?.data?.message || "An unknown error occurred";
+            toast.error(errorMessage);
+        }
+    },
+
     deleteData: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.delete(`${apiPrefix}/delete/${id}`);
+            const response = await Api.delete(`${prefix}/delete/${id}`);
             set({
                 isLoading: false,
                 response: {

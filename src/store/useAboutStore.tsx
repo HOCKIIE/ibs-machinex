@@ -5,7 +5,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { AboutType,AboutState } from "@/types/AboutType";
 
-const apiPrefix = '/about';
+const apiPrefix = '/admin/about';
 
 const useAboutStore = create<AboutState>((set) => ({
     about: null,

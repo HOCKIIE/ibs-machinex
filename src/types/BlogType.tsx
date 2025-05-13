@@ -28,7 +28,7 @@ export interface ApiResponse {
 
 export interface BlogFormProps {
     id: string;
-    image: string;
+    image: File | null;
     title_th: string;
     title_en: string;
     title_ja: string;

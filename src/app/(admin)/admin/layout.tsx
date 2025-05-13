@@ -3,7 +3,7 @@
 import "@/styles/admin.scss";
 import React, { useEffect, useState } from "react";
 import { ThemeProvider } from "next-themes"
-import AdminContext from "@/contexts/AdminContaxt";
+import AdminContext from "@/contexts/AdminContext";
 import { Outfit } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import { useRouter } from "next/navigation";
@@ -42,8 +42,8 @@ export default function RootLayout({children}:{children: React.ReactNode})
                 <body className={`${outfit.className} bg-slate-50`} >
                 <ThemeProvider attribute="class" defaultTheme="system">
                     <div className="dark:bg-boxdark-2 dark:text-bodydark">
-                    <Toaster position="top-right" reverseOrder={false} />
-                    {loading ? <Loader/> : children}
+                        <Toaster position="top-right" reverseOrder={false} />
+                        {loading ? <Loader/> : children}
                     </div>
                 </ThemeProvider>
                 </body>

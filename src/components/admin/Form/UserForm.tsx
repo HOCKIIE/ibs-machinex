@@ -7,7 +7,7 @@ import CancelButton from '@/components/admin/Button/CancelBotton';
 import CreateButton from '@/components/admin/Button/CreateButton';
 import UpdateButton from '@/components/admin/Button/UpdateButton';
 import { useRouter } from 'next/navigation';
-import { useAuth } from '@/contexts/AdminContaxt';
+import { useAuth } from '@/contexts/AdminContext';
 
 
 const UserForm = ({

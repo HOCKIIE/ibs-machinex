@@ -14,7 +14,7 @@ import {
     Node,
     Path
 } from 'slate';
-import { Slate, Editable, withReact, useSlate  } from 'slate-react';
+import { Slate, Editable, withReact, useSlate, RenderElementProps  } from 'slate-react';
 import { withHistory, HistoryEditor } from 'slate-history';
 import { serialize, deserialize  } from '@/utils/slateHtmlConverter';
 
@@ -31,6 +31,7 @@ import { PiTextIndentBold } from "react-icons/pi";
 import { PiTextOutdentBold } from "react-icons/pi";
 
 
+
 const isMarkActive = (editor: Editor, format: string) => {
     const marks = Editor.marks(editor);
     // @ts-expect-error: Marks may not exist on the editor object
@@ -45,13 +46,14 @@ const toggleMark = (editor: Editor, format: string) => {
         Editor.addMark(editor, format, true);
     }
 };
+
 const isBlockActive = (editor: Editor, format: string) => {
     const [match] = Array.from(
         editor.children.map((n: any) => n).filter((n: any) => n.type === format)
     );
     return !!match;
 };
-  
+
 const toggleBlock = (editor: Editor, format: string) => {
     const isActive = isBlockActive(editor, format);
     Transforms.setNodes(
@@ -93,28 +95,44 @@ const toggleBlock = (editor: Editor, format: string) => {
         }
     }
 };
-const toggleAlign = (editor: Editor, align: 'left' | 'center' | 'right') => {
-    Transforms.setNodes(
-        editor,
-        { align },
-        { match: n => Editor.isBlock(editor, n), split: true }
-    );
+const toggleAlign = (editor: Editor, align: 'left' | 'center' | 'right'| 'justify') => {
+    const className =
+        align === 'justify' ? 'text-justify' :
+        align === 'center' ? 'text-center' :
+        align === 'right' ? 'text-right' :
+        'text-left';
+        Transforms.setNodes(
+            editor,
+            { type: 'paragraph', className },
+            { match: n =>
+                !Editor.isEditor(n) &&
+                Element.isElement(n) &&
+                Editor.isBlock(editor, n),
+                split: true,
+            }
+        );
 };
 
-const Button: React.FC<{ format: string; action?: 'mark' | 'block'; align?: string; label: any; title?:string }> = ({ format, action, align, label, title }) => {
+const Button: React.FC<{ 
+    format: string; 
+    action?: 'mark' | 'block'; 
+    align?: 'left' | 'center' | 'right' | 'justify'; 
+    label: React.ReactNode; 
+    title?: string 
+}> = ({ format, action, align, label, title }) => {
     const editor = useSlate();
     const handleMouseDown = (e: React.MouseEvent) => {
         e.preventDefault();
         if (action === 'mark') {
             toggleMark(editor, format);
         } else if (align) {
-            toggleAlign(editor, align as 'left' | 'center' | 'right');
+            toggleAlign(editor, align);
         } else {
             toggleBlock(editor, format);
         }
     };
     return (
-        <button onMouseDown={handleMouseDown} className="hover:bg-gray-200 text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 p-2 rounded-md" title={title}>
+        <button type="button" onMouseDown={handleMouseDown} className="hover:bg-gray-200 text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700 p-2 rounded-md" title={title}>
             {label}
         </button>
     );
@@ -124,7 +142,6 @@ const DropdownButton: React.FC<{ format: string; action?: 'mark' | 'block'; labe
 
     const [open, setOpen] = useState(false);
     const menuRef = useRef(null);
-
     const editor = useSlate();
 
     async function replaceChildren(
@@ -134,9 +151,7 @@ const DropdownButton: React.FC<{ format: string; action?: 'mark' | 'block'; labe
     ) {
         const parentNode = Node.get(editor, parentPath);
         if (!('children' in parentNode)) return;
-      
         const childrenCount = parentNode.children.length;
-
         for (let i = 0; i < childrenCount; i++) {
             Transforms.removeNodes(editor, { at: parentPath.concat(0) });
         }
@@ -177,14 +192,15 @@ const DropdownButton: React.FC<{ format: string; action?: 'mark' | 'block'; labe
     }, [editor]);
 
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (menuRef.current && !menuRef.current.contains(event.target)) {
-                setOpen(false);
+        const handleClickOutside = (event: MouseEvent) => {
+            if (menuRef.current && !(menuRef.current as HTMLElement).contains(event.target as Node)) {
+            setOpen(false);
             }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
     }, []);
+
     return (
         <div className="inline-flex rounded-md relative" ref={menuRef}>
             <button 
@@ -194,6 +210,7 @@ const DropdownButton: React.FC<{ format: string; action?: 'mark' | 'block'; labe
             >{label}
             </button>
             <button
+                type="button"
                 onClick={() => setOpen(!open)}
                 className="rounded-e-md  px-[1px] hover:bg-gray-200 text-gray-900 dark:text-gray-300 dark:hover:bg-gray-700"
                 title="More columns"
@@ -259,7 +276,7 @@ const Paragraph: React.FC = () => {
         </select>
     );
 };
-  
+
 const FontSize: React.FC = () => {
     const editor = useSlate();
     const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -281,9 +298,8 @@ const FontSize: React.FC = () => {
         </select>
     );
 };
-  
 
-type CustomElement = BaseElement & { type: string; children: Array<Omit<Descendant, 'children'>> };
+type CustomElement = BaseElement & { type: string; children: Array<unknown> };
 type CustomText = BaseText & { fontSize?: string };
 
 declare module 'slate' {
@@ -294,28 +310,34 @@ declare module 'slate' {
 }
 const getCurrentElementType = (editor: Editor): string | null => {
     const [match] = Editor.nodes(editor, {
-      match: n => !Editor.isEditor(n) && Element.isElement(n) && !!n.type,
-      mode: 'lowest', // ตรวจสอบ block ต่ำสุดใน path
+        match: n => !Editor.isEditor(n) && Element.isElement(n) && !!n.type,
+        mode: 'lowest', // ตรวจสอบ block ต่ำสุดใน path
     });
-  
-    if (match) {
-      const [node] = match;
-      return (node as Element).type as string;
-    }
-  
-    return null;
-  };
 
-const TextEditor: React.FC<{ value: Descendant[]; onChange: (value: Descendant[]) => void }> = ({value, onChange}) => {
+    if (match) {
+        const [node] = match;
+        return (node as Element).type as string;
+    }
+
+    return null;
+};
+interface EditorProps {
+    name: string;
+    value: string | null;
+    onChange: (value: string) => void;
+}
+
+const TextEditor: React.FC<EditorProps> = ({name, value, onChange}) => {
 
     const editor = useMemo(() => withHistory(withReact(createEditor())), []);
-    const [status, setStatus] = useState<string>('p')
-    const [editorValue, setEditorValue] = useState<Descendant[]>(value || [
+    const [status, setStatus] = useState<string>('p');
+    const [html, setHtml] = useState<string>(Array.isArray(value) ? serialize(value) : value || '');
+    const defaultEditorValue: Descendant[] = [
         {
             type: 'grid',
             children: [{
                 type: 'grid-column',
-                children: [{ type: 'paragraph', children: [{ text: 'Blog image',align:"center" }] }],
+                children: [{ type: 'paragraph', children: [{ text: 'Blog image', align: "center" }] }],
             }],
         },
         {
@@ -325,43 +347,44 @@ const TextEditor: React.FC<{ value: Descendant[]; onChange: (value: Descendant[]
                 children: [{ type: 'paragraph', children: [{ text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum." }] }],
             }]
         }
-    ]);
-    
-    const renderElement = useCallback((props: any) => {
-        const { attributes, children, element } = props;
-        const align = element.children?.[0]?.align || null;
-        const alignStyle = align ? `${align}` : ''; // ใช้ Tailwind class
+    ];
+    const [editorValue, setEditorValue] = useState<Descendant[]>(
+        value ? deserialize(value) : defaultEditorValue
+    );
 
+    
+    const renderElement = useCallback((props: RenderElementProps) => {
+        const { attributes, children, element } = props;
         switch (element.type) {
             case 'paragraph':
-                return <p {...attributes} className="mb-3" style={{textAlign:alignStyle}}>{children}</p>;
+                return <p {...attributes} className={element.className}>{children}</p>;
             case 'heading-one':
-                return <h1 {...attributes} className="text-4xl" style={{textAlign:alignStyle}}>{children}</h1>;
+                return <h1 {...attributes} className={`text-4xl ${element.className}`}>{children}</h1>;
             case 'heading-two':
-                return <h2 {...attributes} className="text-3xl" style={{textAlign:alignStyle}}>{children}</h2>;
+                return <h2 {...attributes} className={`text-3xl ${element.className}`}>{children}</h2>;
             case 'heading-three':
-                return <h3 {...attributes} className="text-2xl" style={{textAlign:alignStyle}}>{children}</h3>;
+                return <h3 {...attributes} className={`text-2xl ${element.className}`}>{children}</h3>;
             case 'heading-four':
-                return <h4 {...attributes} className="text-xl" style={{textAlign:alignStyle}}>{children}</h4>;
+                return <h4 {...attributes} className={`text-xl ${element.className}`}>{children}</h4>;
             case 'heading-five':
-                return <h5 {...attributes} className="text-lg" style={{textAlign:alignStyle}}>{children}</h5>;
+                return <h5 {...attributes} className={`text-lg ${element.className}`}>{children}</h5>;
             case 'heading-six':
-                return <h6 {...attributes} className="text-md" style={{textAlign:alignStyle}}>{children}</h6>;
+                return <h6 {...attributes} className={`text-md ${element.className}`}>{children}</h6>;
             case 'bulleted-list':
-                return <ul {...attributes} className="marker:text-gray-700 list-disc pl-5 space-y-1 text-slate-700 text-md" style={{textAlign:alignStyle}}>{children}</ul>;
+                return <ul {...attributes} className="marker:text-gray-700 list-disc pl-5 space-y-1 text-slate-700 text-md">{children}</ul>;
             case 'numbered-list':
-                return <ol {...attributes} className="marker:text-gray-700 list-decimal pl-5 space-y-1 text-slate-700 text-md" style={{textAlign:alignStyle}}>{children}</ol>;
+                return <ol {...attributes} className="marker:text-gray-700 list-decimal pl-5 space-y-1 text-slate-700 text-md">{children}</ol>;
             case 'list-item':
                 return <li {...attributes}>{children}</li>;
             case 'link':
                 return (
-                    <a {...attributes} href={element.url} className={`text-blue-500 no-underline ${alignStyle}`}>
+                    <a {...attributes} href={element.url} className={`text-blue-500 no-underline`}>
                     {children}
                     </a>
                 );
             case 'image':
                 return (
-                    <div {...attributes} style={{ textAlign: alignStyle }}>
+                    <div {...attributes} className={element.className}>
                         <img src={element.url} alt="image" style={{ maxWidth: '100%', height: 'auto' }} />
                         {children}
                     </div>
@@ -371,7 +394,6 @@ const TextEditor: React.FC<{ value: Descendant[]; onChange: (value: Descendant[]
                     <table 
                         {...attributes} 
                         className={`${element.className?`${element.className}`:`border-collapse border border-gray-200`}`} 
-                        style={{textAlign:alignStyle}}
                     ><tbody>{children}</tbody></table>
                 );
             case 'grid':
@@ -383,7 +405,7 @@ const TextEditor: React.FC<{ value: Descendant[]; onChange: (value: Descendant[]
                     <div {...attributes} className={`${element.className?`${element.className}`:`col-span-12 p-2`}`}>{children}</div>
                 );
             default:
-                return <div {...attributes} style={{textAlign:alignStyle}}>{children}</div>;
+                return <div {...attributes} className={element.className}>{children}</div>;
         }
     }, []);
     
@@ -401,23 +423,23 @@ const TextEditor: React.FC<{ value: Descendant[]; onChange: (value: Descendant[]
     const handleKeyDown = (event: React.KeyboardEvent) => {
         if (event.key === 'Enter' && event.shiftKey) {
             const [match] = Editor.nodes(editor, {
-              match: n => !Editor.isEditor(n) && Element.isElement(n) && n.type === 'list-item',
+                match: n => !Editor.isEditor(n) && Element.isElement(n) && n.type === 'list-item',
             });
         
             if (match) {
-              const [node] = match;
-              const text = Node.string(node as Node);
+                const [node] = match;
+                const text = Node.string(node as Node);
         
-              if (text.trim() === '') {
-                event.preventDefault();
-                // ออกจาก list
-                Transforms.unwrapNodes(editor, {
-                    match: n => Element.isElement(n) && (n.type === 'bulleted-list' || n.type === 'numbered-list'),
-                    split: true,
-                });
-                Transforms.setNodes(editor, { type: 'paragraph' });
-                return;
-              }
+                if (text.trim() === '') {
+                    event.preventDefault();
+                    // ออกจาก list
+                    Transforms.unwrapNodes(editor, {
+                        match: n => Element.isElement(n) && (n.type === 'bulleted-list' || n.type === 'numbered-list'),
+                        split: true,
+                    });
+                    Transforms.setNodes(editor, { type: 'paragraph' });
+                    return;
+                }
             }
         }
         if (!event.ctrlKey) return;
@@ -456,25 +478,36 @@ const TextEditor: React.FC<{ value: Descendant[]; onChange: (value: Descendant[]
         
     }
 
+    useEffect(() => {
+        if (value && value !== serialize(editorValue)) {
+            setEditorValue(deserialize(value));
+        }
+    }, [value]);
+     // Update onChange when Slate content changes
+    const handleChange = (newValue: Descendant[]) => {
+        setEditorValue(newValue);
+        const html = serialize(newValue);
+        onChange(html); // 🔁 ส่งกลับให้ react-hook-form
+    };
+
+    
+
     return (
-        <div className="border border-gray-200 dark:border-gray-600 rounded-xl overflow-hidden">
+        <div className="border border-gray-200 dark:border-gray-600 rounded-xl">
             <div className="editor">
-                <Slate editor={editor} initialValue={editorValue} onChange={(newValue) => {
-                    const html = serialize(newValue);
-                    onChange(html); // อัปเดต react-hook-form เป็น HTML string
-                }}>
-                    <div className="editor-tools p-2 inset-20 h-12 w-full shadow-[rgba(0,0,15,0.1)_0px_1px_5px_0px] dark:shadow-[rgba(255,255,255,0.3)_0px_1px_5px_0px]">
+                <Slate editor={editor} initialValue={editorValue} onChange={handleChange}>
+                    <div className="grid editor-tools p-2 inset-20 h-12 w-full shadow-[rgba(0,0,15,0.1)_0px_1px_5px_0px] dark:shadow-[rgba(255,255,255,0.3)_0px_1px_5px_0px]">
                         <div className="flex justify-between">
                             <div className="flex items-center divide-x">
-                                <div className="pe-1">
+                                <div className="flex pe-1">
                                     <Button format="undo" action="block" label={<LiaUndoSolid/>} />
                                     <Button format="Redo" action="block" label={<LiaRedoSolid/>} />
                                 </div>
-                                <div className="px-1">
+                                <div className="flex px-1">
                                     <Paragraph/>
                                     <FontSize/>
                                 </div>
-                                <div className="px-1">
+                                <div className="flex px-1">
                                     <Button format="bold" action="mark" title="Bold" label={<RiBold/>} />
                                     <Button format="italic" action="mark" title="Italic" label={<RiItalic/>} />
                                     <Button format="underline" action="mark" title="Underline" label={<RiUnderline/>} />
@@ -483,23 +516,23 @@ const TextEditor: React.FC<{ value: Descendant[]; onChange: (value: Descendant[]
                                 <div className="px-1">
                                     <Button format="border" action="mark" title="Border" label={<BsBorderBottom/>} />
                                 </div>
-                                <div className="px-1">
-                                    <Button format="align-left" align="left" title="Align left" label={<RiAlignLeft/>} />
-                                    <Button format="align-center" align="center" title="Align center" label={<RiAlignCenter/>} />
-                                    <Button format="align-right" align="right" title="Align right" label={<RiAlignRight/>} />
-                                    <Button format="align-justify" align="justify" title="Align justify" label={<LuAlignJustify/>} />
+                                <div className="flex px-1">
+                                    <Button format="align" align="left" title="Align left" label={<RiAlignLeft/>} />
+                                    <Button format="align" align="center" title="Align center" label={<RiAlignCenter/>} />
+                                    <Button format="align" align="right" title="Align right" label={<RiAlignRight/>} />
+                                    <Button format="align" align="justify" title="Align justify" label={<LuAlignJustify/>} />
                                 </div>
-                                <div className="px-1">
+                                <div className="flex px-1">
                                     <Button format="outdent" action="mark" title="Outdent"  label={<PiTextOutdentBold />} />
                                     <Button format="indent" action="mark" title="Indent"  label={<PiTextIndentBold />} />
                                 </div>
-                                <div className="px-1">
+                                <div className="flex px-1">
                                     <Button format="bulleted-list" action="block" title="Bulleted list"  label={<RiListUnordered />} />
                                     <Button format="numbered-list" action="block" title="Numbered list"  label={<RiListOrdered2 />} />
                                     <Button format="table" action="block" title="Insert table" label={<LuTable />} />
                                 </div>
                                 
-                                <div className="px-1 flex">
+                                <div className="flex px-1">
                                     <Button format="table" action="block" title="Image" label={<RiImageFill />} />
                                     {/* <button title="Image" className="hover:bg-gray-200 text-black dark:text-gray-300 dark:hover:bg-gray-700 p-2 rounded-md"><RiImageFill /></button> */}
                                     <DropdownButton format="grid-template" action="block" title="Grid template" label={<LuLayoutTemplate/>}/>
@@ -512,7 +545,8 @@ const TextEditor: React.FC<{ value: Descendant[]; onChange: (value: Descendant[]
                             </div>
                         </div>
                     </div>
-                    <div className="editor-body p-2">
+                    <div className="editor-body p-2 resize-y">
+                        
                         <Editable 
                             renderElement={renderElement}
                             renderLeaf={renderLeaf}
@@ -539,6 +573,12 @@ const TextEditor: React.FC<{ value: Descendant[]; onChange: (value: Descendant[]
                             </div>
                         </div>
                     </div>
+                    <input
+                        type="hidden"
+                        name={name}
+                        value={value || ''}
+                        readOnly
+                    />
                 </Slate>
             </div>
         </div>
