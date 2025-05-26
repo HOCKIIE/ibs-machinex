@@ -13,7 +13,7 @@ type Props = {
     errors: UseFormStateReturn<BlogFormProps>['errors'];
 };
 
-const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue, defaultValue, errors }) => {
+const CoverImageUpload: React.FC<Props> = ({ register, setValue, defaultValue, errors }) => {
 
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
     const [dragActive, setDragActive] = React.useState(false);
@@ -48,7 +48,7 @@ const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue, defaultV
     useEffect(() => {
         if (defaultValue) {
             if (typeof defaultValue === "string") {
-                setPreviewUrl(`${process.env.NEXT_PUBLIC_ASSET_PREFIX}${defaultValue}`);
+                setPreviewUrl(`${process.env.NEXT_PUBLIC_API_URL}${defaultValue}`);
             } else if (defaultValue instanceof File) {
                 setPreviewUrl(URL.createObjectURL(defaultValue));
             }

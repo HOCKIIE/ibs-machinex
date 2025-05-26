@@ -331,7 +331,8 @@ const TextEditor: React.FC<EditorProps> = ({name, value, onChange}) => {
 
     const editor = useMemo(() => withHistory(withReact(createEditor())), []);
     const [status, setStatus] = useState<string>('p');
-    const [html, setHtml] = useState<string>(Array.isArray(value) ? serialize(value) : value || '');
+    const didLoadRef = useRef(false);
+    const [editorKey, setEditorKey] = useState(0);
     const defaultEditorValue: Descendant[] = [
         {
             type: 'grid',
@@ -348,9 +349,7 @@ const TextEditor: React.FC<EditorProps> = ({name, value, onChange}) => {
             }]
         }
     ];
-    const [editorValue, setEditorValue] = useState<Descendant[]>(
-        value ? deserialize(value) : defaultEditorValue
-    );
+    const [editorValue, setEditorValue] = useState<Descendant[]>(defaultEditorValue);
 
     
     const renderElement = useCallback((props: RenderElementProps) => {
@@ -478,24 +477,33 @@ const TextEditor: React.FC<EditorProps> = ({name, value, onChange}) => {
         
     }
 
-    useEffect(() => {
-        if (value && value !== serialize(editorValue)) {
-            setEditorValue(deserialize(value));
-        }
-    }, [value]);
-     // Update onChange when Slate content changes
     const handleChange = (newValue: Descendant[]) => {
         setEditorValue(newValue);
         const html = serialize(newValue);
         onChange(html); // 🔁 ส่งกลับให้ react-hook-form
     };
-
+    useEffect(() => {
+        if (value && !didLoadRef.current) {
+            setEditorKey(prev => prev + 1);
+            const newValue = deserialize(value);
+            if (JSON.stringify(newValue) !== JSON.stringify(editorValue)) {
+                console.log("Updating editor value from props:", newValue);
+                setEditorValue(newValue);
+            }
+            didLoadRef.current = true;
+        }
+    }, [value, editorValue, editorKey]);
     
 
     return (
         <div className="border border-gray-200 dark:border-gray-600 rounded-xl">
             <div className="editor">
-                <Slate editor={editor} initialValue={editorValue} onChange={handleChange}>
+                <Slate 
+                    key={editorKey}
+                    editor={editor} 
+                    initialValue={editorValue} 
+                    onChange={handleChange}
+                >
                     <div className="grid editor-tools p-2 inset-20 h-12 w-full shadow-[rgba(0,0,15,0.1)_0px_1px_5px_0px] dark:shadow-[rgba(255,255,255,0.3)_0px_1px_5px_0px]">
                         <div className="flex justify-between">
                             <div className="flex items-center divide-x">
@@ -554,11 +562,7 @@ const TextEditor: React.FC<EditorProps> = ({name, value, onChange}) => {
                             placeholder="Type your message here..."
                             style={{minHeight:'45rem', height:'45rem'}}
                             className="focus:outline-none overflow-y-auto"
-                            onChange={(newValue) => {
-                                console.log("Editor content changed: ", newValue);
-                            }}
-                        >
-                        </Editable>
+                        />
                     </div>
                     <div className="editor-footer border-t">
                         <div className="flex justify-between">
@@ -573,12 +577,7 @@ const TextEditor: React.FC<EditorProps> = ({name, value, onChange}) => {
                             </div>
                         </div>
                     </div>
-                    <input
-                        type="hidden"
-                        name={name}
-                        value={value || ''}
-                        readOnly
-                    />
+                    <input type="hidden" name={name} value={value || ''} readOnly />
                 </Slate>
             </div>
         </div>

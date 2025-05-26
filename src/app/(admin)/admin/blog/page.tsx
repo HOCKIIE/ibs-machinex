@@ -122,7 +122,7 @@ const Blog = () => {
                     </div>
                 </div>
                 {/* <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"> */}
-                    <div className="relative overflow-x-auto shadow-md sm:rounded-lg border border-gray-200/60">
+                <div className="relative overflow-x-auto shadow-md sm:rounded-lg border border-gray-200/60">
                     <div className="p-5 text-md font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
                             <div className="flex justify-between w-full">
                                 <div className='flex gap-3'>
@@ -173,7 +173,7 @@ const Blog = () => {
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 w-10 h-10">
                                                     <img className="w-10 h-10 rounded-full" 
-                                                        src={`${process.env.NEXT_PUBLIC_ASSET_PREFIX}${v.image}` || '/storage/fallback-image.jpg'} 
+                                                        src={`${process.env.NEXT_PUBLIC_API_URL}${v.image}` || '/storage/fallback-image.jpg'} 
                                                         alt={v.title_en} 
                                                     />
                                                 </div>
