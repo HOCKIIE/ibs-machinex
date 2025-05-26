@@ -123,7 +123,7 @@ const BlogForm = ({
                 setValue("category", categoryIds); // set react-hook-form field
             }
         }
-    }, [itemState, reset]);
+    }, [itemState, reset, setValue]);
 
     return (
         <div className="p-4">

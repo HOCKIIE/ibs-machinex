@@ -3,15 +3,25 @@ import { htmlToSlate, slateToHtml } from "slate-serializers";
 
 export const deserialize = (html: string): Descendant[] => {
     try {
-        // return htmlToSlate(html, { 
-        //     elementTags: { div: () => ({ type: "division" }) },
-        //     textTags: { span: () => ({ type: "text" }) },
-        //     filterWhitespaceNodes: true 
-        // });
+        // // return htmlToSlate(html, { 
+        // //     elementTags: { div: () => ({ type: "division" }) },
+        // //     textTags: { span: () => ({ type: "text" }) },
+        // //     filterWhitespaceNodes: true 
+        // // });
+        // const parser = new DOMParser();
+        // const doc = parser.parseFromString(html, 'text/html');
+        // const nodes = Array.from(doc.body.childNodes).map(deserializeElement);
+        // return nodes;
         const parser = new DOMParser();
-        const doc = parser.parseFromString(html, 'text/html');
-        const nodes = Array.from(doc.body.childNodes).map(deserializeElement);
-        return nodes;
+        const doc = parser.parseFromString(html, "text/html");
+        const body = doc.body;
+
+        const nodes: Descendant[] = Array.from(body.childNodes)
+            .map((node) => innerDeserialize(node))
+            .flat()
+            .filter(Boolean);
+
+        return nodes.length ? nodes : [{ type: "paragraph", children: [{ text: "" }] }];
     } catch (e) {
         return [{ type: "paragraph", children: [{ text: "" }] }];
     }
@@ -41,7 +51,8 @@ function serializeNode(node: any): string {
             return `<div>${children}</div>`;
     }
 }
-function deserializeElement(node: ChildNode): Descendant | Descendant[] {
+function innerDeserialize(node: ChildNode): Descendant | Descendant[]
+{
     if (node.nodeType === Node.TEXT_NODE) {
         return { text: node.textContent || "" };
     }
@@ -54,7 +65,7 @@ function deserializeElement(node: ChildNode): Descendant | Descendant[] {
     const nodeName = el.tagName.toLowerCase();
     const classList = el.className.split(" ");
     const children = Array.from(el.childNodes)
-        .map(deserializeElement)
+        .map(innerDeserialize)
         .flat()
         .filter(Boolean);
 

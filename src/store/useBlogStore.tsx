@@ -66,9 +66,7 @@ const useBlogStore = create<BlogState>((set) => ({
                     formData.append(key, value as string);
                 }
             });
-            const response = await Api.post(`${prefix}/store`, formData, {
-                headers: { "Content-Type": "multipart/form-data"}
-            });
+            const response = await Api.post(`${prefix}/store`, formData);
             set((state) => ({
                 items: [...state.items, response.data],
                 isLoading: false,
@@ -89,7 +87,7 @@ const useBlogStore = create<BlogState>((set) => ({
         }
     },
 
-    updateData: async (id, data, router) => {
+    updateData: async (id, data) => {
         try {
             const formData = new FormData();
             Object.entries(data).forEach(([key, value]) => {
@@ -111,8 +109,7 @@ const useBlogStore = create<BlogState>((set) => ({
             // formData.append('detail_th', data.detail_th);
             // formData.append('detail_en', data.detail_en);
             // formData.append('detail_ja', data.detail_ja);
-            const response = await Api.put(`${prefix}/update/${id}`,formData, {
-                method: "POST", // ใช้ POST พร้อม `_method=PUT`
+            const response = await Api.post(`${prefix}/update/${id}`,formData, {
                 headers: {
                     "X-Requested-With": "XMLHttpRequest"
                 },

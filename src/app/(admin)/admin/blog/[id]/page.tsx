@@ -74,8 +74,6 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
     
 
     useEffect(() => {
-        console.log(items)
-        console.log(items.length)
         if (items.length > 0) {
             setBlogState({
                 id: items[0].id ?? "",
@@ -96,9 +94,9 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
                 created_at: items[0].created_at ?? ""
             });
         }
-        // @ts-expect-error
+        // @ts-expect-error: items may have a status property from API response
         if(items.status === true) {
-        // @ts-expect-error
+        // @ts-expect-error: items may have a message property from API response
             toast.success(items.message);
         }
         
