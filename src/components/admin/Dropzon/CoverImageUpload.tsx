@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { LiaTimesSolid } from "react-icons/lia";
 import { UseFormRegister, UseFormSetValue, UseFormStateReturn, UseFormWatch } from 'react-hook-form';
 import { BlogFormProps } from '@/types/BlogType';
@@ -45,6 +45,17 @@ const CoverImageUpload: React.FC<Props> = ({ register, watch, setValue, defaultV
         setValue('image', null); // reset field
         setPreviewUrl(null); // reset preview
     };
+    useEffect(() => {
+        if (defaultValue) {
+            if (typeof defaultValue === "string") {
+                setPreviewUrl(`${process.env.NEXT_PUBLIC_ASSET_PREFIX}${defaultValue}`);
+            } else if (defaultValue instanceof File) {
+                setPreviewUrl(URL.createObjectURL(defaultValue));
+            }
+        } else {
+            setPreviewUrl(null);
+        }
+    }, [defaultValue]);
 
     return (
         <div className="col-span-full">

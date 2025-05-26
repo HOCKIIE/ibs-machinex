@@ -8,7 +8,7 @@ import { BlogType, BlogState, ApiResponse } from "@/types/BlogType";
 const prefix = '/admin/blog';
 
 const useBlogStore = create<BlogState>((set) => ({
-    data: [] as BlogType[],
+    items: [],
     isLoading: false,
     error: null,
     token: null,
@@ -26,7 +26,7 @@ const useBlogStore = create<BlogState>((set) => ({
             const { total, lastPage, currentPage, rows } = response.data;
         
             set({
-                data: rows,
+                items: rows,
                 total,
                 lastPage,
                 currentPage,
@@ -42,10 +42,9 @@ const useBlogStore = create<BlogState>((set) => ({
         set({ isLoading: true, error: null });
         try {
             const response = await Api.get<BlogType>(`${prefix}/show/${id}`);
-            console.log(response.data)
             set((state) => ({
                 ...state,
-                data: [response.data],
+                items: [response.data],
                 isLoading: false,
             }));
         } catch (error: unknown) {
@@ -71,7 +70,7 @@ const useBlogStore = create<BlogState>((set) => ({
                 headers: { "Content-Type": "multipart/form-data"}
             });
             set((state) => ({
-                data: [...state.data, response.data],
+                items: [...state.items, response.data],
                 isLoading: false,
             }));
             const { status, message } = response.data as { status: boolean; message: string };
@@ -91,16 +90,43 @@ const useBlogStore = create<BlogState>((set) => ({
     },
 
     updateData: async (id, data, router) => {
-        set({ isLoading: true, error: null });
         try {
-            const response = await Api.put<BlogType>(`${prefix}/update/${id}`,data);
+            const formData = new FormData();
+            Object.entries(data).forEach(([key, value]) => {
+                if (key === "category" && Array.isArray(value)) {
+                    value.forEach((val) => formData.append("category[]", val));
+                } else if (key === "image" && value instanceof File) {
+                    formData.append("image", value);
+                } else {
+                    formData.append(key, value as string);
+                }
+            });
+            formData.append("_method", "PUT"); // ใช้ _method เพื่อระบุว่าเป็นการอัพเดต
+            // formData.append('title_th', data.title_th);
+            // formData.append('title_en', data.title_en);
+            // formData.append('title_ja', data.title_ja);
+            // formData.append('description_th', data.description_th);
+            // formData.append('description_en', data.description_en);
+            // formData.append('description_ja', data.description_ja);
+            // formData.append('detail_th', data.detail_th);
+            // formData.append('detail_en', data.detail_en);
+            // formData.append('detail_ja', data.detail_ja);
+            const response = await Api.put(`${prefix}/update/${id}`,formData, {
+                method: "POST", // ใช้ POST พร้อม `_method=PUT`
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+            });
             set((state) => ({
-                users: state.data.map((item) => item.id === Number(id) ? response.data : item  ),
-                isLoading: false,
+                items: state.items.map((item) => String(item.id) === String(id) ? response.data.data : item  ),
+                isLoading: false
             }));
-            setTimeout(()=>{
-                router.push(prefix); 
-            },1000)
+            const { status, message } = response.data as { status: boolean; message: string };
+            if (status) { 
+                toast.success(message);
+            } else { 
+                toast.error(message);
+            }
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
@@ -113,7 +139,7 @@ const useBlogStore = create<BlogState>((set) => ({
         try {
             const response = await Api.put<BlogType>(`${prefix}/status/${id}`,{ status });
             set((state) => ({
-                banners: state.data.map((item) => item.id === Number(id) ? response.data : item ),
+                items: state.items.map((item) => String(item.id) === String(id) ? response.data : item ),
                 isLoading: false,
             }));
         } catch (error: unknown) {
@@ -134,7 +160,7 @@ const useBlogStore = create<BlogState>((set) => ({
         try {
             await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set((state) => ({
-                users: state.data.filter((item) => item.id !== Number(id)),
+                items: state.items.filter((item) => item.id !== Number(id)),
                 isLoading: false,
                 response:{
                     status: true,
