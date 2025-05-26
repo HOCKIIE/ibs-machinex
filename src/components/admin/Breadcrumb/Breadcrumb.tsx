@@ -4,9 +4,10 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { IoChevronForwardOutline } from "react-icons/io5";
 
-const Breadcrumb = () => {
+const Breadcrumb = ({ current }: { current?: string }) => {
     const pathname = usePathname();
-    const pathSegments = pathname.split("/").filter((segment) => isNaN(Number(segment)));
+    // const pathSegments = pathname.split("/").filter((segment) => isNaN(Number(segment)));
+    const pathSegments = pathname.split("/").filter((segment) => segment !== "");
 
     function UcFirst(str:string) {
         return str.charAt(0).toUpperCase() + str.slice(1);
@@ -23,6 +24,9 @@ const Breadcrumb = () => {
                 {pathSegments.map((segment, index) => {
                     const href = "/" + pathSegments.slice(0, index + 1).join("/");
                     const isLast = index === pathSegments.length - 1;
+                    if(typeof Number(segment) == 'number' && current!== undefined && isLast) {
+                        segment = current;
+                    }
                     return (
                         <li key={href} className="flex items-center">
                             <span className="mx-2"><IoChevronForwardOutline/></span>

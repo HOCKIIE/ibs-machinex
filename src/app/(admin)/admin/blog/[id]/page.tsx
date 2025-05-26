@@ -8,17 +8,18 @@ import BlogForm from '@/components/admin/Form/BlogForm';
 import useBlogStore from '@/store/useBlogStore';
 import { BlogFormProps, BlogType } from '@/types/BlogType';
 import { debounce } from 'lodash';
+import toast from 'react-hot-toast';
 
 
 const Page = ({ params }: { params: Promise<{ id: string }> }) => {
 
     const { id } = use(params);
     const router = useRouter();
-    const { data, fetchDataById, updateData } = useBlogStore();
+    const { items, fetchDataById, updateData, response } = useBlogStore();
     const [blogState, setBlogState] = useState<BlogType>({
         id: "",
         image: "",
-        category: "",
+        categories: [],
         title_th: "",
         title_en: "",
         title_ja: "",
@@ -28,10 +29,10 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
         detail_th: ``,
         detail_en: ``,
         detail_ja: ``,
-        status: false,
-        created_at:"",
-        updated_at:"",
-        published_at:""
+        updated_at: "",
+        status: false, // Add default value for status
+        published_at: "", // Add default value for published_at
+        created_at: "", // Add default value for created_at
     });
 
     const { formState: { errors },reset } = useForm();
@@ -48,23 +49,20 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
         }, 500)
     );
 
-     const handleChange = (
+    const handleChange = (
         event: React.ChangeEvent<HTMLInputElement>,
         setValue: UseFormSetValue<BlogFormProps>,
         trigger: UseFormTrigger<BlogFormProps>
     ) => {
         const { name, value } = event.target;
-
         setBlogState((prev) => ({ ...prev, [name]: value }));
         debouncedSetValueRef.current(name as keyof BlogFormProps, value, setValue, trigger)
-        
     };
 
     const handleSubmit = async (data: any) => {
+        console.log(data);
         await updateData(id, data, router);
     };
-
-    
 
     const fetchData = async () => {
         await fetchDataById(id);
@@ -76,24 +74,35 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
     
 
     useEffect(() => {
-        if (data.length > 0) {
-            console.log(data);
+        console.log(items)
+        console.log(items.length)
+        if (items.length > 0) {
             setBlogState({
-                image: data[0].image,
-                category: data[0].category,
-                title_th: data[0].title_th,
-                title_en: data[0].title_en,
-                title_ja: data[0].title_ja,
-                description_th: data[0].description_th,
-                description_en: data[0].description_en,
-                description_ja: data[0].description_ja,
-                detail_th: data[0].detail_th,
-                detail_en: data[0].detail_en,
-                detail_ja: data[0].detail_ja,
-                status: data[0].status,
+                id: items[0].id ?? "",
+                image: items[0].image ?? "",
+                categories: items[0].categories ?? [],
+                title_th: items[0].title_th ?? "",
+                title_en: items[0].title_en ?? "",
+                title_ja: items[0].title_ja ?? "",
+                description_th: items[0].description_th ?? "",
+                description_en: items[0].description_en ?? "",
+                description_ja: items[0].description_ja ?? "",
+                detail_th: items[0].detail_th ?? "",
+                detail_en: items[0].detail_en ?? "",
+                detail_ja: items[0].detail_ja ?? "",
+                updated_at: items[0].updated_at ?? "",
+                status: items[0].status ?? false,
+                published_at: items[0].published_at ?? "",
+                created_at: items[0].created_at ?? ""
             });
         }
-      }, [data]);
+        // @ts-expect-error
+        if(items.status === true) {
+        // @ts-expect-error
+            toast.success(items.message);
+        }
+        
+    }, [items, reset]);
 
     return (
         <DefaultLayout>
@@ -101,7 +110,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
                 {/* <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"> */}
                 <div className="control-button mb-3">
                     <div className="flex justify-between">
-                        <div><Breadcrumb /></div>
+                        <div><Breadcrumb current={blogState.title_th}/></div>
                     </div>
                 </div>
         
@@ -114,7 +123,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
                         itemState={blogState}
                         setItemState={handleChange}
                         onSubmit={handleSubmit}
-                        type="create"
+                        type="edit"
                     />
                 </div>
             </div>

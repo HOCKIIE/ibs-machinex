@@ -42,24 +42,8 @@ const BlogForm = ({
         reset
     } = useForm<BlogFormProps>({
         mode: 'onChange',
-        defaultValues: {
-            id: itemState.id || "",
-            image: itemState.image || null,
-            title_th: itemState.title_th || "",
-            title_en: itemState.title_en || "",
-            title_ja: itemState.title_ja || "",
-            description_th: itemState.description_th || "",
-            description_en: itemState.description_en || "",
-            description_ja: itemState.description_ja || "",
-            detail_th: itemState.detail_th || "",
-            detail_en: itemState.detail_en || "",
-            detail_ja: itemState.detail_ja || "",
-            category: itemState.category || [],
-            status: itemState.status || false,
-        },
         criteriaMode: 'all'
     });
-
 
     const Exclamation = () => <HiExclamation className="text-rose-500" fontSize={18}/>;
     const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
@@ -82,10 +66,6 @@ const BlogForm = ({
     const onEdit = async (formData: any) => {
         console.log(errors)
         const modifiedData = { ...formData };
-        if (!formData?.password) {
-            delete modifiedData?.password;
-        }
-        delete modifiedData?.confirmPassword;
         onSubmit(modifiedData);
     };
 
@@ -93,6 +73,23 @@ const BlogForm = ({
         
     }
 
+    const formatDate = (date: Date): string => {
+        const now = new Date();
+        const bangkokTime = new Intl.DateTimeFormat('en-GB', {
+            timeZone: 'Asia/Bangkok',
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit',
+            second: '2-digit',
+            hourCycle: 'h23',
+        }).format(now);
+
+        const [datePart, timePart] = bangkokTime.split(', ');
+        const [day, month, year] = datePart.split('/');
+        return `${year}-${month}-${day} ${timePart}`;
+    };
 
     const fetchCategory = useCallback(async()=>{
         const res = await Api.get('/category');
@@ -102,6 +99,31 @@ const BlogForm = ({
     useEffect(()=>{
         fetchCategory();
     }, [fetchCategory]);
+
+    useEffect(() => {
+        if (itemState) {
+            reset({
+                id: itemState.id,
+                image: itemState.image,
+                categories: itemState.categories,
+                title_th: itemState.title_th,
+                title_en: itemState.title_en,
+                title_ja: itemState.title_ja,
+                description_th: itemState.description_th,
+                description_en: itemState.description_en,
+                description_ja: itemState.description_ja,
+                detail_th: itemState.detail_th,
+                detail_en: itemState.detail_en,
+                detail_ja: itemState.detail_ja,
+                status: itemState.status ?? false,
+                published_at: itemState.published_at,
+            });
+            if (itemState?.categories) {
+                const categoryIds = itemState.categories.map((c: any) => String(c.id));
+                setValue("category", categoryIds); // set react-hook-form field
+            }
+        }
+    }, [itemState, reset]);
 
     return (
         <div className="p-4">
@@ -150,7 +172,7 @@ const BlogForm = ({
                                 render={({field}) => (
                                     <>
                                     {category?.map((v, k) => {
-                                        const isChecked = field.value?.includes(v.id);
+                                        const isChecked = field.value?.includes(String(v.id));
                                         return (
                                             <label key={k} className="inline-flex items-center gap-2 cursor-pointer space-y-2">
                                                 <input
@@ -160,10 +182,11 @@ const BlogForm = ({
                                                     checked={isChecked}
                                                     onChange={(e) => {
                                                         const checked = e.target.checked;
+                                                        const current = field.value || [];
                                                         if (checked) {
-                                                            field.onChange([...field.value, v.id]);
+                                                            field.onChange([...current, String(v.id)]);
                                                         } else {
-                                                            field.onChange(field.value.filter((id: number) => id !== v.id));
+                                                            field.onChange(current.filter((id: string) => id !== String(v.id)));
                                                         }
                                                     }}
                                                 />
@@ -190,16 +213,18 @@ const BlogForm = ({
                         </div>
                         <div className="setting-body mt-2">
                             <div className="flex items-center mb-4">
-                                <input id="default-radio-1" 
-                                    onChange={statusHandler}
-                                    checked={status == 1 ?true:false} type="radio" value="1" name="status" className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600 outline-none" />
-                                <label htmlFor="default-radio-1" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Active</label>
-                            </div>
-                            <div className="flex items-center">
-                                <input id="default-radio-2" 
-                                    onChange={statusHandler}
-                                    checked={status == 0 ?true:false} type="radio" value="0" name="status" className="w-4 h-4 text-indigo-600 bg-gray-100 border-gray-300 dark:ring-offset-gray-800 dark:bg-gray-700 dark:border-gray-600 outline-none" />
-                                <label htmlFor="default-radio-2" className="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">Inactive</label>
+                                <Controller
+                                    name="status"
+                                    control={control}
+                                    defaultValue={!!itemState?.status}
+                                    render={({ field }) => (
+                                        <label className="inline-flex items-center cursor-pointer">
+                                            <input type="checkbox" value="1" className="sr-only peer" checked={Boolean(field.value)} onChange={(e) => field.onChange(e.target.checked)}/>
+                                            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600 dark:peer-checked:bg-indigo-600"></div>
+                                            <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Status: </span>
+                                        </label>
+                                    )}
+                                />
                             </div>
                         </div>
                     </div>
@@ -210,12 +235,41 @@ const BlogForm = ({
                             </div> 
                         </div>
                         <div className="setting-body mt-2">
-                            <label className="inline-flex items-center cursor-pointer">
-                                <input type="checkbox" value="1" className="sr-only peer" />
-                                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600 dark:peer-checked:bg-indigo-600"></div>
-                                <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Publish: </span>
-                            </label>
-                            
+                            <Controller
+                                name="published_at"
+                                control={control}
+                                defaultValue={itemState?.published_at ?? null}
+                                render={({ field }) => {
+                                    const isChecked = !!field.value;
+                                    return (
+                                    <label className="inline-flex items-center cursor-pointer">
+                                        <input
+                                        type="checkbox"
+                                        className="sr-only peer"
+                                        checked={isChecked}
+                                        onChange={(e) => {
+                                            const checked = e.target.checked;
+                                            field.onChange(checked ? formatDate(new Date()) : null);
+                                        }}
+                                        disabled={!!itemState?.published_at}
+                                        />
+                                        <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600 dark:peer-checked:bg-indigo-600"></div>
+                                        <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Publish:</span>
+                                    </label>
+                                    );
+                                }}
+                            />
+                            {itemState?.published_at && (
+                                <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">Published at: {new Date(itemState?.published_at).toLocaleDateString('en-US', {
+                                        year: 'numeric',
+                                        month: '2-digit',
+                                        day: '2-digit',
+                                        hour: '2-digit',
+                                        minute: '2-digit',
+                                    })}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="border border-gray-300 dark:border-gray-500 p-2 rounded-lg">
@@ -251,7 +305,6 @@ const BlogForm = ({
                                             <input 
                                                 type="text"
                                                 {...register("title_th", { required: true })}
-                                                defaultValue={itemState.title_th}
                                                 className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
                                                 placeholder="Title TH" 
                                             />
@@ -264,7 +317,6 @@ const BlogForm = ({
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
                                         <textarea 
                                             {...register("description_th", { required: true })}
-                                            defaultValue={itemState.description_th}
                                             className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
                                             placeholder="Description TH"
                                             onChange={e => setData(e, setValue, trigger)}
@@ -297,7 +349,6 @@ const BlogForm = ({
                                             <input 
                                                 type="text" 
                                                 {...register("title_en", { required: true })}
-                                                defaultValue={itemState.detail_th}
                                                 className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_en ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
                                                 placeholder="Title EN" />
                                                 {errors?.title_en?.type === "required" && (
@@ -309,7 +360,6 @@ const BlogForm = ({
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
                                         <textarea 
                                             {...register("description_en", { required: true })}
-                                            defaultValue={itemState.description_en}
                                             className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_en ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
                                             placeholder="Description EN"
                                             rows={5}
@@ -340,7 +390,6 @@ const BlogForm = ({
                                             <input 
                                                 type="text" 
                                                 {...register("title_ja", { required: true })}
-                                                defaultValue={itemState.title_ja}
                                                 className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_ja ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
                                                 placeholder="Title JA" />
                                                 {errors?.title_ja?.type === "required" && (
@@ -352,7 +401,6 @@ const BlogForm = ({
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
                                         <textarea 
                                             {...register("description_ja", { required: true })}
-                                            defaultValue={itemState.description_ja}
                                             className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_ja ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
                                             placeholder="Description JA"
                                             rows={5}
@@ -380,7 +428,7 @@ const BlogForm = ({
                             <div className="col-span-12">
                                 <div className="flex gap-4 items-center justify-center">
                                     <CancelButton title="Cancel" setEdit={cancelAdd}/>
-                                    <SaveButton type="submit" title="Add"/>
+                                    <SaveButton type="submit" title={edit?'Save':'Add'}/>
                                 </div>
                             </div>
                         </div>

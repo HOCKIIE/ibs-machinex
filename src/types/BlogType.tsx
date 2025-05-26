@@ -1,4 +1,5 @@
 import { useRouter } from "next/navigation";
+import { CategoryType } from "./CategoryType";
 
 export interface BlogType {
     id: string;
@@ -13,7 +14,8 @@ export interface BlogType {
     detail_en: string;
     detail_ja: string;
     status: boolean;
-    category: string;
+    category?: [];
+    categories: Array<CategoryType>;
     published_at: string;
     created_at: string;
     updated_at: string;
@@ -39,11 +41,15 @@ export interface BlogFormProps {
     detail_en: string;
     detail_ja: string;
     status: boolean;
-    category: number[];
+    category?: Array<string>;
+    categories: Array<{id: string;}>;
+    published_at: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface BlogState {
-    data: BlogType[];
+    items: BlogType[];
     isLoading: boolean;
     error: string | null;
     token: string | null;
