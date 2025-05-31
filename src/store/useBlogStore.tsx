@@ -99,16 +99,7 @@ const useBlogStore = create<BlogState>((set) => ({
                     formData.append(key, value as string);
                 }
             });
-            formData.append("_method", "PUT"); // ใช้ _method เพื่อระบุว่าเป็นการอัพเดต
-            // formData.append('title_th', data.title_th);
-            // formData.append('title_en', data.title_en);
-            // formData.append('title_ja', data.title_ja);
-            // formData.append('description_th', data.description_th);
-            // formData.append('description_en', data.description_en);
-            // formData.append('description_ja', data.description_ja);
-            // formData.append('detail_th', data.detail_th);
-            // formData.append('detail_en', data.detail_en);
-            // formData.append('detail_ja', data.detail_ja);
+            formData.append("_method", "PUT");
             const response = await Api.post(`${prefix}/update/${id}`,formData, {
                 headers: {
                     "X-Requested-With": "XMLHttpRequest"

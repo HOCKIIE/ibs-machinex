@@ -1,126 +1,173 @@
+"use client";
+
 import Api from "@/services/Api";
 import { create } from "zustand";
 import toast from "react-hot-toast";
-import { ProductState } from "@/types/ProductType";
+import { ProductType, ProductState, ApiResponse } from "@/types/ProductType";
 
-const useProductStore = create<ProductState>((set) => {
-    let errorMessage = "Something went wrong.";
-    return {
-        items: [],
-        isLoading: false,
-        error: null,
-        total: 0,
-        lastPage: 0,
-        currPage: 1,
+const prefix = '/admin/product';
 
-        fetchData: async() => {
-            try{
-                const response = await Api.get('/product');
-                set((state) => ({
-                    ...state,
-                    items: [response.data],
-                    isLoading: false,
-                }));
-            } catch(error: unknown) {
-                if (error instanceof Error) {
-                    errorMessage = error.message;
-                } else if (typeof error === "string") {
-                    errorMessage = error;
-                }
-                set({ error: errorMessage, isLoading: false });
-                toast.error(`${errorMessage}`, { duration: 2000 });
-            }
-        },
+const useProductStore = create<ProductState>((set) => ({
+    items: [],
+    isLoading: false,
+    error: null,
+    token: null,
+    
+    id: "",
+    total: 1,
+    lastPage: 1,
+    currentPage: 1,
+    response: { status: null, message: null },
 
-        fetchItemById: async (id) => {
-            set({ isLoading: true, error: null });
-            try {
-                const response = await Api.get(`produc/${id}`);
-                set((state) => ({
-                    ...state,
-                    items: [response.data],
-                    isLoading: false,
-                }));
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    errorMessage = error.message;
-                } else if (typeof error === "string") {
-                    errorMessage = error;
-                }
-                set({ error: errorMessage, isLoading: false });
-                toast.error(`${errorMessage}`, { duration: 2000 });
-            }
-          },
+    fetchData: async (page: number) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await Api.get<ApiResponse>(`${prefix}?page=${page}`);
+            const { total, lastPage, currentPage, rows } = response.data;
+        
+            set({
+                items: rows,
+                total,
+                lastPage,
+                currentPage,
+                isLoading: false,
+            });
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+            set({ error: errorMessage, isLoading: false });
+        }
+    },
 
-        createData: async (data) => {
+    fetchDataById: async (id) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await Api.get<ProductType>(`${prefix}/show/${id}`);
+            set((state) => ({
+                ...state,
+                items: [response.data],
+                isLoading: false,
+            }));
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+            set({ error: errorMessage, isLoading: false });
+        }
+    },
+
+
+    createData: async (newData, router) => {
+        try {
             const formData = new FormData();
-            formData.append("title", data.title_en);
-            formData.append("link", data.link);
-            if (data.image) {
-                formData.append("image", data.image);
-            }
-            formData.append("image_alt", data.image_alt);
-            set({ isLoading: true, error: null });
-    
-            try {
-                const response = await Api.post('/product', formData);
-                set((state) => ({
-                    items: [...state.items, response.data], isLoading: false,
-                }));
-                toast.error(`Success, The product was created successfully!`, { duration: 2000 });
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    errorMessage = error.message;
-                } else if (typeof error === "string") {
-                    errorMessage = error;
+            Object.entries(newData).forEach(([key, value]) => {
+                if (key === "category" && Array.isArray(value)) {
+                    value.forEach((val) => formData.append("category[]", val));
+                } else if (key === "image" && value instanceof File) {
+                    formData.append("image", value);
+                } else {
+                    formData.append(key, value as string);
                 }
-                set({ error: errorMessage, isLoading: false });
-                toast.error(`${errorMessage}`, { duration: 2000 });
+            });
+            const response = await Api.post(`${prefix}/store`, formData);
+            set((state) => ({
+                items: [...state.items, response.data],
+                isLoading: false,
+            }));
+            const { status, message } = response.data as { status: boolean; message: string };
+            if (status) { 
+                toast.success(message);
+                setTimeout(() => { 
+                    router.push(`${prefix}`); 
+                }, 1000);
+            } else { 
+                toast.error(message);
             }
-        },
-    
+        } catch (error) {
+            const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
+            const errorMessage = response?.data?.message || "An unknown error occurred";
+            toast.error(errorMessage);
+        }
+    },
 
-        updateData: async (id, data) => {
-            set({ isLoading: true, error: null });
-            try {
-                const response = await Api.put(`/product/${id}`,data);
-                set((state) => ({
-                    items: state.items.map((item) =>
-                        item.id === id ? response.data : item
-                    ),
-                    isLoading: false,
-                }));
-                toast.success(`Success, The User was updated successfully!`, { duration: 2000 });
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    errorMessage = error.message;
-                } else if (typeof error === "string") {
-                    errorMessage = error;
+    updateData: async (id, data) => {
+        try {
+            const formData = new FormData();
+            Object.entries(data).forEach(([key, value]) => {
+                if (key === "category" && Array.isArray(value)) {
+                    value.forEach((val) => formData.append("category[]", val));
+                } else if (key === "image" && value instanceof File) {
+                    formData.append("image", value);
+                } else {
+                    formData.append(key, value as string);
                 }
-                set({ error: errorMessage, isLoading: false });
-                toast.success(`Fail, ${errorMessage}`, { duration: 2000 });
+            });
+            formData.append("_method", "PUT");
+            const response = await Api.post(`${prefix}/update/${id}`,formData, {
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                },
+            });
+            set((state) => ({
+                items: state.items.map((item) => String(item.id) === String(id) ? response.data.data : item  ),
+                isLoading: false
+            }));
+            const { status, message } = response.data as { status: boolean; message: string };
+            if (status) { 
+                toast.success(message);
+            } else { 
+                toast.error(message);
             }
-        },
+        } catch (error: unknown) {
+            const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
+            const errorMessage = response?.data?.message || "An unknown error occurred";
+            toast.error(errorMessage);
+        }
+    },
 
-        deleteData: async (id) => {
-            set({ isLoading: true, error: null });
-            try {
-                await Api.delete(`/product/${id}`);
-                set((state) => ({
-                    items: state.items.filter((item) => item.id !== id),
-                    isLoading: false,
-                }));
-                toast.success(`Success, The product was deleted successfully!`, { duration: 2000 });
-            } catch (error: unknown) {
-                if (error instanceof Error) {
-                    errorMessage = error.message;
-                } else if (typeof error === "string") {
-                    errorMessage = error;
+    onChangeStatus: async (id, status) => {
+        set({ isLoading: true, error: null });
+        try {
+            const response = await Api.put<ProductType>(`${prefix}/status/${id}`,{ status });
+            set((state) => ({
+                items: state.items.map((item) => String(item.id) === String(id) ? response.data : item ),
+                isLoading: false,
+            }));
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+            set({ 
+                error: errorMessage, 
+                isLoading: false,
+                response : {
+                    status: false,
+                    message: errorMessage
                 }
-                set({ error: errorMessage, isLoading: false });
-                toast.error(`${errorMessage}`, { duration: 2000 });
-            }
+            });
+        }
+    },
+
+    deleteData: async (id) => {
+        set({ isLoading: true, error: null });
+        try {
+            await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
+            set((state) => ({
+                items: state.items.filter((item) => item.id !== Number(id)),
+                isLoading: false,
+                response:{
+                    status: true,
+                    message: "The user was deleted successfully!"
+                }
+            }));
+        } catch (error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+            set({
+                error: errorMessage,
+                isLoading: false,
+                response : {
+                    status: false,
+                    message: errorMessage
+                }
+            });
         }
     }
-});
+
+}));
+
 export default useProductStore;

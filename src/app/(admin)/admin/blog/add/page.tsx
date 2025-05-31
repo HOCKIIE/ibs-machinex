@@ -15,8 +15,7 @@ const Page = () => {
 
     const router = useRouter();
     const { createData } = useBlogStore();
-    const [userState, setUserState] = useState<BlogType>({
-        id: "",
+    const [blogState, setBlogState] = useState<Omit<BlogType,"id"|"created_at"|"updated_at">>({
         image: "",
         title_th: "",
         title_en: "",
@@ -28,9 +27,8 @@ const Page = () => {
         detail_en: `<div class="grid grid-cols-12 gap-4"><div class="col-span-12 p-2"><p class="mb-3 text-center">Blog Image</p></div><div class="col-span-12"><p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p></div></div>`,
         detail_ja: `<div class="grid grid-cols-12 gap-4"><div class="col-span-12 p-2"><p class="mb-3 text-center">Blog Image</p></div><div class="col-span-12"><p>Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.</p></div></div>`,
         status: false,
-        category: "",
-        created_at:"",
-        updated_at:"",
+        category: [],
+        categories: [],
         published_at:""
     });
 
@@ -54,7 +52,7 @@ const Page = () => {
     ) => {
         const { name, value } = event.target;
 
-        setUserState((prev) => ({ ...prev, [name]: value }));
+        setBlogState((prev) => ({ ...prev, [name]: value }));
         debouncedSetValueRef.current(name as keyof BlogFormProps, value, setValue, trigger)
         
     };
@@ -81,7 +79,7 @@ const Page = () => {
                     </div>
                     <hr />
                     <BlogForm 
-                        itemState={userState}
+                        itemState={blogState}
                         setItemState={handleChange}
                         onSubmit={handleSubmit}
                         type="create"

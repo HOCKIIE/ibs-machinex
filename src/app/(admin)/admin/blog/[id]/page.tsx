@@ -15,7 +15,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
 
     const { id } = use(params);
     const router = useRouter();
-    const { items, fetchDataById, updateData, response } = useBlogStore();
+    const { items, fetchDataById, updateData } = useBlogStore();
     const [blogState, setBlogState] = useState<BlogType>({
         id: "",
         image: "",
@@ -35,7 +35,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
         created_at: "", // Add default value for created_at
     });
 
-    const { formState: { errors },reset } = useForm();
+    const { reset } = useForm();
 
     const debouncedSetValueRef = useRef(
         debounce((
@@ -64,13 +64,13 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
         await updateData(id, data, router);
     };
 
-    const fetchData = async () => {
+    const fetchData = React.useCallback(async () => {
         await fetchDataById(id);
-    };
+    }, [fetchDataById, id]);
     
     useEffect(() => {
         fetchData();
-    }, []);
+    }, [fetchData]);
     
 
     useEffect(() => {
