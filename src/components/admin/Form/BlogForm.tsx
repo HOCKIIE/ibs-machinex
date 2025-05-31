@@ -23,7 +23,6 @@ const BlogForm = ({
 } : any) => {
 
     const [category, setCategory] = useState<ApiResponse[]>([]);
-    const [status, setStatus] = useState<number>(0)
     const [lng, setLang] = useState<string>('th');
     const activeLng = `bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800`;
     const invalidClass = "border-rose-300 text-rose-600 border-rose-300 focus:border-rose-500 focus:ring-rose-500/40 dark:border-rose dark:border-rose-500";
@@ -319,7 +318,6 @@ const BlogForm = ({
                                             {...register("description_th", { required: true })}
                                             className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
                                             placeholder="Description TH"
-                                            onChange={e => setData(e, setValue, trigger)}
                                             rows={5}
                                         ></textarea>
                                         {errors?.description_th?.type === "required" && (

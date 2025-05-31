@@ -3,12 +3,10 @@
 import React,{ useState,useEffect } from 'react';
 import Link from 'next/link';
 import { BiTrash } from "react-icons/bi";
-// import { toast } from "react-hot-toast";
 import { LuPencil } from "react-icons/lu";
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
-import ConfirmModal from '@/components/admin/Modal/ConfirmModal';
 import AddButton from '@/components/admin/Button/AddButton';
 import { IoSearchOutline } from "react-icons/io5";
 import useProductStore from '@/store/useProductStore';
@@ -34,18 +32,16 @@ const Product = () =>
         meta,
         loading,
         limit,
-        updateLimit,
-        setLoading,
-        setPage,
+        prevPage, 
         nextPage,
-        prevPage,
+        updateLimit,
+        StatusTab, 
         fetchData,
         handleSearch, 
-        handlePageChange,
-        StatusTab
+        handlePageChange
     } = usePagination({ 
         initialLimit: show[0],
-        endpoint: '/product'
+        endpoint: '/admin/product'
     });
 
     const { isLoading, error, deleteData, response } = useProductStore();
@@ -101,6 +97,11 @@ const Product = () =>
         response.status = null;
         response.message = null;
         setModalOpen(!isOpen);
+    }
+
+    const closeModal = () => {
+        setModalOpen(false);
+        successProgress();
     }
 
     return (
@@ -304,24 +305,23 @@ const Product = () =>
                     {/* </div> */}
                 </div>
             </div>
-            <ConfirmModal 
+            <ActionModal 
                 isOpen={isOpen} 
                 action={isAction}
-                toggleModal={successProgress}
                 onClose={() => setModalOpen(false)}
                 onAfterClose={()=>fetchData}
+                closeModal={closeModal}
                 data={{
                     confirm: deleteRecord,
                     progress: isLoading,
                     successProgress: successProgress,
                     response: { 
-                        status: typeof response?.status === 'boolean' ? response.status : null, 
-                        message: response?.message ? response?.message : null
+                        status: typeof response.status === 'boolean' ? response.status : null, 
+                        message: response.message 
                     },
                     error: error
                 }}
             />
-            <ActionModal />
         </DefaultLayout>
     )
 }
