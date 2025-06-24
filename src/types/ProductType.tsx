@@ -2,7 +2,7 @@ import { useRouter } from "next/navigation";
 import { CategoryType } from "./CategoryType";
 
 export interface ProductType {
-    id: number;
+    id: string;
     title_th: string;
     title_en: string;
     title_ja: string;
@@ -16,14 +16,16 @@ export interface ProductType {
     image: string;
     image_alt: string;
     color: string;
-    brand: string;
-    category: string;
+    brand?: [];
+    category?: [];
     price: number;
+    quantity: number;
     isActive: boolean;
     categories: Array<CategoryType>;
     published_at: string;
     created_at: string;
     updated_at: string;
+    deleted_at: string;
 }
 export interface ApiResponse {
     total: number;
@@ -32,8 +34,8 @@ export interface ApiResponse {
     rows: ProductType[];
 }
 
-export interface propductFormProps {
-    id: number;
+export interface PropductFormProps {
+    id: string;
     title_th: string;
     title_en: string;
     title_ja: string;
@@ -44,12 +46,13 @@ export interface propductFormProps {
     detail_th: string,
     detail_en: string,
     detail_ja: string,
-    image: string;
+    image: File | null;
     image_alt: string;
     color: string;
-    brand: string;
-    category: string;
+    brand?: [];
+    category?: [];
     price: number;
+    quantity: number;
     isActive: boolean;
     categories: Array<{id: string;}>;
     published_at: string;
@@ -71,12 +74,11 @@ export interface ProductState {
     fetchData: (page: number) => Promise<void>;
     fetchDataById: (id: string) => Promise<void>;
     createData: (
-        newUser: propductFormProps, 
+        newData: PropductFormProps, 
         router: ReturnType<typeof useRouter>
     ) => Promise<void>;
-    updateData: (id: string, data: propductFormProps, router: ReturnType<typeof useRouter>) => Promise<void>;
+    updateData: (id: string, data: PropductFormProps, router: ReturnType<typeof useRouter>) => Promise<void>;
     onChangeStatus: (id: string, status: boolean) => Promise<void>;
     deleteData: (id: string) => Promise<void>;
 
-  
 }

@@ -11,7 +11,7 @@ import { UseFormSetValue, UseFormTrigger, useForm } from 'react-hook-form';
 import { debounce } from 'lodash';
 
 
-const Page = () => {
+export default function Page(){
 
     const router = useRouter();
     const { createData } = useBlogStore();
@@ -89,5 +89,3 @@ const Page = () => {
         </DefaultLayout>
     )
 }
-
-export default Page

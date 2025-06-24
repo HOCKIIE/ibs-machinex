@@ -338,7 +338,7 @@ const TextEditor: React.FC<EditorProps> = ({name, value, onChange}) => {
             type: 'grid',
             children: [{
                 type: 'grid-column',
-                children: [{ type: 'paragraph', children: [{ text: 'Blog image', align: "center" }] }],
+                children: [{ type: 'paragraph', children: [{ text: 'Image', align: "center" }] }],
             }],
         },
         {

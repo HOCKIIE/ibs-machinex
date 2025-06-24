@@ -29,6 +29,7 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
     const [keyword, setKeyword] = useState<string>(currentKeyword);
     const debounceTimeout = useRef<NodeJS.Timeout | null>(null);
     const searchRef = useRef<HTMLInputElement | null>(null);
+    const didFetch = useRef(false);
 
     const classNames = {
         active: "px-2 py-1 text-sm rounded-md bg-white dark:bg-gray-600 text-black-2 dark:text-gray-300",
@@ -124,8 +125,11 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
     }
 
     useEffect(() => {
+        if (didFetch.current) return;
+        didFetch.current = true;
+
         fetchData();
-      }, [fetchData]);
+    }, [fetchData]);
 
     const StatusTab = ({ status }: { status: Array<{ label: string; value: string }> }) => {
         return (

@@ -4,16 +4,21 @@ import { UseFormRegister, UseFormSetValue, UseFormStateReturn, UseFormWatch } fr
 import { BlogFormProps } from '@/types/BlogType';
 import { ErrorMessage } from '@/components/admin/Form/Validation';
 import { set } from 'lodash';
+import { FieldValues } from "react-hook-form";
 
-type Props = {
-    register: UseFormRegister<BlogFormProps>;
-    watch: UseFormWatch<BlogFormProps>;
-    setValue: UseFormSetValue<BlogFormProps>;
-    defaultValue: BlogFormProps["image"] | null;
-    errors: UseFormStateReturn<BlogFormProps>['errors'];
-};
+interface CoverImageUploadFormValues {
+    image: File | string | null;
+}
 
-const CoverImageUpload: React.FC<Props> = ({ register, setValue, defaultValue, errors }) => {
+interface CoverImageUploadProps<T extends FieldValues = FieldValues> {
+    register: UseFormRegister<T>;
+    watch: UseFormWatch<T>;
+    setValue: UseFormSetValue<T>;
+    defaultValue: CoverImageUploadFormValues["image"];
+    errors: UseFormStateReturn<T>["errors"];
+}
+
+const CoverImageUpload =  <T extends FieldValues>({ register, setValue, defaultValue, errors }: CoverImageUploadProps<T>) => {
 
     const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
     const [dragActive, setDragActive] = React.useState(false);
@@ -22,7 +27,7 @@ const CoverImageUpload: React.FC<Props> = ({ register, setValue, defaultValue, e
         const file = event.target.files?.[0];
         if (file) {
             setPreviewUrl(URL.createObjectURL(file));
-            setValue("image", file, {
+            setValue("image" as Parameters<typeof setValue>[0], file as any, {
                 shouldValidate: true,
                 shouldTouch: true,
                 shouldDirty: true,
@@ -37,12 +42,12 @@ const CoverImageUpload: React.FC<Props> = ({ register, setValue, defaultValue, e
         const file = e.dataTransfer.files?.[0];
         if (file && file.type.startsWith("image/")) {
             setPreviewUrl(URL.createObjectURL(file));
-            setValue("image", file, { shouldValidate: true });
+            setValue("image" as Parameters<typeof setValue>[0], file as any, { shouldValidate: true });
         }
     };
 
     const handleResetImage = () => {
-        setValue('image', null); // reset field
+        setValue("image" as Parameters<typeof setValue>[0], null as any); // reset field
         setPreviewUrl(null); // reset preview
     };
     useEffect(() => {
@@ -59,9 +64,9 @@ const CoverImageUpload: React.FC<Props> = ({ register, setValue, defaultValue, e
 
     return (
         <div className="col-span-full">
-            <label className="block text-sm/6 font-medium text-gray-900 dark:text-gray-400">Cover Image</label>
+            <label className="block text-sm/6 font-medium text-gray-900 dark:text-gray-400 h-full">Cover Image</label>
             <div 
-                className={`mt-2 flex justify-center items-center rounded-lg border border-dashed ${errors?.image ? `border-red-400 dark:border-red-800` : `dark:border-gray-600 border-gray-900/25 h-50`} ${dragActive ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}`}
+                className={`h-full flex justify-center items-center rounded-lg border border-dashed ${errors?.image ? `border-red-400 dark:border-red-800` : `dark:border-gray-600 border-gray-900/25 h-50`} ${dragActive ? 'border-indigo-500 bg-indigo-50' : 'border-gray-300'}`}
                 onDragOver={(e) => {
                     e.preventDefault();
                     setDragActive(true);
@@ -72,12 +77,12 @@ const CoverImageUpload: React.FC<Props> = ({ register, setValue, defaultValue, e
                 <div className="text-center">
                     {previewUrl ? (
                         <div className="relative">
-                            <img src={previewUrl} alt="Preview" className="max-h-50 rounded-md shadow" />
+                            <img src={previewUrl} alt="Preview" className="h-auto min-h-[300px] max-h-[300px] w-auto max-w-full rounded-md shadow" /> 
                             <button
                                 title="Reset"
                                 type="button"
                                 onClick={handleResetImage}
-                                className="absolute flex items-center justify-center top-2 right-2 w-8 h-8 rounded-full bg-red-50 border-red-300 border hover:bg-red-100 text-red-600 dark:text-red-200 dark:bg-red-800 dark:hover px-2 py-1 text-xs"
+                                className="absolute flex items-center justify-center top-2 right-2 w-8 h-8 rounded-full bg-red-50 border-red-300 border hover:bg-red-100 text-red-600 dark:text-red-200 dark:bg-red-2000 dark:hover px-2 py-1 text-xs"
                             ><LiaTimesSolid/></button>
                         </div>
                     ):(
@@ -97,16 +102,34 @@ const CoverImageUpload: React.FC<Props> = ({ register, setValue, defaultValue, e
                                     id="file-upload"
                                     accept="image/*"
                                     className="sr-only focus:outline-none"
-                                    {...register("image", {
+                                    {...register("image" as Parameters<typeof register>[0], {
                                         required: true,
                                         validate: {
                                             required: (value) => value ? true : "This field is required.",
                                             fileType: (value) => {
-                                                const file = value instanceof FileList ? value[0] : null;
+                                                let file: File | null = null;
+                                                if (value && typeof value === "object") {
+                                                    // @ts-expect-error
+                                                    if (typeof FileList !== "undefined" && value instanceof FileList) {
+                                                        file = value[0];
+                                                    // @ts-expect-error
+                                                    } else if (typeof File !== "undefined" && value instanceof File) {
+                                                        file = value;
+                                                    }
+                                                }
                                                 return file && file.type.startsWith("image/") || "Only image files are allowed.";
                                             },
                                             fileSize: (value) => {
-                                                const file = value instanceof FileList ? value[0] : null;
+                                                let file: File | null = null;
+                                                if (value && typeof value === "object") {
+                                                    // @ts-expect-error
+                                                    if (value instanceof FileList) {
+                                                        file = value[0];
+                                                    // @ts-expect-error
+                                                    } else if (value instanceof File) {
+                                                        file = value;
+                                                    }
+                                                }
                                                 return file ? file.size <= 2 * 1024 * 1024 || "File size must be less than 2MB." : "This field is required.";
                                             },
                                         },

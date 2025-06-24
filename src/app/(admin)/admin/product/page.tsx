@@ -145,22 +145,20 @@ const Product = () =>
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
                                     <th scope="col" className="px-6 py-3" style={{width:'3%'}}><AnimatedCheckbox checked={isAllSelected} onChange={toggleSelectAll}/></th>
-                                    <th scope="col" className="px-6 py-3" style={{width:'60%'}}>Product name</th>
+                                    <th scope="col" className="px-6 py-3" style={{width:'40%'}}>Product name</th>
                                     <th scope="col" className="px-6 py-3">Brand</th>
-                                    <th scope="col" className="px-6 py-3">Category</th>
-                                    <th scope="col" className="px-6 py-3">Price</th>
                                     <th scope="col" className="px-6 py-3">Status</th>
                                     <th scope="col" className="px-6 py-3" style={{width:'10%'}}>Created</th>
                                     <th scope="col" className="px-6 py-3">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {data && data.map((product,index) => 
+                                {data && data.map((v,index) => 
                                     <tr key={index} className={`bg-white dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-900 transition-all ease-in-out ${loading ? ' animate-pulse' : ''}`}>
                                         <td className="px-6 py-4">
                                             {loading
                                                 ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded col-span-2"></div>
-                                                :<AnimatedCheckbox className="select" checked={selectedIds.includes(product.id)} onChange={()=>toggleSelect(product.id)}/>
+                                                :<AnimatedCheckbox className="select" checked={selectedIds.includes(v.id)} onChange={()=>toggleSelect(v.id)}/>
                                             }
                                         </td>
                                         <td className="px-6 py-4" width={720}>
@@ -181,16 +179,16 @@ const Product = () =>
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 w-10 h-10">
                                                     <img className="w-10 h-10 rounded-full" 
-                                                        src={product.thumbnail} 
-                                                        alt={product.title}
+                                                        src={`${process.env.NEXT_PUBLIC_API_URL}${v.image}` || '/storage/fallback-image.jpg'} 
+                                                        alt={v.title_en}
                                                     />
                                                 </div>
                                                 <div className="ml-4">
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                        {product.title}
+                                                        {v.title_en}
                                                     </div>
                                                     <p className="text-sm text-gray-500 dark:text-gray-400 h-[40px] line-clamp-2">
-                                                        {product.description}
+                                                        {v.description_en}
                                                     </p>
                                                 </div>
                                             </div>
@@ -198,7 +196,7 @@ const Product = () =>
                                         </td>
                                         <td className="px-6 py-4">
                                             {!loading?
-                                            <div className="text-sm text-gray-900 dark:text-gray-200">{product.brand}</div>
+                                            <div className="text-sm text-gray-900 dark:text-gray-200">{v.brand[0].title_en}</div>
                                             :
                                             <div className="flex-1 space-y-6 py-1">
                                                 <div className="space-y-3">
@@ -209,7 +207,7 @@ const Product = () =>
                                             }
                                             
                                         </td>
-                                        <td className="px-6 py-4">
+                                        {/* <td className="px-6 py-4">
                                             { !loading ?
                                                 <div className="text-sm text-gray-900 dark:text-gray-200">{product.category}</div>
                                             :
@@ -220,10 +218,10 @@ const Product = () =>
                                                     </div>
                                                 </div>
                                             }
-                                        </td>
+                                        </td> */}
                                         <td className="px-6 py-4">
                                             {!loading?
-                                            <div className="text-sm text-gray-900 dark:text-gray-200">{Format.number(product.price,2)}</div>
+                                            <div className="text-sm text-gray-900 dark:text-gray-200">{Format.number(v.price,2)}</div>
                                             :
                                             <div className="flex-1 space-y-6 py-1">
                                                 <div className="space-y-3">
@@ -250,7 +248,7 @@ const Product = () =>
                                         </td>
                                         <td className="px-6 py-4">
                                             { !loading ?
-                                                <div className="text-sm text-gray-900 dark:text-gray-200">{Format.date(product.meta.createdAt)}</div>
+                                                <div className="text-sm text-gray-900 dark:text-gray-200">{Format.date(v.created_at)}</div>
                                             :
                                                 <div className="flex-1 space-y-6 py-1">
                                                     <div className="space-y-3">
@@ -271,7 +269,7 @@ const Product = () =>
                                                 </button>
                                                 <Link 
                                                     type="button"
-                                                    href={`user/edit/${v.id}`}
+                                                    href={`product/${v.id}`}
                                                     className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-500 dark:hover:text-white/90">
                                                     <LuPencil fontSize={20}/>
                                                 </Link>                                                
