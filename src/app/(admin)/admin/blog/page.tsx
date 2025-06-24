@@ -14,7 +14,6 @@ import SearchBar from '@/components/admin/Paginate/SearchBar';
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
 import useBlogStore from '@/store/useBlogStore';
 import ActionModal from '@/components/admin/Modal/ActionModal';
-
 import { BlogType } from '@/types/BlogType';
 
 const show = [10, 25, 50, 100];

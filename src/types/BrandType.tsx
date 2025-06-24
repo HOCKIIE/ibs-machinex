@@ -1,7 +1,26 @@
+import { useRouter } from "next/navigation";
 export interface BrandType {
     id: string;
-    name: string;
+    title_th: string;
+    title_en: string;
+    title_ja: string;
     image: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export interface BrandFormProps {
+    id: string;
+    image: File | null;
+    title_th: string;
+    title_en: string;
+    title_ja: string;
+    description_th: string;
+    description_en: string;
+    description_jp: string;
+    status: boolean;
+    brands: BrandType[];
+    published_at: string;
     created_at: string;
     updated_at: string;
 }
@@ -13,19 +32,22 @@ export interface ApiResponse {
 }
 
 export interface BrandState {
-    brands: BrandType[];
+    items: BrandType[];
     isLoading: boolean;
     error: string | null;
     token: string | null;
+
     id: string;
-    role: string;
-    user: string;
-    response: {
-        status: number | null;
-        message: string | null;
-    };
-    fetchData: () => Promise<void>;
-    createData: (data: BrandType, router: any) => Promise<void>;
-    updateData: (id: string, data: BrandType, router: any) => Promise<void>;
-    deleteData: (id: string, router: any) => Promise<void>;
+    total: number;
+    lastPage: number;
+    currentPage: number;
+    response: { status: boolean | null; message: string | null };
+    fetchData: (page: number) => Promise<void>;
+    fetchDataById: (id: string) => Promise<void>;
+    createData: (
+        newData: BrandFormProps, 
+        router: ReturnType<typeof useRouter>
+    ) => Promise<void>;
+    updateData: (id: string, data: BrandFormProps, router: ReturnType<typeof useRouter>) => Promise<void>;
+    deleteData: (id: string) => Promise<void>;
 }

@@ -3,11 +3,11 @@
 import Api from "@/services/Api";
 import { create } from "zustand";
 import toast from "react-hot-toast";
-import { ProductType, ProductState, ApiResponse } from "@/types/ProductType";
+import { BrandState, BrandType, ApiResponse } from "@/types/BrandType";
 
-const prefix = '/admin/product';
+const prefix = '/admin/category';
 
-const useProductStore = create<ProductState>((set) => ({
+const useBrandStore = create<BrandState>((set) => ({
     items: [],
     isLoading: false,
     error: null,
@@ -40,7 +40,7 @@ const useProductStore = create<ProductState>((set) => ({
     fetchDataById: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.get<ProductType>(`${prefix}/show/${id}`);
+            const response = await Api.get<BrandType>(`${prefix}/show/${id}`);
             set((state) => ({
                 ...state,
                 items: [response.data],
@@ -51,7 +51,7 @@ const useProductStore = create<ProductState>((set) => ({
             set({ error: errorMessage, isLoading: false });
         }
     },
-
+    
 
     createData: async (newData, router) => {
         try {
@@ -90,9 +90,7 @@ const useProductStore = create<ProductState>((set) => ({
         try {
             const formData = new FormData();
             Object.entries(data).forEach(([key, value]) => {
-                if (key === "category" && Array.isArray(value)) {
-                    value.forEach((val) => formData.append("category[]", val));
-                } else if (key === "image" && value instanceof File) {
+                if (key === "image" && value instanceof File) {
                     formData.append("image", value);
                 } else {
                     formData.append(key, value as string);
@@ -121,33 +119,12 @@ const useProductStore = create<ProductState>((set) => ({
         }
     },
 
-    onChangeStatus: async (id, status) => {
-        set({ isLoading: true, error: null });
-        try {
-            const response = await Api.put<ProductType>(`${prefix}/status/${id}`,{ status });
-            set((state) => ({
-                items: state.items.map((item) => String(item.id) === String(id) ? response.data : item ),
-                isLoading: false,
-            }));
-        } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-            set({ 
-                error: errorMessage, 
-                isLoading: false,
-                response : {
-                    status: false,
-                    message: errorMessage
-                }
-            });
-        }
-    },
-
     deleteData: async (id) => {
         set({ isLoading: true, error: null });
         try {
             await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set((state) => ({
-                items: state.items.filter((item) => item.id !== Number(id)),
+                items: state.items.filter((item) => item.id !== id),
                 isLoading: false,
                 response:{
                     status: true,
@@ -167,6 +144,6 @@ const useProductStore = create<ProductState>((set) => ({
         }
     }
 
-}));
 
-export default useProductStore;
+}));
+export default useBrandStore;

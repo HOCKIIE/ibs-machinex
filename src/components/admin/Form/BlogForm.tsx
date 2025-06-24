@@ -49,9 +49,6 @@ const BlogForm = ({
     const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
     const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
 
-    const statusHandler = () => {
-
-    }
     const search = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         console.log(value)
