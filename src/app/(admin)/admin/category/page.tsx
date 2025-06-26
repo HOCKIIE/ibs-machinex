@@ -153,13 +153,13 @@ const Category = () =>
                         <tbody>
                             {data && data.map((v:CategoryType,index) => 
                                 <tr key={index} className={`bg-white dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-900 transition-all ease-in-out ${loading ? ' animate-pulse' : ''}`}>
-                                    <td>
+                                    <td className="px-6 py-4">
                                         {loading
                                             ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded col-span-2"></div>
                                             :<AnimatedCheckbox className="select" checked={selectedIds.includes(v.id)} onChange={()=>toggleSelect(v.id)}/>
                                         }
                                     </td>
-                                    <td>
+                                    <td className="px-6 py-4">
                                         {loading
                                             ? <div className="flex space-x-4 h-[60px] justify-center items-center">
                                                 <div className="rounded-full bg-gray-300 dark:bg-slate-700 h-10 w-10"></div>
@@ -175,28 +175,28 @@ const Category = () =>
                                             </div>
                                             : <div className="flex items-center">
                                                 <div className="flex-shrink-0 w-10 h-10">
-                                                    <img className="w-10 h-10 rounded-full" 
+                                                      <img className="w-10 h-10 rounded-full" 
                                                         src={`${process.env.NEXT_PUBLIC_API_URL}${v.image}` || '/storage/fallback-image.jpg'} 
                                                         alt={v.title_en}
                                                     />
                                                 </div>
-                                                <div className="ml-4">
+                                                <div className="ml-4 space-y-1">
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                        {v.title_th}
+                                                        <span className="p-1 bg-indigo-200 text-blue-600 rounded-lg text-xs">TH</span>{v.title_th}
                                                     </div>
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                        {v.title_en}
+                                                        <span className="p-1 bg-blue-200 text-blue-600 rounded-lg text-xs">EN</span>{v.title_en}
                                                     </div>
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                        {v.title_ja}
+                                                        <span className="p-1 bg-cyan-200 text-blue-600 rounded-lg text-xs">JA</span>{v.title_ja}
                                                     </div>
                                                 </div>
                                             </div>
                                         }
                                     </td>
-                                    <td>{v.status}</td>
-                                    <td>{v.created_at}</td>
-                                    <td>
+                                    <td className="px-6 py-4">{v.status}</td>
+                                    <td className="px-6 py-4">{v.created_at}</td>
+                                    <td className="px-6 py-4">
                                         {!loading
                                             ? <div className="flex gap-2">
                                                 <button 
@@ -207,7 +207,7 @@ const Category = () =>
                                                 </button>
                                                 <Link 
                                                     type="button"
-                                                    href={`product/${v.id}`}
+                                                    href={`category/${v.id}`}
                                                     className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-500 dark:hover:text-white/90">
                                                     <LuPencil fontSize={20}/>
                                                 </Link>                                                

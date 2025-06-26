@@ -4,14 +4,18 @@ import Link from 'next/link';
 import { FiBarChart2 } from "react-icons/fi";
 import { RxDashboard } from "react-icons/rx";
 import { BsCardText, BsPersonVcard, BsBox, BsMailbox  } from "react-icons/bs";
+import { MdOutlineCategory } from "react-icons/md";
+import { TbTagStarred } from "react-icons/tb";
 import { TbUsers } from "react-icons/tb";
 import { useAuth } from "@/contexts/AdminContext";
 
-type menuName = "Dashboard"|"Product"|"Blog"|"About"|"Contact"|"User";
+type menuName = "Dashboard"|"Category"|"Brand"|"Product"|"Blog"|"About"|"Contact"|"User";
 interface IconProps { type: menuName }
 const Icon : React.FC<IconProps> = ({ type }) => {
     const iconMap : Record<menuName, JSX.Element> = {
         Dashboard:<RxDashboard fontSize={20}/>,
+        Category:<MdOutlineCategory fontSize={20}/>,
+        Brand: <TbTagStarred fontSize={20}/>,
         Product:<BsBox fontSize={20}/>,
         Blog:<BsCardText fontSize={20}/>,
         About:<BsPersonVcard fontSize={20}/>,
@@ -23,6 +27,8 @@ const Icon : React.FC<IconProps> = ({ type }) => {
 
 const menuItem: { name: menuName, path: string }[] = [
     { name:"Dashboard", path:"/admin" },
+    { name:"Category", path:"/admin/category" },
+    { name:"Brand", path:"/admin/brand" },
     { name:"Product", path:"/admin/product" },
     { name:"Blog", path:"/admin/blog" },
     { name:"About", path:"/admin/about" },
