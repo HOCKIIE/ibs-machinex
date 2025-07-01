@@ -3,20 +3,19 @@
 import React,{ useEffect,useState,useRef,use } from 'react';
 import { UseFormSetValue, UseFormTrigger, useForm } from 'react-hook-form';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
-import CategoryForm from '@/components/admin/Form/CategoryForm';
+import BrandForm from '@/components/admin/Form/BrandForm';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
-import useCategoryStore from '@/store/useCategoryStore';
+import useBrandStore from '@/store/useBrandStore';
 import { useRouter } from 'next/navigation';
-import { CategoryFormProps, CategoryType } from '@/types/CategoryType';
+import { BrandFormProps, BrandType } from '@/types/BrandType';
 import { debounce } from 'lodash';
 import toast from 'react-hot-toast';
 
-const EditCategory = ({ params }: { params: Promise<{ id: string }> }) => {
-
+const page = ({ params }:{ params: Promise<{id:string}> }) => {
     const  { id } = use(params);
     const router = useRouter();
-    const { items, fetchDataById, updateData } = useCategoryStore();
-    const [ itemState, setItemState ] = useState<CategoryType>({
+    const { items, fetchDataById, updateData } = useBrandStore();
+    const [ itemState, setItemState ] = useState<BrandType>({
         id: "",
         image: "",
         title_th: "",
@@ -28,15 +27,14 @@ const EditCategory = ({ params }: { params: Promise<{ id: string }> }) => {
         updated_at: "",
         status: false, // Add default value for status
         created_at: "", // Add default value for created_at
-        deleted_at: "",
     });
     const { reset } = useForm();
     const debouncedSetValueRef = useRef(
         debounce((
-            name: keyof CategoryFormProps,
+            name: keyof BrandFormProps,
             value: string,
-            setValue: UseFormSetValue<CategoryFormProps>,
-            trigger: UseFormTrigger<CategoryFormProps>
+            setValue: UseFormSetValue<BrandFormProps>,
+            trigger: UseFormTrigger<BrandFormProps>
         ) => {
             setValue(name, value, { shouldValidate: true });
             trigger(name);
@@ -45,12 +43,12 @@ const EditCategory = ({ params }: { params: Promise<{ id: string }> }) => {
 
     const handleChange = (
         event: React.ChangeEvent<HTMLInputElement>,
-        setValue: UseFormSetValue<CategoryFormProps>,
-        trigger: UseFormTrigger<CategoryFormProps>
+        setValue: UseFormSetValue<BrandFormProps>,
+        trigger: UseFormTrigger<BrandFormProps>
     ) => {
         const { name, value } = event.target;
         setItemState((prev) => ({ ...prev, [name]: value }));
-        debouncedSetValueRef.current(name as keyof CategoryFormProps, value, setValue, trigger)
+        debouncedSetValueRef.current(name as keyof BrandFormProps, value, setValue, trigger)
     };
 
     const handleSubmit = async (data: any) => {
@@ -89,31 +87,30 @@ const EditCategory = ({ params }: { params: Promise<{ id: string }> }) => {
         
     }, [items, reset]);
 
-    return (
-        <DefaultLayout>
-            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                {/* <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"> */}
-                <div className="control-button mb-3">
-                    <div className="flex justify-between">
-                        <div><Breadcrumb current={itemState.title_en}/></div>
-                    </div>
-                </div>
-        
-                <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-                    <div className="px-5 py-4 sm:px-6 sm:py-5">
-                        <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Edit category</h3>
-                    </div>
-                    <hr />
-                    <CategoryForm 
-                        itemState={itemState}
-                        setItemState={handleChange}
-                        onSubmit={handleSubmit}
-                        type="create"
-                    />
+  return (
+    <DefaultLayout>
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="control-button mb-3">
+                <div className="flex justify-between">
+                    <div><Breadcrumb current={itemState.title_en}/></div>
                 </div>
             </div>
-        </DefaultLayout>
-    )
+    
+            <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
+                <div className="px-5 py-4 sm:px-6 sm:py-5">
+                    <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Add a new brand</h3>
+                </div>
+                <hr />
+                <BrandForm 
+                    itemState={itemState}
+                    setItemState={handleChange}
+                    onSubmit={handleSubmit}
+                    type="create"
+                />
+            </div>
+        </div>
+    </DefaultLayout>
+  )
 }
 
-export default EditCategory
+export default page

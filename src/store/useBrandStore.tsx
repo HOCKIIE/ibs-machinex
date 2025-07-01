@@ -5,7 +5,7 @@ import { create } from "zustand";
 import toast from "react-hot-toast";
 import { BrandState, BrandType, ApiResponse } from "@/types/BrandType";
 
-const prefix = '/admin/category';
+const prefix = '/admin/brand';
 
 const useBrandStore = create<BrandState>((set) => ({
     items: [],
