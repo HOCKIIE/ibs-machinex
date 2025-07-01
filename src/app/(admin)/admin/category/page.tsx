@@ -112,7 +112,7 @@ const Category = () =>
                         <div><Breadcrumb /></div>
                         <div className="flex gap-3 right">
                             <StatusTab status={recordStatus}/>
-                            <AddButton title="Add Category" href="/admin/product/add"/>
+                            <AddButton title="Add Category" href="/admin/category/add"/>
                         </div>
                         
                     </div>
@@ -175,7 +175,7 @@ const Category = () =>
                                             </div>
                                             : <div className="flex items-center">
                                                 <div className="flex-shrink-0 w-10 h-10">
-                                                      <img className="w-10 h-10 rounded-full" 
+                                                    <img className="w-10 h-10 rounded-full" 
                                                         src={`${process.env.NEXT_PUBLIC_API_URL}${v.image}` || '/storage/fallback-image.jpg'} 
                                                         alt={v.title_en}
                                                     />

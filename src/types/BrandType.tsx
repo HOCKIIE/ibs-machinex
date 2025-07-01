@@ -4,6 +4,10 @@ export interface BrandType {
     title_th: string;
     title_en: string;
     title_ja: string;
+    description_th: string;
+    description_en: string;
+    description_ja: string;
+    status: boolean;
     image: string;
     created_at: string;
     updated_at: string;
@@ -17,7 +21,7 @@ export interface BrandFormProps {
     title_ja: string;
     description_th: string;
     description_en: string;
-    description_jp: string;
+    description_ja: string;
     status: boolean;
     brands: BrandType[];
     published_at: string;
