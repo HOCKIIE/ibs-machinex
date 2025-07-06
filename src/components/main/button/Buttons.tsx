@@ -20,6 +20,7 @@ export const EditButton = ({title,setEdit}: ButtonProps) => {
 export const CancelButton = ({title,setEdit}: ButtonProps) => {
     return <button 
         onClick={setEdit}
+        type="button"
         className="rounded-md px-5 py-2 min-w-30 max-w-35 dark:text-gray-400 bg-gray-100 border border-gray-200 hover:bg-gray-200 dark:border-gray-600 dark:bg-gray-700 focus:ring focus:ring-gray-500/20"
     >{title?`${title}`:`Cancel`}</button>
 }

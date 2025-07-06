@@ -11,7 +11,7 @@ import { BrandFormProps, BrandType } from '@/types/BrandType';
 import { debounce } from 'lodash';
 import toast from 'react-hot-toast';
 
-const page = ({ params }:{ params: Promise<{id:string}> }) => {
+const Page = ({ params }:{ params: Promise<{id:string}> }) => {
     const  { id } = use(params);
     const router = useRouter();
     const { items, fetchDataById, updateData } = useBrandStore();
@@ -24,9 +24,10 @@ const page = ({ params }:{ params: Promise<{id:string}> }) => {
         description_th: "",
         description_en: "",
         description_ja: "",
+        categories: [],
         updated_at: "",
-        status: false, // Add default value for status
-        created_at: "", // Add default value for created_at
+        status: false,
+        created_at: "", 
     });
     const { reset } = useForm();
     const debouncedSetValueRef = useRef(
@@ -63,6 +64,7 @@ const page = ({ params }:{ params: Promise<{id:string}> }) => {
     useEffect(() => {
         fetchData();
     }, [fetchData]);
+    
     useEffect(() => {
         if (items.length > 0) {
             setItemState({
@@ -75,6 +77,7 @@ const page = ({ params }:{ params: Promise<{id:string}> }) => {
                 description_en: items[0].description_en ?? "",
                 description_ja: items[0].description_ja ?? "",
                 updated_at: items[0].updated_at ?? "",
+                categories: items[0].categories ?? [],
                 status: Boolean(items[0]?.status) || false,
                 created_at: items[0].created_at ?? ""
             });
@@ -105,7 +108,7 @@ const page = ({ params }:{ params: Promise<{id:string}> }) => {
                     itemState={itemState}
                     setItemState={handleChange}
                     onSubmit={handleSubmit}
-                    type="create"
+                    type="edit"
                 />
             </div>
         </div>
@@ -113,4 +116,4 @@ const page = ({ params }:{ params: Promise<{id:string}> }) => {
   )
 }
 
-export default page
+export default Page

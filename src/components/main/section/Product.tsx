@@ -1,10 +1,11 @@
 "use client"
-import React,{ useEffect, useState, useCallback } from 'react';
+import React,{ useEffect, useState, useCallback, useRef } from 'react';
 import { useRouter,usePathname, useSearchParams } from "next/navigation";
 import Api from '@/services/Api';
 import Link from 'next/link';
 import { IoSearchSharp } from "react-icons/io5";
 import { CategoryType } from '@/types/CategoryType';
+import { BrandType } from '@/types/BrandType';
 
 const ProductSection = () => {
     const [allCategory, setAllCategory] = useState<CategoryType | []>([]);    
@@ -16,6 +17,8 @@ const ProductSection = () => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const didfetchAllCategory = useRef(false);
+    const didfetchCategory = useRef(false);
 
     const getQueryParam = useCallback(() => {
         const params = new URLSearchParams(searchParams.toString());
@@ -30,7 +33,7 @@ const ProductSection = () => {
 
     const fetchAndSetProducts = useCallback(async () => {
         setLoading(true);
-        const path = `/category/product?${getQueryParam()}`;
+        const path = `/category/brand?${getQueryParam()}`;
         const request = await Api.get(path);
         return request;
     }, [getQueryParam]);
@@ -38,7 +41,7 @@ const ProductSection = () => {
     const fetchCategory = useCallback(async () => {
         try {
             const response = await fetchAndSetProducts();
-            console.log("Category response:", response.data);
+            console.log("Category response >>> ", response.data);
             setCategory(response.data);
         } catch (error) {
             console.error("Error fetching category:", error);
@@ -47,7 +50,7 @@ const ProductSection = () => {
         }
     }, [fetchAndSetProducts]);
 
-    const fetchAllCategory = useCallback(async () => {
+    const fetchAllCategory = useCallback(async() => {
         try {
             const response = await Api.get("/category");
             console.log("All Category response:", response.data);
@@ -80,11 +83,19 @@ const ProductSection = () => {
     }
 
     useEffect(() => {
-        fetchCategory();
+        if(didfetchAllCategory.current) return;
+        didfetchAllCategory.current = true;
         fetchAllCategory();
         const keyword = getQueryParam().get("keyword") || "";
         setKeyword(keyword)
-    }, [fetchCategory, fetchAllCategory, getQueryParam]);
+    },[fetchAllCategory, getQueryParam]);
+    
+    useEffect(() => {
+        if(didfetchCategory.current) return;
+        didfetchCategory.current = true;
+        fetchCategory();
+    },[fetchCategory]);
+    console.log('category >>> ', category);
   return (
     <div>
         <div className="relative h-[340px] md:h-[350px] xl:h-[400px]">
@@ -110,13 +121,16 @@ const ProductSection = () => {
         </div>
         <div className="container space-y-7">
             <h5 className="flex justify-center items-center text-black text-xl">Choose the category you are interested in.</h5>
-            <div className="grid grid-cols-2 md:grid-cols-4 xl:grid-cols-8 gap-4">
-                {Array.isArray(allCategory) && allCategory.map((item: any, k:number) => (
-                    <div key={item.id} className="flex flex-col items-center p-4 text-black bg-white/70 backdrop-blur-sm hover:bg-red-700 hover:text-white !important rounded-xl transition-all duration-300 ease-in-out cursor-pointer">
-                        <div className="rounded-full overflow-hidden w-[107px] h-[107px] flex justify-center items-center  mb-2">
-                            <img src={item.image} alt={item.name_en} width={107} height={107} />
+            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 px-4 md:px-7">
+                {Array.isArray(allCategory) && allCategory.map((item: CategoryType) => (
+                    <div key={item.id} className="group h-60 px-4 py-5 text-black bg-white/70 backdrop-blur-sm hover:ring-[3px] hover:ring-red-500 rounded-3xl transform transition-all duration-500 ease-in-out cursor-pointer">
+                        <div className="flex flex-col items-center transition-transform duration-300 ease-in-out group-hover:scale-110">
+                            <div className="overflow-hidden w-[107px] h-[107px] flex justify-center items-center">
+                                <img src={item.image} alt={item.title_en} width={107} height={107} className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] pb-2"/>
+                            </div>
+                            <h2 className="text-center line-clamp-3 mt-5 group-hover:text-red-600">{item.title_en}</h2>
+
                         </div>
-                        <h2 className="text-center line-clamp-3">{item.name_en}</h2>
                     </div>
                 ))}
             </div>
@@ -124,30 +138,30 @@ const ProductSection = () => {
         </div>
         <div className="container mt-20">
             <div className="flex justify-center">
-                <h2 className="bg-gradient-to-r from-sky-500 from-5% via-blue-600 via-50% to-blue-900 to-90% text-5xl font-bold text-transparent bg-clip-text">Product And Service</h2>
+                <h2 className="bg-gradient-to-r from-[#0055d3] from-2% via-[#007ecf] via-55% to-[#00a5cb] to-1% text-5xl font-bold text-transparent bg-clip-text">Product And Service</h2>
             </div>
             <div className="flex justify-center mt-2">
                 <h3 className="text-black text-xl">Find the Best Solutions Here!</h3>
             </div>
             <div className="mt-20">
-                {Array.isArray(category) && category.map((item: any, k:number) => (
-                    <div key={k} className="grid grid-cols-12 gap-5 mt-5 group">
+                {Array.isArray(category) && category.map((item: CategoryType) => (
+                    <div key={item.id} className="grid grid-cols-12 gap-5 mt-5 group">
                         <div className="col-span-12 xl:col-span-4 p-5 bg-white/60 backdrop-blur-sm rounded-3xl border border-blue-800 group-hover:bg-blue-800/90 group-hover:backdrop-blur-[4px] transition-all duration-300 ease-in-out">
                             <div className="text-blue-800 text-3xl font-bold relative group-hover:text-white">
-                                {item.name_en}
+                                {item.title_en}
                                 <div className="absolute h-[5px] bg-red-600 w-[80px] left-0 bottom-[-10px]"/>
                             </div>
                             <div className="text-black text-xl mt-5 group-hover:text-white">{item.description_en}</div>
                         </div>
                         <div className="col-span-12 xl:col-span-8 p-5 bg-white/60 backdrop-blur-sm rounded-3xl border border-blue-800 group-hover:bg-blue-800/90 group-hover:backdrop-blur-[4px] transition-all duration-300 ease-in-out">
                             <div className="grid grid-cols-4 md:grid-cols-5 xl:grid-cols-7 gap-5">
-                                {item.brand?.map((brand: any, k:number) => (
+                                {item.brand?.map((brand: BrandType, k:number) => (
                                     <div key={k} className="flex items-center group-hover:text-white">
                                         <Link
-                                            href={`${item.name_en.replace(' ','-').toLowerCase()}/${brand.name_en.replace(' ','-').toLowerCase()}`}
+                                            href={`${item.title_en.replace(' ','-').toLowerCase()}/${brand.title_en.replace(' ','-').toLowerCase()}`}
                                             className="rounded-full overflow-hidden w-[107px] h-[107px] flex justify-center items-center mb-2 border shadow-md hover:outline hover:outline-offset-[-4px] outline-red-700 hover:outline-[5px] transition-all duration-300 ease-in-out"
                                         >
-                                            <img src={brand.image} alt={brand.name_en} className="w-full h-full object-contain"/>
+                                            <img src={brand.image} alt={brand.title_en} className="w-full h-full object-contain"/>
                                         </Link>
                                     </div>)
                                 )}

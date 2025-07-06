@@ -174,7 +174,7 @@ const Brand = () =>
                                         : <div className="flex items-center">
                                             <div className="flex-shrink-0 w-20 h-20">
                                                 <img className="w-20 h-20 rounded-full" 
-                                                    src={`${process.env.NEXT_PUBLIC_API_URL}${v.image}` || '/storage/fallback-image.jpg'} 
+                                                    src={`${v.image}` || '/storage/fallback-image.jpg'} 
                                                     alt={v.title_en}
                                                 />
                                             </div>

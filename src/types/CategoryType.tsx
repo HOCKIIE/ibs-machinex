@@ -10,7 +10,7 @@ export interface CategoryType {
     description_th: string;
     description_en: string;
     description_ja: string;
-    brands?: [];
+    brand?: [];
     status: boolean;
     created_at: string;
     updated_at: string;
