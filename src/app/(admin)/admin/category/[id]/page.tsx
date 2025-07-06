@@ -108,7 +108,7 @@ const EditCategory = ({ params }: { params: Promise<{ id: string }> }) => {
                         itemState={itemState}
                         setItemState={handleChange}
                         onSubmit={handleSubmit}
-                        type="create"
+                        type="edit"
                     />
                 </div>
             </div>

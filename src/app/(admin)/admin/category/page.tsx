@@ -176,19 +176,19 @@ const Category = () =>
                                             : <div className="flex items-center">
                                                 <div className="flex-shrink-0 w-10 h-10">
                                                     <img className="w-10 h-10 rounded-full" 
-                                                        src={`${process.env.NEXT_PUBLIC_API_URL}${v.image}` || '/storage/fallback-image.jpg'} 
+                                                        src={`${v.image}` || '/storage/fallback-image.jpg'} 
                                                         alt={v.title_en}
                                                     />
                                                 </div>
                                                 <div className="ml-4 space-y-1">
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                        <span className="p-1 bg-indigo-200 text-blue-600 rounded-lg text-xs">TH</span>{v.title_th}
+                                                        <span className="p-[3px] bg-green-200 text-blue-600 rounded-md text-[11px] me-1">TH</span>{v.title_th}
                                                     </div>
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                        <span className="p-1 bg-blue-200 text-blue-600 rounded-lg text-xs">EN</span>{v.title_en}
+                                                        <span className="p-[3px] bg-blue-200 text-blue-600 rounded-md text-[11px] me-1">EN</span>{v.title_en}
                                                     </div>
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                        <span className="p-1 bg-cyan-200 text-blue-600 rounded-lg text-xs">JA</span>{v.title_ja}
+                                                        <span className="p-[3px] bg-red-200 text-blue-600 rounded-md text-[11px] me-1">JA</span>{v.title_ja}
                                                     </div>
                                                 </div>
                                             </div>

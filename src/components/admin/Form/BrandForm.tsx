@@ -1,25 +1,22 @@
 "use client";
 
-import Api from '@/services/Api';
-import React, { useState, useCallback, useEffect, Children } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
-import { useForm, Controller  } from "react-hook-form";
-import { LiaLanguageSolid } from "react-icons/lia";
-import { ApiResponse, BrandFormProps } from '@/types/BrandType';
-import { HiExclamation } from "react-icons/hi";
+import { useForm  } from "react-hook-form";
+import { BrandFormProps } from '@/types/BrandType';
 import { ErrorMessage } from './Validation';
 import CoverImageUpload from '../Dropzon/CoverImageUpload';
+import { useRouter } from 'next/navigation';
+import Api from '@/services/Api';
 
 const BrandForm = ({
     itemState,
-    setItemState: setData,
     onSubmit,
     type
 } : any) => {
-
-    const [brand, setBrand] = useState<ApiResponse[]>([]);
-    const [lng, setLang] = useState<string>('th');
-    const activeLng = `bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800`;
+    const didFetch = useRef(false);
+    const [category, setCategory] = useState([]);
+    const router = useRouter();
     const invalidClass = "border-rose-300 text-rose-600 border-rose-300 focus:border-rose-500 focus:ring-rose-500/40 dark:border-rose dark:border-rose-500";
     const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
     const create = type === "create";
@@ -30,23 +27,12 @@ const BrandForm = ({
         handleSubmit: handleSubmitForm,
         formState: { errors },
         setValue,
-        control,
-        trigger,
         watch,
         reset
     } = useForm<BrandFormProps>({
         mode: 'onChange',
         criteriaMode: 'all'
     });
-    const Exclamation = () => <HiExclamation className="text-rose-500" fontSize={18}/>;
-    const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
-    const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
-    const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
-
-    const search = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        console.log(value)
-    }
 
     const onCreate = async (data: any) => {
         // console.log(typeof errors)
@@ -57,32 +43,26 @@ const BrandForm = ({
         console.log(errors)
         const modifiedData = { ...formData };
         onSubmit(modifiedData);
-    };
-
-    const cancelAdd = () => {
-        
+    }
+    const cancelAction = () => {
+        router.push('/admin/brand');
     }
 
-    const formatDate = (date: Date): string => {
-        const now = new Date();
-        const bangkokTime = new Intl.DateTimeFormat('en-GB', {
-            timeZone: 'Asia/Bangkok',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hourCycle: 'h23',
-        }).format(now);
+ 
+    // Fetch categories from an API or define them statically
+    const fetchCategory = useCallback(async()=>{
+        const res = await Api.get('/category');
+        setCategory(res.data);
+    }, [setCategory]);
 
-        const [datePart, timePart] = bangkokTime.split(', ');
-        const [day, month, year] = datePart.split('/');
-        return `${year}-${month}-${day} ${timePart}`;
-    };
+    useEffect(()=>{
+        if (didFetch.current) return;
+        didFetch.current = true;
+        fetchCategory();
+    }, [fetchCategory]);
 
     useEffect(() => {
-            if (itemState) {
+        if (itemState) {
             reset({
                 id: itemState.id,
                 image: itemState.image,
@@ -92,9 +72,14 @@ const BrandForm = ({
                 description_th: itemState.description_th,
                 description_en: itemState.description_en,
                 description_ja: itemState.description_ja,
+                categories: itemState.categories,
                 status: itemState.status ?? false,
                 published_at: itemState.published_at,
             });
+            if (itemState?.categories) {
+                const categoryIds = itemState.categories.map((c: any) => String(c.id));
+                setValue("category", categoryIds); // set react-hook-form field
+            }
         }
     }, [itemState, reset, setValue]);
     
@@ -102,9 +87,23 @@ const BrandForm = ({
 return (
     <div className="p-4">
         <form onSubmit={handleSubmitForm(type === "create" ? onCreate : onEdit)}>
-            <div className="grid grid-cols-12">
-                <div className="col-span-12">
+            <div className="grid grid-cols-12 gap-6">
+                <div className="col-span-6">
                     <CoverImageUpload<BrandFormProps> register={register} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
+                </div>
+                <div className="col-span-6">
+                    <div className="space-y-3">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Cateogry</label>
+                        <select
+                            {...register("category", { required: true })}
+                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.category ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                        >
+                            <option value="" hidden>Select Category</option>
+                            {category.map((cat: any) => (
+                                <option key={cat.id} value={cat.id}>{cat.title_en}</option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
             </div>
             <div className="grid grid-cols-12 gap-4">
@@ -188,14 +187,13 @@ return (
                 </div>
                 <div className="col-span-12">
                     <div className="flex gap-4 items-center justify-center">
-                        <CancelButton title="Cancel" setEdit={cancelAdd}/>
+                        <CancelButton title="Cancel" setEdit={cancelAction}/>
                         <SaveButton type="submit" title={edit?'Save':'Add'}/>
                     </div>
                 </div>
             </div>
         </form>
     </div>
-)
-}
+)}
 
-export default BrandForm
+export default BrandForm;

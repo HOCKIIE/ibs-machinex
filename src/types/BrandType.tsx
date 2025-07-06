@@ -1,4 +1,5 @@
 import { useRouter } from "next/navigation";
+import { CategoryType } from "./CategoryType";
 export interface BrandType {
     id: string;
     title_th: string;
@@ -7,6 +8,8 @@ export interface BrandType {
     description_th: string;
     description_en: string;
     description_ja: string;
+    category?: [];
+    categories: Array<CategoryType>;
     status: boolean;
     image: string;
     created_at: string;
@@ -24,6 +27,8 @@ export interface BrandFormProps {
     description_ja: string;
     status: boolean;
     brands: BrandType[];
+    category?: Array<string>;
+    categories: Array<{id: string;}>;
     published_at: string;
     created_at: string;
     updated_at: string;

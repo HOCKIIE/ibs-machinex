@@ -8,7 +8,7 @@ export default function Home() {
         <div 
             className="relative bg-fixed bg-center bg-cover" 
             style={{ 
-                backgroundImage: "url('/images/bg.png')",
+                backgroundImage: "url('/images/bg-2.svg')",
                 backgroundRepeat:"no-repeat",
                 backgroundPosition: "center top",
                 backgroundSize: "100%", 

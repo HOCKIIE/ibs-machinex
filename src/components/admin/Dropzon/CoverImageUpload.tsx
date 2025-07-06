@@ -53,7 +53,7 @@ const CoverImageUpload =  <T extends FieldValues>({ register, setValue, defaultV
     useEffect(() => {
         if (defaultValue) {
             if (typeof defaultValue === "string") {
-                setPreviewUrl(`${process.env.NEXT_PUBLIC_API_URL}${defaultValue}`);
+                setPreviewUrl(`${defaultValue}`);
             } else if (defaultValue instanceof File) {
                 setPreviewUrl(URL.createObjectURL(defaultValue));
             }

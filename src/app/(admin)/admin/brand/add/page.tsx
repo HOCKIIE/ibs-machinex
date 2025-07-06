@@ -10,7 +10,7 @@ import { BrandFormProps, BrandType } from '@/types/BrandType';
 import { UseFormSetValue, UseFormTrigger, useForm } from 'react-hook-form';
 import { debounce } from 'lodash';
 
-const page = () => {
+const Page = () => {
 
     const router = useRouter();
     const { createData } = useBrandStore();
@@ -22,7 +22,9 @@ const page = () => {
         description_th: "",
         description_en: "",
         description_ja: "",
-        status: false
+        status: false,
+        category: [],
+        categories: [],
     });
 
     const { formState: { errors } } = useForm()
@@ -78,4 +80,4 @@ const page = () => {
     )
 }
 
-export default page
+export default Page
