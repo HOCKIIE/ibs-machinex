@@ -144,6 +144,7 @@ const Brand = () =>
                             <tr>
                                 <th scope="col" className="px-6 py-3" style={{width:'3%'}}><AnimatedCheckbox checked={isAllSelected} onChange={toggleSelectAll}/></th>
                                 <th scope="col" className="px-6 py-3" style={{width:'70%'}}>Title</th>
+                                <th scope="col" className="px-6 py-3" style={{width:'10%'}}>Status</th>
                                 <th scope="col" className="px-6 py-3" style={{width:'15%'}}>Created</th>
                                 <th scope="col" className="px-6 py-3">Action</th>
                             </tr>
@@ -180,18 +181,19 @@ const Brand = () =>
                                             </div>
                                             <div className="ml-4 space-y-1">
                                                 <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                    <span className="p-1 bg-indigo-200 text-blue-600 rounded-lg text-xs me-1">TH</span>{v.title_th}
+                                                    <span className="p-1 bg-green-200 text-blue-600 rounded-lg text-xs me-1">TH</span>{v.title_th}
                                                 </div>
                                                 <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
                                                     <span className="p-1 bg-blue-200 text-blue-600 rounded-lg text-xs me-1">EN</span>{v.title_en}
                                                 </div>
                                                 <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                    <span className="p-1 bg-cyan-200 text-blue-600 rounded-lg text-xs me-1">JA</span>{v.title_ja}
+                                                    <span className="p-1 bg-rose-200 text-blue-600 rounded-lg text-xs me-1">JA</span>{v.title_ja}
                                                 </div>
                                             </div>
                                         </div>
                                     }
                                 </td>
+                                <td className='px-6 py-4'>{v.status === true ? `On`:`Off`}</td>
                                 <td className="px-6 py-4">
                                     { !loading ?
                                         <div className="text-sm text-gray-900 dark:text-gray-200">{Format.date(v.created_at)}</div>

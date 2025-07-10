@@ -72,17 +72,17 @@ const useBrandStore = create<BrandState>((set) => ({
             }));
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
-                toast.success(message);
+                toast.success(message,{position: "top-center"});
                 setTimeout(() => { 
                     router.push(`${prefix}`); 
                 }, 1000);
             } else { 
-                toast.error(message);
+                toast.error(message,{position: "top-center"});
             }
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage);
+            toast.error(errorMessage,{position: "top-center"});
         }
     },
 
@@ -108,14 +108,14 @@ const useBrandStore = create<BrandState>((set) => ({
             }));
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
-                toast.success(message);
+                toast.success(message,{position: "top-center"});
             } else { 
-                toast.error(message);
+                toast.error(message,{position: "top-center"});
             }
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage);
+            toast.error(errorMessage,{position: "top-center"});
         }
     },
 
