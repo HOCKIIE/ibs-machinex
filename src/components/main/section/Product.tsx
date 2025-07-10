@@ -18,7 +18,8 @@ const ProductSection = () => {
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const didfetchAllCategory = useRef(false);
-    const didfetchCategory = useRef(false);
+    const didfetchCategory = useRef<string | null>(null);
+    const queryString = searchParams.toString();
 
     const getQueryParam = useCallback(() => {
         const params = new URLSearchParams(searchParams.toString());
@@ -91,11 +92,12 @@ const ProductSection = () => {
     },[fetchAllCategory, getQueryParam]);
     
     useEffect(() => {
-        if(didfetchCategory.current) return;
-        didfetchCategory.current = true;
+  
+        if(didfetchCategory.current === queryString) return;
+        didfetchCategory.current = queryString;
         fetchCategory();
-    },[fetchCategory]);
-    console.log('category >>> ', category);
+    },[fetchCategory, queryString]);
+
   return (
     <div>
         <div className="relative h-[340px] md:h-[350px] xl:h-[400px]">

@@ -1,0 +1,9 @@
+{
+  "header": {
+    "home": "Home",
+    "portfolio": "portfolio",
+    "cv": "Curriculum Vitae",
+    "tricks": "Tricks",
+    "contact": "Contact"
+  }
+}
