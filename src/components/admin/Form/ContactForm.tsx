@@ -12,9 +12,17 @@ const ContactForm = () =>
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const [isEditContact, setEditContact] = useState<boolean>(false);
     const [map, setMap] = useState<string|''>('');
+    const [tab, setTab] = useState<string>('th')
+    const didFetchContact = useRef<boolean>(false);
+    const didFetchAbout = useRef<boolean>(false);
     const [contactData, setContactData] = useState<ContactType>({
-        title: "",
-        address: "",
+        id: "",
+        title_th: "",
+        title_en: "",
+        title_ja: "",
+        address_th: "",
+        address_en: "",
+        address_ja: "",
         phone: "",
         mobile: "",
         email: "",
@@ -28,8 +36,12 @@ const ContactForm = () =>
         formState: { errors }
     } = useForm({
         defaultValues: {
-            title: contactData.title,
-            address: contactData.address,
+            title_th: contactData.title_th,
+            title_en: contactData.title_en,
+            title_ja: contactData.title_ja,
+            address_th: contactData.address_th,
+            address_en: contactData.address_en,
+            address_ja: contactData.address_ja,
             phone: contactData.phone,
             mobile: contactData.mobile,
             email: contactData.email,
@@ -60,10 +72,20 @@ const ContactForm = () =>
         }
         setContactData((prevState) => ({ ...prevState,[name]: newValue }));
     };
+
+    const languageTab = (ev: React.MouseEvent<HTMLButtonElement>) => {
+        ev.preventDefault();
+        const currentTab =  ev.currentTarget.dataset['tab'];
+        setTab(currentTab ?? 'th')
+    }
     const CalcelEdit = () => {
         reset({
-            title: contact?.title,
-            address: contact?.address,
+            title_th: contact?.title_th,
+            title_en: contact?.title_en,
+            title_ja: contact?.title_ja,
+            address_th: contact?.address_th,
+            address_en: contact?.address_en,
+            address_ja: contact?.address_ja,
             phone: contact?.phone,
             mobile: contact?.mobile,
             email: contact?.email,
@@ -75,10 +97,15 @@ const ContactForm = () =>
 
     useEffect(() => { fetchData(); }, [fetchData]);
     useEffect(() => {
-        if (contact && contact.title) {
+        if (contact && contact.title_th) {
             const data = {
-                title: contact.title,
-                address: contact.address,
+                id: contact.id,
+                title_th: contact.title_th,
+                title_en: contact.title_en,
+                title_ja: contact.title_ja,
+                address_th: contact.address_th,
+                address_en: contact.address_en,
+                address_ja: contact.address_ja,
                 phone: contact.phone,
                 mobile: contact.mobile,
                 email: contact.email,
@@ -107,12 +134,52 @@ const ContactForm = () =>
                 </div>
                 <div>
                     <div className="space-y-6 border-t border-gray-100 p-5 sm:p-6 dark:border-gray-800">
+                        <div className="flex gap-1">
+                            <button type="button" className={`py-2 px-4 text-sm rounded-lg ${tab=="th"?'bg-indigo-100 text-indigo-600':'bg-gray-50'}`} onClick={languageTab} data-tab="th">Thai</button>
+                            <button type="button" className={`py-2 px-4 text-sm rounded-lg ${tab=="en"?'bg-indigo-100 text-indigo-600':'bg-gray-50'}`} onClick={languageTab} data-tab="en">English</button>
+                            <button type="button" className={`py-2 px-4 text-sm rounded-lg ${tab=="ja"?'bg-indigo-100 text-indigo-600':'bg-gray-50'}`} onClick={languageTab} data-tab="ja">Japanese</button>
+                        </div>
                         <div className="grid grid-cols-12 gap-5">
-                            <div className="col-span-12 xl:col-span-6 space-y-3">
+                            <div className={`col-span-12 xl:col-span-6 space-y-3 language-field${tab=="th"?'':' hidden'}`} tab-toggle="th">
                                 <div className="space-y-3">
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Company Name</label>
+                                    <div className="flex gap-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Company Name</label>
+                                        <span className="px-1 bg-indigo-200 text-indigo-600 rounded-md text-xs flex items-center">TH</span>
+                                    </div>
                                     <input 
-                                        {...register('title',{required:true})}
+                                        {...register('title_th',{required:true})}
+                                        type="text" 
+                                        className="dark:bg-dark-900 shadow-theme-xs focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-700 placeholder:text-gray-400 focus:ring-3 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 disabled:bg-gray-50 disabled:border-gray-100 disabled:text-gray-500" 
+                                        placeholder="Company Name"
+                                        disabled={!isEditContact}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+                            <div className={`col-span-12 xl:col-span-6 space-y-3 language-field${tab=="en"?'':' hidden'}`} tab-toggle="en">
+                                <div className="space-y-3">
+                                    <div className="flex gap-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Company Name</label>
+                                        <span className="px-1 bg-indigo-200 text-indigo-600 rounded-md text-xs flex items-center">EN</span>
+                                    </div>
+                                    <input 
+                                        {...register('title_en',{required:true})}
+                                        type="text" 
+                                        className="dark:bg-dark-900 shadow-theme-xs focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-700 placeholder:text-gray-400 focus:ring-3 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 disabled:bg-gray-50 disabled:border-gray-100 disabled:text-gray-500" 
+                                        placeholder="Company Name"
+                                        disabled={!isEditContact}
+                                        onChange={handleChange}
+                                    />
+                                </div>
+                            </div>
+                            <div className={`col-span-12 xl:col-span-6 space-y-3 language-field${tab=="ja"?'':' hidden'}`} tab-toggle="ja">
+                                <div className="space-y-3">
+                                    <div className="flex gap-2">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Company Name</label>
+                                        <span className="px-1 bg-indigo-200 text-indigo-600 rounded-md text-xs flex items-center">JA</span>
+                                    </div>
+                                    <input 
+                                        {...register('title_ja',{required:true})}
                                         type="text" 
                                         className="dark:bg-dark-900 shadow-theme-xs focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2 text-sm text-gray-700 placeholder:text-gray-400 focus:ring-3 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 disabled:bg-gray-50 disabled:border-gray-100 disabled:text-gray-500" 
                                         placeholder="Company Name"
@@ -134,24 +201,63 @@ const ContactForm = () =>
                                     />
                                 </div>
                             </div>
-                            <div className="col-span-12 md:col-span-6">
-                                <div className="text-black font-bold text-xl xl:text-[36px]">
-                                <div>
-                                    <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Address</label>
+                            <div className={`col-span-12 md:col-span-6 language-field${tab=="th"?'':' hidden'}`} toggle-tab="th">
+                                <div className="space-y-3">
+                                    <div className="flex gap-2">
+                                        <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Address</label>
+                                        <span className="px-1 bg-indigo-200 text-indigo-600 rounded-md text-xs flex items-center">TH</span>
+                                    </div>
                                     <textarea 
-                                        {...register('address',{required:true})}
+                                        {...register('address_th',{required:true})}
                                         rows={5}
                                         placeholder="Enter a description..."
                                         className="dark:bg-dark-900 shadow-theme-xs focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-700 font-normal placeholder:text-gray-400 focus:ring-3 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 disabled:bg-gray-50 disabled:border-gray-100 disabled:text-gray-500"
                                         disabled={!isEditContact}
                                         onChange={handleChange}
                                     ></textarea>
-                                    {errors?.address?.type === "required" && (
+                                    {errors?.address_th?.type === "required" && (
                                         <p className="text-xs text-rose-600 dark:text-rose-700">This field is required.</p>
                                     )}
                                 </div>
                             </div>
-                        </div>
+                            <div className={`col-span-12 md:col-span-6 language-field${tab=="en"?'':' hidden'}`} toggle-tab="en">
+                                <div className="space-y-3">
+                                    <div className="flex gap-2">
+                                        <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Address</label>
+                                        <span className="px-1 bg-indigo-200 text-indigo-600 rounded-md text-xs flex items-center">EN</span>
+                                    </div>
+                                    <textarea 
+                                        {...register('address_en',{required:true})}
+                                        rows={5}
+                                        placeholder="Enter a description..."
+                                        className="dark:bg-dark-900 shadow-theme-xs focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-700 font-normal placeholder:text-gray-400 focus:ring-3 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 disabled:bg-gray-50 disabled:border-gray-100 disabled:text-gray-500"
+                                        disabled={!isEditContact}
+                                        onChange={handleChange}
+                                    ></textarea>
+                                    {errors?.address_th?.type === "required" && (
+                                        <p className="text-xs text-rose-600 dark:text-rose-700">This field is required.</p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className={`col-span-12 md:col-span-6 language-field${tab=="ja"?'':' hidden'}`} toggle-tab="ja">
+                                <div className="space-y-3">
+                                    <div className="flex gap-2">
+                                        <label className="mb-1.5 block text-sm font-medium text-gray-700 dark:text-gray-400">Address</label>
+                                        <span className="px-1 bg-indigo-200 text-indigo-600 rounded-md text-xs flex items-center">JA</span>
+                                    </div>
+                                    <textarea 
+                                        {...register('address_ja',{required:true})}
+                                        rows={5}
+                                        placeholder="Enter a description..."
+                                        className="dark:bg-dark-900 shadow-theme-xs focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-700 font-normal placeholder:text-gray-400 focus:ring-3 focus:outline-none dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 disabled:bg-gray-50 disabled:border-gray-100 disabled:text-gray-500"
+                                        disabled={!isEditContact}
+                                        onChange={handleChange}
+                                    ></textarea>
+                                    {errors?.address_th?.type === "required" && (
+                                        <p className="text-xs text-rose-600 dark:text-rose-700">This field is required.</p>
+                                    )}
+                                </div>
+                            </div>
                             <div className="col-span-12 md:col-span-6 space-y-3">
                                 <div className="space-y-3">
                                     <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Telephone</label>

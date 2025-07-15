@@ -3,6 +3,7 @@ import React, { useState, useCallback, useEffect, Children } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
 import { PropductFormProps } from "@/types/ProductType";
 import { useForm, Controller  } from "react-hook-form";
+import { useRouter } from "next/navigation";
 import { MdRemoveRedEye } from "react-icons/md";
 import { ApiResponse as CategoryApiResponse } from '@/types/CategoryType';
 import { BrandType } from '@/types/BrandType'
@@ -24,6 +25,7 @@ const ProductForm = ({
     type
 }:any) => {
 
+    const router = useRouter();
     const [category, setCategory] = useState<CategoryApiResponse[]>([]);
     const [lng, setLang] = useState<string>('th');
     const activeLng = `bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800`;
@@ -94,9 +96,7 @@ const ProductForm = ({
         return `${year}-${month}-${day} ${timePart}`;
     };
 
-    const cancelAdd = () => {
-        
-    }
+    const cancelAction = () => router.back();
 
     const fetchCategory = useCallback(async()=>{
         const res = await Api.get('/category/product');
@@ -442,7 +442,7 @@ const ProductForm = ({
                             <div className="grid grid-cols-12 mt-4">
                                 <div className="col-span-12">
                                     <div className="flex gap-4 items-center justify-center">
-                                        <CancelButton title="Cancel" setEdit={cancelAdd}/>
+                                        <CancelButton title="Cancel" setEdit={cancelAction}/>
                                         <SaveButton type="submit" title={edit?'Save':'Add'}/>
                                     </div>
                                 </div>

@@ -32,6 +32,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
         detail_ja: ``,
         color: "",
         price: 0,
+        quantity: 0,
         updated_at: "",
         isActive: false, // Add default value for status
         published_at: "", // Add default value for published_at
@@ -93,6 +94,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
                 detail_ja: items[0].detail_ja ?? "",
                 color: items[0].color ?? "",
                 price: items[0].price ?? 0,
+                quantity: items[0].quantity ?? 0,
                 updated_at: items[0].updated_at ?? "",
                 isActive: typeof items[0].isActive !== "undefined" ? items[0].isActive : false,
                 published_at: items[0].published_at ?? "",

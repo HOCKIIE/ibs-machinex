@@ -1,9 +1,8 @@
 {
   "header": {
-    "home": "Home",
-    "portfolio": "portfolio",
-    "cv": "Curriculum Vitae",
-    "tricks": "Tricks",
-    "contact": "Contact"
+    "home": "ホーム",
+    "about": "について",
+    "blog": "ブログ",
+    "contact": "お問い合わせ"
   }
 }

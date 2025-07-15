@@ -1,10 +1,11 @@
 "use client";
 
 import Api from '@/services/Api';
-import React, { useState, useCallback, useEffect, Children } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
 import { useForm, Controller  } from "react-hook-form";
 import { LiaLanguageSolid } from "react-icons/lia";
+import { useRouter } from 'next/navigation';
 import { ApiResponse } from '@/types/CategoryType';
 import { CategoryFormProps } from '@/types/CategoryType';
 import { HiExclamation } from "react-icons/hi";
@@ -18,6 +19,7 @@ const CategoryForm = ({
     type
 } : any) => {
 
+    const rounter = useRouter();
     const [category, setCategory] = useState<ApiResponse[]>([]);
     const [lng, setLang] = useState<string>('th');
     const activeLng = `bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800`;
@@ -60,9 +62,7 @@ const CategoryForm = ({
         onSubmit(modifiedData);
     };
 
-    const cancelAdd = () => {
-        
-    }
+    const cancelAdd = () => rounter.back();
 
     const formatDate = (date: Date): string => {
         const now = new Date();

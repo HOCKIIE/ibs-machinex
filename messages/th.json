@@ -1,9 +1,8 @@
 {
   "header": {
     "home": "หน้าแรก",
-    "portfolio": "portfolio",
-    "cv": "ประวัติย่อ",
-    "tricks": "เคล็ดลับ",
+    "about": "เกี่ยวกับเรา",
+    "blog": "บทความ",
     "contact": "ติดต่อเรา"
   }
 }

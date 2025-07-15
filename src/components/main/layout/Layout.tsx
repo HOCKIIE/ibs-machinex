@@ -10,9 +10,10 @@ import { useGlobal } from "@/contexts/PageSettingsContext";
 import { useEffect } from "react";
 import LanguageSwitcher from "../dropdown/LanguageSwitcher";
 
-
+import {useTranslations} from 'next-intl';
 
 export const Header = () => {
+    const t = useTranslations('header');
     const {ToggleSidebarHandle} = useGlobal();
     interface ScrollToEvent extends React.MouseEvent<HTMLAnchorElement> {
         currentTarget: HTMLAnchorElement;
@@ -33,12 +34,12 @@ export const Header = () => {
         <div className="fixed w-full bg-white z-20 shadow-sm">
             <div className="container mx-auto flex items-center justify-between 2xl">
                 <div className="flex gap-1 items-center text-blue-900 text-sm h-12 lg:h-auto md:text-md xl:text-title-md md:font-semibold">
-                    <img src="/images/logo.png" alt="IBS Machinex (Thailand) Company Limited" />
+                    <img src="/images/logo.png" alt="IBS Machinex (Thailand) Company Limited"/>
                     <div>IBS Machinex (Thailand) Company Limited</div>
                 </div>
                 <div className="hidden lg:flex items-center gap-20">
                     <ul className="flex md:text-sm xl:text-base">
-                        {MenuItem.map((item, index) => <li key={index}><a className="block py-4 px-4 uppercase font-light text-black hover:bg-red-700 hover:text-white transition-all" href={item.href} onClick={scrollTo}>{item.title}</a></li>)}
+                        {MenuItem.map((item, index) => <li key={index}><a className="block py-4 px-4 uppercase font-light text-black hover:bg-red-700 hover:text-white transition-all" href={item.href} onClick={scrollTo}>{t(`${item.key}`)}</a></li>)}
                     </ul>
                     <div>
                         <LanguageSwitcher/>
@@ -96,6 +97,7 @@ export const Footer = () => {
 }
 
 export const Sidebar = () => {
+    const t = useTranslations('header');
     const {SidebarActive,ToggleSidebarHandle} = useGlobal();
     useEffect(()=>{
         if (SidebarActive) document.body.classList.add("overflow-hidden");
@@ -120,7 +122,7 @@ export const Sidebar = () => {
                                 href={item.href} 
                                 title={item.title} 
                                 className="block px-4 p-3 uppercase text-white hover:bg-red-600 hover:text-white transition-all duration-500 rounded-xl"
-                            >{item.title}</a>
+                            >{t(`${item.key}`)}</a>
                         </li> 
                     )}
                 </ul>

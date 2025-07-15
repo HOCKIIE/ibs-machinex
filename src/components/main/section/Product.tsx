@@ -6,8 +6,10 @@ import Link from 'next/link';
 import { IoSearchSharp } from "react-icons/io5";
 import { CategoryType } from '@/types/CategoryType';
 import { BrandType } from '@/types/BrandType';
+import { useLocale } from 'next-intl';
 
 const ProductSection = () => {
+    const locale = useLocale();
     const [allCategory, setAllCategory] = useState<CategoryType | []>([]);    
     const [category, setCategory] = useState<CategoryType | []>([]);    
     const [keyword, setKeyword] = useState<string>("");
@@ -92,13 +94,13 @@ const ProductSection = () => {
     },[fetchAllCategory, getQueryParam]);
     
     useEffect(() => {
-  
+
         if(didfetchCategory.current === queryString) return;
         didfetchCategory.current = queryString;
         fetchCategory();
     },[fetchCategory, queryString]);
 
-  return (
+    return (
     <div>
         <div className="relative h-[340px] md:h-[350px] xl:h-[400px]">
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-3/4 bg-gradient-to-b from-blue-950 to-sky-500 text-white p-6 h-[350px] xl:h-[500px] w-[100%] max-w-[2300px] rounded-[20px] md:rounded-[80px] xl:rounded-[150px] 2xl:rounded-[230px] 3xl:rounded-[300px] z-1"></div>
@@ -111,26 +113,26 @@ const ProductSection = () => {
                                 <div className="relative w-full">
                                     <input defaultValue={keyword} type="search" id="search" className="block w-full p-4 ps-6 text-sm text-gray-900 border border-gray-300 rounded-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 outline-none" placeholder="Search" />
                                 </div>
-                                <button className="min-w-[20px] flex items-center justify-center bg-red-800 h-full p-3 rounded-full" title="search"><IoSearchSharp fontSize={30}/></button>
+                                <button className="min-w-[20px] flex items-center justify-center text-white bg-red-800 h-full p-3 rounded-full" title="search"><IoSearchSharp fontSize={30}/></button>
                             </div>
                         </form>
                     </div>
                 </div>
             </div>
             <div className="absolute bottom-8 flex justify-center items-start w-full z-10">
-                <div className="w-[80px] h-[80px] rounded-full bg-red-700 flex justify-center items-center text-3xl font-bold">OR</div>
+                <div className="w-[80px] h-[80px] rounded-full text-white bg-red-700 flex justify-center items-center text-3xl font-bold">OR</div>
             </div>
         </div>
         <div className="container space-y-7">
             <h5 className="flex justify-center items-center text-black text-xl">Choose the category you are interested in.</h5>
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 px-4 md:px-7">
-                {Array.isArray(allCategory) && allCategory.map((item: CategoryType) => (
+                {Array.isArray(allCategory) && allCategory.map((item: any) => (
                     <div key={item.id} className="group h-60 px-4 py-5 text-black bg-white/70 backdrop-blur-sm hover:ring-[3px] hover:ring-red-500 rounded-3xl transform transition-all duration-500 ease-in-out cursor-pointer">
                         <div className="flex flex-col items-center transition-transform duration-300 ease-in-out group-hover:scale-110">
                             <div className="overflow-hidden w-[107px] h-[107px] flex justify-center items-center">
-                                <img src={item.image} alt={item.title_en} width={107} height={107} className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] pb-2"/>
+                                <img src={item.image} alt={item[`title_${locale}`]} width={107} height={107} className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] pb-2"/>
                             </div>
-                            <h2 className="text-center line-clamp-3 mt-5 group-hover:text-red-600">{item.title_en}</h2>
+                            <h2 className="text-center line-clamp-3 mt-5 group-hover:text-red-600">{item[`title_${locale}`]}</h2>
 
                         </div>
                     </div>
@@ -146,14 +148,14 @@ const ProductSection = () => {
                 <h3 className="text-black text-xl">Find the Best Solutions Here!</h3>
             </div>
             <div className="mt-20">
-                {Array.isArray(category) && category.map((item: CategoryType) => (
+                {Array.isArray(category) && category.map((item: any) => (
                     <div key={item.id} className="grid grid-cols-12 gap-5 mt-5 group">
                         <div className="col-span-12 xl:col-span-4 p-5 bg-white/60 backdrop-blur-sm rounded-3xl border border-blue-800 group-hover:bg-blue-800/90 group-hover:backdrop-blur-[4px] transition-all duration-300 ease-in-out">
                             <div className="text-blue-800 text-3xl font-bold relative group-hover:text-white">
-                                {item.title_en}
+                                {item[`title_${locale}`]}
                                 <div className="absolute h-[5px] bg-red-600 w-[80px] left-0 bottom-[-10px]"/>
                             </div>
-                            <div className="text-black text-xl mt-5 group-hover:text-white">{item.description_en}</div>
+                            <div className="text-black text-xl mt-5 group-hover:text-white">{item[`description_${locale}`]}</div>
                         </div>
                         <div className="col-span-12 xl:col-span-8 p-5 bg-white/60 backdrop-blur-sm rounded-3xl border border-blue-800 group-hover:bg-blue-800/90 group-hover:backdrop-blur-[4px] transition-all duration-300 ease-in-out">
                             <div className="grid grid-cols-4 md:grid-cols-5 xl:grid-cols-7 gap-5">
@@ -178,7 +180,7 @@ const ProductSection = () => {
             </div>
         </div>
     </div>
-  )
+    )
 }
 
 export default ProductSection
