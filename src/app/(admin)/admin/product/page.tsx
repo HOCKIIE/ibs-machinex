@@ -153,7 +153,7 @@ const Product = () =>
                                 </tr>
                             </thead>
                             <tbody>
-                                {data && data.map((v,index) => 
+                                {data && data.map((v: any,index) => 
                                     <tr key={index} className={`bg-white dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-900 transition-all ease-in-out ${loading ? ' animate-pulse' : ''}`}>
                                         <td className="px-6 py-4">
                                             {loading
@@ -196,7 +196,7 @@ const Product = () =>
                                         </td>
                                         <td className="px-6 py-4">
                                             {!loading?
-                                            <div className="text-sm text-gray-900 dark:text-gray-200">{v.brand[0].title_en}</div>
+                                            <div className="text-sm text-gray-900 dark:text-gray-200">{v.title_en}</div>
                                             :
                                             <div className="flex-1 space-y-6 py-1">
                                                 <div className="space-y-3">

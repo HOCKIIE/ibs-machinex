@@ -11,6 +11,7 @@ import { MdRemoveRedEye } from "react-icons/md";
 import CoverImageUpload from '../Dropzon/CoverImageUpload';
 import TextEditor from '../Editor/TextEditor';
 import { ErrorMessage } from './Validation';
+import { useRouter } from 'next/router';
 
 import { IoMdPricetag, IoMdClose } from "react-icons/io";
 import { HiExclamation } from "react-icons/hi";
@@ -22,6 +23,7 @@ const BlogForm = ({
     type
 } : any) => {
 
+    const router = useRouter();
     const [category, setCategory] = useState<ApiResponse[]>([]);
     const [lng, setLang] = useState<string>('th');
     const activeLng = `bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800`;
@@ -65,9 +67,7 @@ const BlogForm = ({
         onSubmit(modifiedData);
     };
 
-    const cancelAdd = () => {
-        
-    }
+    const cancelAdd = () => router.back();
 
     const formatDate = (date: Date): string => {
         const now = new Date();

@@ -1,10 +1,31 @@
-import React from 'react';
+"use client"
+
+import React, { useEffect, useRef, useState,useCallback } from 'react';
+import Api from '@/services/Api';
 import Image from 'next/image';
 import { GoDotFill } from "react-icons/go";
+import { useLocale } from 'next-intl';
 
 const AboutMeSection = () => {
-  return (
+    const locale = useLocale()
+    const didFetchData = useRef<boolean>(false);
+    const [aboutData, setAboutData ] = useState();
+    const fetchData = useCallback(async () => {
+        const request = await Api.get('/about-us');
+        setAboutData(request.data);
+    }, []);
+
+    useEffect(()=>{
+        if(didFetchData.current === true) return;
+        didFetchData.current = true;
+        fetchData();
+    })
+    return (
     <div className="container px-2 xl:px-0" id="about">
+        {/* <div
+            className="prose dark:prose-invert max-w-none"
+            dangerouslySetInnerHTML={{ __html: '' }}
+        /> */}
         <div className="grid grid-cols-12 gap-10">
             <div className="col-span-12 xl:mb-5">
                 <div className="text-black font-bold text-xl xl:text-[36px]">IBS Machinex (Thailand) Company Limited</div>
@@ -131,8 +152,9 @@ const AboutMeSection = () => {
                 </ul>
             </div>
         </div>
+
     </div>
-  )
+    )
 }
 
 export default AboutMeSection

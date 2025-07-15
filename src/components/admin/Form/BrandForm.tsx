@@ -60,11 +60,8 @@ const BrandForm = ({
         const modifiedData = { ...formData };
         onSubmit(modifiedData);
     }
-    const cancelAction = () => {
-        router.push('/admin/brand');
-    }
+    const cancelAction = () => router.back();
 
- 
     // Fetch categories from an API or define them statically
     const fetchCategory = useCallback(async()=>{
         const res = await Api.get('/category');

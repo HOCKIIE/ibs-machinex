@@ -1,11 +1,15 @@
 export interface ContactType {
-    id:string;
-    title:string;
-    address:string;
-    phone:string;
-    mobile:string;
-    email:string;
-    gmap:string;
+    id: string;
+    title_th: string;
+    title_en: string;
+    title_ja: string;
+    address_th: string;
+    address_en: string;
+    address_ja: string;
+    phone: string;
+    mobile: string;
+    email: string;
+    gmap: string;
 }
 
 export type ResponseType = {

@@ -1,6 +1,6 @@
 [
-    {"title":"Home","href":"/"},
-    {"title":"About","href":"/#about"},
-    {"title":"Blog","href":"/#blog"},
-    {"title":"Contact","href":"/#contact"}
+    {"title":"Home","key":"home","href":"/"},
+    {"title":"About","key":"about","href":"/#about"},
+    {"title":"Blog","key":"blog","href":"/#blog"},
+    {"title":"Contact","key":"contact","href":"/#contact"}
 ]
