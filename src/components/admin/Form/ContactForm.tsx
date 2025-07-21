@@ -48,9 +48,7 @@ const ContactForm = () =>
             gmap: contactData.gmap
         }
     });
-    const fetchData = useCallback(async () => {
-        await getData();
-    }, [getData]);
+    const fetchData = useCallback(() => getData(), [getData]);
     const EditContact = () => setEditContact(!isEditContact);
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => 
     {

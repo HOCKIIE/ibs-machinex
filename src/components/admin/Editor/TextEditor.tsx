@@ -443,16 +443,16 @@ const TextEditor: React.FC<EditorProps> = ({name, value, onChange}) => {
         }
         if (!event.ctrlKey) return;
         switch (event.key) {
-            case 'y': {
-                event.preventDefault();
-                HistoryEditor.redo(editor);
-                break;
-            }
-            case 'z': {
-                event.preventDefault();
-                HistoryEditor.undo(editor);
-                break;
-            }
+            // case 'y': {
+            //     event.preventDefault();
+            //     HistoryEditor.redo(editor);
+            //     break;
+            // }
+            // case 'z': {
+            //     event.preventDefault();
+            //     HistoryEditor.undo(editor);
+            //     break;
+            // }
             case 'b': {
                 event.preventDefault();
                 toggleMark(editor, 'bold');
@@ -507,10 +507,10 @@ const TextEditor: React.FC<EditorProps> = ({name, value, onChange}) => {
                     <div className="grid editor-tools p-2 inset-20 h-12 w-full shadow-[rgba(0,0,15,0.1)_0px_1px_5px_0px] dark:shadow-[rgba(255,255,255,0.3)_0px_1px_5px_0px]">
                         <div className="flex justify-between">
                             <div className="flex items-center divide-x">
-                                <div className="flex pe-1">
+                                {/* <div className="flex pe-1">
                                     <Button format="undo" action="block" label={<LiaUndoSolid/>} />
                                     <Button format="Redo" action="block" label={<LiaRedoSolid/>} />
-                                </div>
+                                </div> */}
                                 <div className="flex px-1">
                                     <Paragraph/>
                                     <FontSize/>
