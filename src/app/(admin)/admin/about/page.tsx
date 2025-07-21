@@ -7,27 +7,27 @@ import AboutForm from '@/components/admin/Form/AboutForm';
 
 const About = () => 
 {   
-  return (
-    <DefaultLayout>
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="control-button mb-3">
-                <div className="flex justify-between">
-                    <div><Breadcrumb /></div>                    
+    return (
+        <DefaultLayout>
+            <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div className="control-button mb-3">
+                    <div className="flex justify-between">
+                        <div><Breadcrumb /></div>                    
+                    </div>
+                </div>
+                <div className="grid grid-cols-12 gap-6">
+                    <div className="col-span-12">
+                        <AboutForm />
+                    </div>
+                </div>
+                <div className="grid grid-cols-1 mt-6">
+                    <div className="col-span-12">
+                        <ContactForm />
+                    </div>
                 </div>
             </div>
-            <div className="grid grid-cols-12 gap-6">
-                <div className="col-span-12">
-                    <AboutForm />
-                </div>
-            </div>
-            <div className="grid grid-cols-1 mt-6">
-                <div className="col-span-12">
-                    <ContactForm />
-                </div>
-            </div>
-        </div>
-    </DefaultLayout>
-  )
+        </DefaultLayout>
+    )
 }
 
 export default About

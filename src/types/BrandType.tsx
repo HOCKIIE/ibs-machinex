@@ -8,6 +8,10 @@ export interface BrandType {
     description_th: string;
     description_en: string;
     description_ja: string;
+    detail_th: string;
+    detail_en: string;
+    detail_ja: string;
+    website: string;
     category?: [];
     categories: Array<CategoryType>;
     status: boolean;
@@ -25,6 +29,10 @@ export interface BrandFormProps {
     description_th: string;
     description_en: string;
     description_ja: string;
+    detail_th: string;
+    detail_en: string;
+    detail_ja: string;
+    website: string;
     status: boolean;
     brands: BrandType[];
     category?: Array<string>;

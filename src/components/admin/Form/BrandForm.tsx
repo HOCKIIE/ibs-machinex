@@ -15,6 +15,7 @@ import { FaCheck, FaMapPin } from 'react-icons/fa6';
 import { BiSolidCategoryAlt } from "react-icons/bi";
 import { LiaLanguageSolid } from "react-icons/lia";
 import { HiExclamation } from "react-icons/hi";
+import TextEditor from '../Editor/TextEditor';
 
 const BrandForm = ({
     itemState,
@@ -85,6 +86,10 @@ const BrandForm = ({
                 description_th: itemState.description_th,
                 description_en: itemState.description_en,
                 description_ja: itemState.description_ja,
+                detail_th: itemState.detail_th,
+                detail_en: itemState.detail_en,
+                detail_ja: itemState.detail_ja,
+                website: itemState.website,
                 categories: itemState.categories,
                 status: itemState.status ?? false,
                 published_at: itemState.published_at,
@@ -152,21 +157,32 @@ return (
                 <div className="w-10/12">
                     <div className="grid grid-cols-12 gap-4">
                         <div className="col-span-12">
-                             <div className="grid grid-cols-12 gap-6">
+                            <div className="grid grid-cols-12 gap-6">
                                 <div className="col-span-6">
                                     <CoverImageUpload<BrandFormProps> register={register} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
                                 </div>
-                                <div className="col-span-6">                                    
-                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Cateogry</label>
-                                    <select
-                                        {...register("category", { required: true })}
-                                        className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.category ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                                    >
-                                        <option value="" hidden>Select Category</option>
-                                        {category.map((cat: any) => (
-                                            <option key={cat.id} value={cat.id}>{cat.title_en}</option>
-                                        ))}
-                                    </select>
+                                <div className="col-span-6">
+                                    <div className="space-y-3">
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Cateogry</label>
+                                        <select
+                                            {...register("category", { required: true })}
+                                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.category ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                                        >
+                                            <option value="" hidden>Select Category</option>
+                                            {category.map((cat: any) => (
+                                                <option key={cat.id} value={cat.id}>{cat.title_en}</option>
+                                            ))}
+                                        </select>
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Website</label>
+                                        </div>
+                                        <textarea 
+                                            {...register("website", { required: true })}
+                                            rows={5}
+                                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.website ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                                            placeholder="Brand Name" 
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -192,7 +208,9 @@ return (
                                 </div>
                                 <div className="col-span-12">
                                     <div className="space-y-3">
-                                        <label className="text-sm text-gray-700 dark:text-gray-400">Description</label>
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Description</label> <BadgeLang lng="TH"/>
+                                        </div>
                                         <textarea 
                                             {...register("description_th", { required: true })}
                                             className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
@@ -202,6 +220,22 @@ return (
                                         {errors?.description_th?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )}
+                                    </div>
+                                </div>
+                                <div className="col-span-12">
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Detail</label> <BadgeLang lng="TH"/>
+                                        </div>
+                                        <Controller
+                                            name="detail_th"
+                                            control={control}
+                                            defaultValue={itemState.detail_th}
+                                            render={({field}) => (<TextEditor name={field.name} value={field.value} onChange={field.onChange} />) }
+                                        />                        
+                                        {errors?.detail_th?.type === "required" && (
+                                            <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
+                                        )} 
                                     </div>
                                 </div>
                             </div>
@@ -240,6 +274,22 @@ return (
                                         )}
                                     </div>
                                 </div>
+                                <div className="col-span-12">
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Detail</label> <BadgeLang lng="TH"/>
+                                        </div>
+                                        <Controller
+                                            name="detail_en"
+                                            control={control}
+                                            defaultValue={itemState.detail_en}
+                                            render={({field}) => (<TextEditor name={field.name} value={field.value} onChange={field.onChange} />) }
+                                        />                        
+                                        {errors?.detail_en?.type === "required" && (
+                                            <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
+                                        )} 
+                                    </div>
+                                </div>
                             </div>
                         </div>
                         <div className={`tab ease-in-out duration-300 ${lng=='ja'?``:` hidden`}`} data-tab="ja">
@@ -274,6 +324,22 @@ return (
                                         {errors?.description_ja?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )}
+                                    </div>
+                                </div>
+                                <div className="col-span-12">
+                                    <div className="space-y-3">
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Detail</label> <BadgeLang lng="JA"/>
+                                        </div>
+                                        <Controller
+                                            name="detail_ja"
+                                            control={control}
+                                            defaultValue={itemState.detail_ja}
+                                            render={({field}) => (<TextEditor name={field.name} value={field.value} onChange={field.onChange} />) }
+                                        />                        
+                                        {errors?.detail_ja?.type === "required" && (
+                                            <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
+                                        )} 
                                     </div>
                                 </div>
                             </div>

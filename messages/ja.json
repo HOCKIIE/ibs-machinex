@@ -4,5 +4,31 @@
     "about": "について",
     "blog": "ブログ",
     "contact": "お問い合わせ"
+  },
+  "sectionHead":{
+    "subtitle":"ここで最高のソリューションを見つけましょう！",
+    "searchBoxTitle":"製品とサービス",
+    "searchPlaceholder":"検索...",
+    "CategoryCaption":"興味のあるカテゴリを選択してください。",
+    "or":"または"
+  },
+  "ContactUsForm": {
+    "contact": "お問い合わせ",
+    "firstName": "名",
+    "lastName": "姓",
+    "email": "メールアドレス",
+    "message": "メッセージ",
+    "submit": "送信",
+    "successMessage": "お問い合わせありがとうございます！すぐにご連絡いたします。",
+    "errorMessage": "フォームの送信中にエラーが発生しました。後でもう一度お試しください。"
+  },
+  "Validation":{
+    "required": "このフィールドは必須です。",
+    "email": "有効なメールアドレスを入力してください。"
+  },
+  "Button":{
+    "ReadMore":"続きを読む",
+    "ViewAll":"すべて表示",
+    "viewMore":"もっと見る"
   }
 }

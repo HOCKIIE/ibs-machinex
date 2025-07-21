@@ -6,10 +6,11 @@ import Link from 'next/link';
 import { IoSearchSharp } from "react-icons/io5";
 import { CategoryType } from '@/types/CategoryType';
 import { BrandType } from '@/types/BrandType';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 const ProductSection = () => {
     const locale = useLocale();
+    const t = useTranslations('sectionHead');
     const [allCategory, setAllCategory] = useState<CategoryType | []>([]);    
     const [category, setCategory] = useState<CategoryType | []>([]);    
     const [keyword, setKeyword] = useState<string>("");
@@ -106,12 +107,17 @@ const ProductSection = () => {
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-3/4 bg-gradient-to-b from-blue-950 to-sky-500 text-white p-6 h-[350px] xl:h-[500px] w-[100%] max-w-[2300px] rounded-[20px] md:rounded-[80px] xl:rounded-[150px] 2xl:rounded-[230px] 3xl:rounded-[300px] z-1"></div>
             <div className="absolute top-[0.5rem] md:top-[2rem] xl:top-[3rem] left-1/2 -translate-x-1/2 container mt-16 p-2 md:p-0 z-9">
                 <div className="p-5 bg-white rounded-3xl shadow-md border border-gray-300">
-                    <div className="flex justify-center text-black font-bold text-xl">Products and Services</div>
+                    <div className="flex justify-center text-black font-bold text-xl">{t('searchBoxTitle')}</div>
                     <div className="mt-4">
                         <form onSubmit={(e) => handleSearch(e)}>   
                             <div className="flex gap-5">
                                 <div className="relative w-full">
-                                    <input defaultValue={keyword} type="search" id="search" className="block w-full p-4 ps-6 text-sm text-gray-900 border border-gray-300 rounded-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 outline-none" placeholder="Search" />
+                                    <input 
+                                        defaultValue={keyword} 
+                                        type="search" 
+                                        id="search" 
+                                        className="block w-full p-4 ps-6 text-sm text-gray-900 border border-gray-300 rounded-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 outline-none" 
+                                        placeholder={t('searchPlaceholder')} />
                                 </div>
                                 <button className="min-w-[20px] flex items-center justify-center text-white bg-red-800 h-full p-3 rounded-full" title="search"><IoSearchSharp fontSize={30}/></button>
                             </div>
@@ -120,11 +126,11 @@ const ProductSection = () => {
                 </div>
             </div>
             <div className="absolute bottom-8 flex justify-center items-start w-full z-10">
-                <div className="w-[80px] h-[80px] rounded-full text-white bg-red-700 flex justify-center items-center text-3xl font-bold">OR</div>
+                <div className="w-[80px] h-[80px] rounded-full text-white bg-red-700 flex justify-center items-center text-3xl font-bold">{t('or')}</div>
             </div>
         </div>
         <div className="container space-y-7">
-            <h5 className="flex justify-center items-center text-black text-xl">Choose the category you are interested in.</h5>
+            <h5 className="flex justify-center items-center text-black text-xl">{t('CategoryCaption')}</h5>
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 px-4 md:px-7">
                 {Array.isArray(allCategory) && allCategory.map((item: any) => (
                     <div key={item.id} className="group h-60 px-4 py-5 text-black bg-white/70 backdrop-blur-sm hover:ring-[3px] hover:ring-red-500 rounded-3xl transform transition-all duration-500 ease-in-out cursor-pointer">
@@ -142,10 +148,10 @@ const ProductSection = () => {
         </div>
         <div className="container mt-20">
             <div className="flex justify-center">
-                <h2 className="bg-gradient-to-r from-[#0055d3] from-2% via-[#007ecf] via-55% to-[#00a5cb] to-1% text-5xl font-bold text-transparent bg-clip-text">Product And Service</h2>
+                <h2 className="bg-gradient-to-r from-[#0055d3] from-2% via-[#007ecf] via-55% to-[#00a5cb] to-1% text-5xl font-bold text-transparent bg-clip-text">{t('searchBoxTitle')}</h2>
             </div>
             <div className="flex justify-center mt-2">
-                <h3 className="text-black text-xl">Find the Best Solutions Here!</h3>
+                <h3 className="text-black text-xl">{t('subtitle')}</h3>
             </div>
             <div className="mt-20">
                 {Array.isArray(category) && category.map((item: any) => (

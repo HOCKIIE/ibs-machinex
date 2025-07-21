@@ -3,6 +3,7 @@ import Api from "@/services/Api";
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import { ContactState, ContactType } from "@/types/ContactType";
+import { stat } from "fs";
 
 const prefix = '/admin/contact';
 
@@ -24,6 +25,11 @@ const useContactStore = create<ContactState>((set) => ({
                 contact: response.data,
                 isLoading: false,
             });
+            return {
+                status: true,
+                message: "Data fetched successfully",
+                data: response.data,
+            }
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
