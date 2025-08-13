@@ -1,10 +1,10 @@
 "use client";
 
-import { ReactNode, createContext, useContext, useState, useEffect } from "react";
-import { getToken, removeToken  } from "@/services/Auth";
-import AxiosInstance from "@/utils/AxiosInstance";
+import { ReactNode, createContext, useContext, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { UserType } from "@/types/UserType";
+import { setAccessToken } from "@/services/Api";
+import { getUser } from "@/services/Auth";
 
 interface AuthContextType {
     user: UserType | null;
@@ -36,31 +36,23 @@ export default function AdminContextProvider({ children }: { children: ReactNode
     const [menuActive, setMenuActive] = useState<string>('');
     const [userMenu, setUserMenu] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
+    const didFetchUserData = useRef(false);
 
-    const toggleSidebar = () => {
-        setSidebarOpen(!isSidebarOpen);
-        console.log(isSidebarOpen);
-    }
-
-    useEffect(() => {
-        const fetchUser = async () => {
-            try {
-                const res = await AxiosInstance.get('/admin/me');
-                setUser(res.data.user);
-            } catch (error) {
-                console.log(error)
-                removeToken();
-                router.push('/admin/signin');
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (getToken()) {
-            fetchUser();
-        } else {
-            setLoading(false);
+    const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
+    const fetchUser = async () => {
+        try {
+            const res = await getUser();
+            setUser(res.user);
+            setAccessToken(res.accessToken);
+        } catch (error) {
+            console.log(error);
         }
+        setLoading(false);
+    };
+    useEffect(() => {
+        if (didFetchUserData.current) return;
+        didFetchUserData.current = true;
+        fetchUser()
     }, [router]);
 
 

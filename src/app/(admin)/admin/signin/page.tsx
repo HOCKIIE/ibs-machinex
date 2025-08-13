@@ -48,6 +48,7 @@ const Signin = () =>
                 setStatus('success')
                 setMessage('Success, The system is redirecting.')
                 const redirectTo = typeof redirect === 'string' ? redirect : '/admin';
+                console.log('redirectTo > ',redirectTo)
                 router.push(redirectTo);
             }else{
                 setStatus('error')

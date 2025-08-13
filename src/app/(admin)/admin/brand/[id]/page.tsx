@@ -24,6 +24,10 @@ const Page = ({ params }:{ params: Promise<{id:string}> }) => {
         description_th: "",
         description_en: "",
         description_ja: "",
+        detail_th: "",
+        detail_en: "",
+        detail_ja: "",
+        website: "",
         categories: [],
         updated_at: "",
         status: false,
@@ -94,7 +98,7 @@ const Page = ({ params }:{ params: Promise<{id:string}> }) => {
         
     }, [items, reset]);
 
-  return (
+    return (
     <DefaultLayout>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="control-button mb-3">
@@ -105,7 +109,7 @@ const Page = ({ params }:{ params: Promise<{id:string}> }) => {
     
             <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
                 <div className="px-5 py-4 sm:px-6 sm:py-5">
-                    <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Add a new brand</h3>
+                    <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Edit Brand</h3>
                 </div>
                 <hr />
                 <BrandForm 
@@ -117,7 +121,7 @@ const Page = ({ params }:{ params: Promise<{id:string}> }) => {
             </div>
         </div>
     </DefaultLayout>
-  )
+    )
 }
 
 export default Page

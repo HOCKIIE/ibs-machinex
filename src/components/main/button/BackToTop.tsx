@@ -13,7 +13,7 @@ const BackToTop = () => {
     };
     return <button 
         onClick={scrollToTop} 
-        className={`fixed bottom-5 lg:bottom-25 xl:bottom-70 right-2 md:right-10 lg:right-20 xl:right-50 rounded-full bg-red-600 text-white ${isVisible?"opacity-100 scale-100" : "opacity-0 scale-0"}`}
+        className={`fixed bottom-5 lg:bottom-25 xl:bottom-25 right-2 md:right-10 lg:right-15 rounded-full bg-red-600 text-white ${isVisible?"opacity-100 scale-100" : "opacity-0 scale-0"}`}
         title="Back To Top"
     >
         <div className="flex items-center justify-center w-12 h-12 "><FiChevronUp fontSize={24} /></div>
