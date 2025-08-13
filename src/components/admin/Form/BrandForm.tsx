@@ -45,7 +45,7 @@ const BrandForm = ({
         criteriaMode: 'all'
     });
 
-    const BadgeLang = ({lng}:{lng:string}) => <div className="bg-blue-200 text-blue-500 rounded-md text-xs flex items-center px-1">{lng}</div>
+    const BadgeLang = ({lng}:{lng:string}) => <div className="bg-blue-200 text-indigo-500 rounded-md text-xs flex items-center px-1">{lng}</div>
     const Exclamation = () => <HiExclamation className="text-rose-500" fontSize={18}/>;
     const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
     const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
@@ -177,10 +177,10 @@ return (
                                             <label className="text-sm text-gray-700 dark:text-gray-400">Website</label>
                                         </div>
                                         <textarea 
-                                            {...register("website", { required: true })}
+                                            {...register("website")}
                                             rows={5}
                                             className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.website ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                                            placeholder="Brand Name" 
+                                            placeholder="Website" 
                                         />
                                     </div>
                                 </div>
@@ -277,7 +277,7 @@ return (
                                 <div className="col-span-12">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2">
-                                            <label className="text-sm text-gray-700 dark:text-gray-400">Detail</label> <BadgeLang lng="TH"/>
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Detail</label> <BadgeLang lng="EN"/>
                                         </div>
                                         <Controller
                                             name="detail_en"

@@ -45,7 +45,6 @@ const ProductSection = () => {
     const fetchCategory = useCallback(async () => {
         try {
             const response = await fetchAndSetProducts();
-            console.log("Category response >>> ", response.data);
             setCategory(response.data);
         } catch (error) {
             console.error("Error fetching category:", error);
@@ -57,7 +56,6 @@ const ProductSection = () => {
     const fetchAllCategory = useCallback(async() => {
         try {
             const response = await Api.get("/category");
-            console.log("All Category response:", response.data);
             setAllCategory(response.data);
         }
         catch (error) {
@@ -106,7 +104,7 @@ const ProductSection = () => {
         <div className="relative h-[340px] md:h-[350px] xl:h-[400px]">
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-3/4 bg-gradient-to-b from-blue-950 to-sky-500 text-white p-6 h-[350px] xl:h-[500px] w-[100%] max-w-[2300px] rounded-[20px] md:rounded-[80px] xl:rounded-[150px] 2xl:rounded-[230px] 3xl:rounded-[300px] z-1"></div>
             <div className="absolute top-[0.5rem] md:top-[2rem] xl:top-[3rem] left-1/2 -translate-x-1/2 container mt-16 p-2 md:p-0 z-9">
-                <div className="p-5 bg-white rounded-3xl shadow-md border border-gray-300">
+                <div className="p-5 bg-white rounded-3xl shadow-md border border-gray-300 md:w-[80%] m-auto">
                     <div className="flex justify-center text-black font-bold text-xl">{t('searchBoxTitle')}</div>
                     <div className="mt-4">
                         <form onSubmit={(e) => handleSearch(e)}>   
@@ -119,7 +117,7 @@ const ProductSection = () => {
                                         className="block w-full p-4 ps-6 text-sm text-gray-900 border border-gray-300 rounded-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 outline-none" 
                                         placeholder={t('searchPlaceholder')} />
                                 </div>
-                                <button className="min-w-[20px] flex items-center justify-center text-white bg-red-800 h-full p-3 rounded-full" title="search"><IoSearchSharp fontSize={30}/></button>
+                                <button type="submit" className="min-w-[20px] flex items-center justify-center text-white bg-red-800 h-full p-3 rounded-full" title="search"><IoSearchSharp fontSize={30}/></button>
                             </div>
                         </form>
                     </div>
@@ -156,14 +154,14 @@ const ProductSection = () => {
             <div className="mt-20">
                 {Array.isArray(category) && category.map((item: any) => (
                     <div key={item.id} className="grid grid-cols-12 gap-5 mt-5 group">
-                        <div className="col-span-12 xl:col-span-4 p-5 bg-white/60 backdrop-blur-sm rounded-3xl border border-blue-800 group-hover:bg-blue-800/90 group-hover:backdrop-blur-[4px] transition-all duration-300 ease-in-out">
+                        <div className="col-span-12 xl:col-span-4 p-5 rounded-3xl border border-blue-800 bg-white group-hover:bg-blue-800/90 transition-all duration-300 ease-in-out">
                             <div className="text-blue-800 text-3xl font-bold relative group-hover:text-white">
                                 {item[`title_${locale}`]}
                                 <div className="absolute h-[5px] bg-red-600 w-[80px] left-0 bottom-[-10px]"/>
                             </div>
                             <div className="text-black text-xl mt-5 group-hover:text-white">{item[`description_${locale}`]}</div>
                         </div>
-                        <div className="col-span-12 xl:col-span-8 p-5 bg-white/60 backdrop-blur-sm rounded-3xl border border-blue-800 group-hover:bg-blue-800/90 group-hover:backdrop-blur-[4px] transition-all duration-300 ease-in-out">
+                        <div className="col-span-12 xl:col-span-8 p-5 rounded-3xl border border-blue-800 bg-white group-hover:bg-blue-800/90 transition-all duration-300 ease-in-out">
                             <div className="grid grid-cols-4 md:grid-cols-5 xl:grid-cols-7 gap-5">
                                 {item.brand?.map((brand: BrandType, k:number) => (
                                     <div key={k} className="flex items-center group-hover:text-white">

@@ -28,11 +28,11 @@ const BlogSection = () => {
     };
     return (
         <div className="container px-2 lg:px-0" id="blog">
-            <div className="grid grid-cols-1">
-                <div className="text-center">
-                    <div className="text-blue-800 text-5xl font-bold">Blog</div>
-                    <div className="text-gray-800 text-md mt-4">Find the best solutions here!</div>
-                </div>
+            <div className="flex justify-center">
+                <h2 className="text-[3rem] font-bold bg-gradient-to-r from-[#00a5cb] to-[#0055d3]  bg-clip-text text-transparent [-webkit-background-clip:text]">Blog</h2>
+            </div>
+            <div className="flex justify-center mb-[4rem]">
+                <h3 className="text-black text-lg">Find the best solutions here!</h3>
             </div>
             <div className="grid grid-cols-12 gap-5">
                 {blogs && blogs.length > 0
@@ -51,7 +51,7 @@ const BlogSection = () => {
                 : ``}
             </div>
             <div className="flex justify-center mt-10">
-                <Link href={'/blog'} className="bg-red-700 px-[50px] py-3 rounded-md">View More</Link>
+                <Link href={'/blog'} className="text-white bg-red-700 px-[50px] py-3 rounded-md">View More</Link>
             </div>
             <hr className="my-10" />
         </div>

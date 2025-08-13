@@ -1,5 +1,5 @@
 import Api from '@/services/Api';
-import React, { useState, useCallback, useEffect, Children } from 'react';
+import React, { useState, useCallback, useEffect } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
 import { useForm, Controller  } from "react-hook-form";
 import { ApiResponse } from '@/types/CategoryType';
@@ -11,7 +11,7 @@ import { MdRemoveRedEye } from "react-icons/md";
 import CoverImageUpload from '../Dropzon/CoverImageUpload';
 import TextEditor from '../Editor/TextEditor';
 import { ErrorMessage } from './Validation';
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 
 import { IoMdPricetag, IoMdClose } from "react-icons/io";
 import { HiExclamation } from "react-icons/hi";

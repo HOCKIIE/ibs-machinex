@@ -127,7 +127,7 @@ const Contact = () =>
                         <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                             <tr>
                                 <th scope="col" className="px-6 py-3" style={{width:'3%'}}><AnimatedCheckbox checked={isAllSelected} onChange={toggleSelectAll}/></th>
-                                <th scope="col" className="px-6 py-3" style={{width:'15%'}}>Forst name</th>
+                                <th scope="col" className="px-6 py-3" style={{width:'15%'}}>First name</th>
                                 <th scope="col" className="px-6 py-3" style={{width:'15%'}}>Last name</th>
                                 <th scope="col" className="px-6 py-3" style={{width:'15%'}}>Email</th>
                                 <th scope="col" className="px-6 py-3">MEssage</th>

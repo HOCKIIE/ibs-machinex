@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import useContactUsStore from '@/store/useContactUsStore';
 import { useForm  } from "react-hook-form";
 import { ErrorMessage } from './Validation';
@@ -9,6 +9,9 @@ const ContactUsForm = () => {
     const t = useTranslations('ContactUsForm');
     const vt = useTranslations('Validation');
     const { createData } = useContactUsStore();
+    const [status, setStatus] = useState(false);
+    const [message, setMessage] = useState<string>('');
+    const didSubmit = useRef(false);
     const [contactData, setContactData] = useState({
         firstName: "",
         lastName: "",
@@ -33,7 +36,16 @@ const ContactUsForm = () => {
     const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
 
     const onSubmit = async (data: any) => {
-        await createData(data);
+        const res = await createData(data);
+        setStatus(res.status);
+        if(res.status === true){
+            if (didSubmit.current) return;
+            didSubmit.current = true;
+            setMessage(t('successMessage'));
+            reset();
+        }else{
+            setMessage(t('errorMessage'));
+        }
     };
 
 
@@ -41,6 +53,12 @@ const ContactUsForm = () => {
     <>
         <form onSubmit={handleSubmitForm(onSubmit)}>
             <div className="grid gap-7">
+                {didSubmit.current 
+                    && status === true
+                    && <div className="col-span-12"><div className={`${status === true ? `bg-green-100 text-green-800`:`bg-red-100 text-red-800`} p-4 rounded-md`}>
+                        {status == true ? `Success!, `: `Failed!, `}{message}
+                    </div></div>
+                }
                 <div className="col-span-12 xl:col-span-6">
                     <div>
                         <label htmlFor="first_name" className="block mb-2 text-sm text-gray-900 dark:text-white">{t('firstName')}</label>
