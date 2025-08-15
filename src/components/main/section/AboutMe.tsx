@@ -21,7 +21,7 @@ const AboutMeSection = () => {
         fetchData();
     })
     return (
-    <div className="container px-2 xl:px-0" id="about">
+    <div className="md:container px-2 md:px-4" id="about">
         <div
             className="prose dark:prose-invert max-w-none"
             dangerouslySetInnerHTML={{ __html: aboutData?.[`detail_${locale}`] || '' }}
