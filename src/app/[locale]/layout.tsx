@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, IBM_Plex_Sans_Thai } from "next/font/google";
 import "./globals.css";
 import { Header, Footer, Sidebar } from "@/components/main/layout/Layout";
 import PageSettingsContext from "@/contexts/PageSettingsContext";
@@ -13,6 +13,12 @@ const inter = Inter({
     weight: ["100","200","300","400","500","600","700","800","900"],
     style: ["normal", "italic"],
 })
+const th = IBM_Plex_Sans_Thai({
+    subsets: ["latin", "thai"],
+    weight: ["200","300","400","500","600","700"],
+    style: ["normal"],
+    display: "swap",
+});
 
 export const metadata : Metadata = {
     title: "IBS Machinex Co.,ltd.",
@@ -28,7 +34,7 @@ export default async function RootLayout({children}:{children: React.ReactNode})
         <html lang="en">
             <PageSettingsContext>
                 <NextIntlClientProvider messages={messages} >
-                    <body className={`scroll-smooth ${inter.className} antialiased bg-gray-100`}>
+                    <body className={`scroll-smooth ${locale == 'th'? th.className :inter.className} antialiased bg-gray-100`}>
                         <Sidebar />
                         <main>
                             <Header />

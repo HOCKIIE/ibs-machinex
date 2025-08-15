@@ -22,11 +22,11 @@ const AboutMeSection = () => {
     })
     return (
     <div className="container px-2 xl:px-0" id="about">
-        {/* <div
+        <div
             className="prose dark:prose-invert max-w-none"
-            dangerouslySetInnerHTML={{ __html: '' }}
-        /> */}
-        <div className="grid grid-cols-12 gap-10">
+            dangerouslySetInnerHTML={{ __html: aboutData?.[`detail_${locale}`] || '' }}
+        />
+        {/* <div className="grid grid-cols-12 gap-10">
             <div className="col-span-12 xl:mb-5">
                 <div className="text-black font-bold text-xl xl:text-[36px]">IBS Machinex (Thailand) Company Limited</div>
             </div>
@@ -151,7 +151,7 @@ const AboutMeSection = () => {
                     <div className="flex space-y-2"><div className="mt-[3px]"><GoDotFill fontSize={20} className="text-red-700 w-6"/></div><div>PT IKEUCHI INDONESIA (Agency)</div></div>
                 </ul>
             </div>
-        </div>
+        </div> */}
 
     </div>
     )
