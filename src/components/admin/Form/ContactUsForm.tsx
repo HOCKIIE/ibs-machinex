@@ -66,7 +66,7 @@ const ContactUsForm = () => {
                             {...register('firstName',{required:true})}
                             type="text" 
                             id="first_name" 
-                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.firstName ? `${invalidClass} `:`${validClass} `}focus:outline-none`} 
+                            className={`bg-white dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.firstName ? `${invalidClass} `:`${validClass} `}focus:outline-none`} 
                             placeholder={t('firstName')}
                         />
                         {errors?.firstName?.type === "required" && (
@@ -81,7 +81,7 @@ const ContactUsForm = () => {
                             {...register('lastName',{required:true})}
                             type="text" 
                             id="last_name" 
-                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.lastName ? `${invalidClass} `:`${validClass} `}focus:outline-none`} 
+                            className={`bg-white dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.lastName ? `${invalidClass} `:`${validClass} `}focus:outline-none`} 
                             placeholder={t('lastName')}
                         />
                         {errors?.lastName?.type === "required" && (
@@ -96,7 +96,7 @@ const ContactUsForm = () => {
                             {...register('email',{required:true})}
                             type="text" 
                             id="email" 
-                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.email ? `${invalidClass} `:`${validClass} `}focus:outline-none`} 
+                            className={`bg-white dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.email ? `${invalidClass} `:`${validClass} `}focus:outline-none`} 
                             placeholder={t('email')}
                         />
                         {errors?.email?.type === "required" && (
@@ -111,8 +111,8 @@ const ContactUsForm = () => {
                             {...register('message',{required:true})}
                             rows={8}
                             id="message" 
-                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.message ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                            placeholder={t('message')}
+                            className={`bg-white dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.message ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                            placeholder={t('placeholder.message')}
                         ></textarea>
                         {errors?.message?.type === "required" && (
                             <ErrorMessage>{vt('required')}</ErrorMessage>
