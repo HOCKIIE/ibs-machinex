@@ -39,7 +39,7 @@ const BlogSection = () => {
         return request;
     };
     return (
-        <div className="container px-2 lg:px-0" id="blog">
+        <div className="md:container px-2 lg:px-0" id="blog">
             <div className="flex justify-center">
                 <h2 className="text-[3rem] font-bold bg-gradient-to-r from-[#00a5cb] to-[#0055d3]  bg-clip-text text-transparent [-webkit-background-clip:text]">{t('title')}</h2>
             </div>

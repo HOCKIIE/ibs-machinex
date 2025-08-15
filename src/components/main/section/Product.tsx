@@ -136,7 +136,7 @@ const ProductSection = () => {
                 <div className="w-[80px] h-[80px] rounded-full text-white bg-red-700 flex justify-center items-center text-3xl font-bold">{t('or')}</div>
             </div>
         </div>
-        <div className="container space-y-7">
+        <div className="md:container space-y-7">
             <h5 className="flex justify-center items-center text-black text-xl">{t('CategoryCaption')}</h5>
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-5 px-4 md:px-7">
                 {Array.isArray(allCategory) && allCategory.map((item: any) => (
@@ -156,7 +156,7 @@ const ProductSection = () => {
             </div>
             <hr />
         </div>
-        <div className="container mt-20">
+        <div className="md:container md:px-4 mt-20">
             <div className="flex justify-center">
                 <h2 className="bg-gradient-to-r from-[#0055d3] from-2% via-[#007ecf] via-55% to-[#00a5cb] to-1% text-5xl font-bold text-transparent bg-clip-text">{t('searchBoxTitle')}</h2>
             </div>

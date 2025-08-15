@@ -53,7 +53,7 @@ const ContactSection = () => {
     }, []);
     const address = owner?.[`address_${locale}` as keyof ContactType] || ''
     return (
-    <div className='container px-2 xl:px-0' id="contact">
+    <div className='md:container px-2 xl:px-4' id="contact">
         <hr className="my-14" />
         <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12">
