@@ -39,7 +39,7 @@ const BlogSection = () => {
         return request;
     };
     return (
-        <div className="md:container px-2 lg:px-0" id="blog">
+        <div className="container px-2 lg:px-0" id="blog">
             <div className="flex justify-center">
                 <h2 className="text-[3rem] font-bold bg-gradient-to-r from-[#00a5cb] to-[#0055d3]  bg-clip-text text-transparent [-webkit-background-clip:text]">{t('title')}</h2>
             </div>
@@ -51,17 +51,23 @@ const BlogSection = () => {
                     {blogs && blogs.length > 0
                     ? 
                     <Swiper
-                        autoplay={true}
                         modules={[Navigation, Autoplay, A11y]}
+                        autoplay={true}
                         spaceBetween={50}
                         slidesPerView={3}
+                        effect='fade'
+                        breakpoints={{
+                            320: { slidesPerView: 1 },
+                            640: { slidesPerView: 2 },
+                            1024: { slidesPerView: 3 },
+                        }}
                         onSwiper={(swiper) => (swiperRef.current = swiper)}
                     >
                         {blogs.map((item,k) => 
                             <SwiperSlide key={k} virtualIndex={k} className=''>
                                 <div className="bg-white rounded-2xl overflow-hidden">
-                                    <div className="max-h-[200px] overflow-hidden">
-                                        <img src={item.featured_image} alt={item.title} />
+                                    <div className="h-[180px] overflow-hidden">
+                                        <img src={item.featured_image} alt={item.title} height={180} className="object-cover"/>
                                     </div>
                                     <div className="min-h-[260px] p-4">
                                         <span className="text-gray-500">{item.updated_at}</span>

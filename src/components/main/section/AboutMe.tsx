@@ -21,11 +21,8 @@ const AboutMeSection = () => {
         fetchData();
     })
     return (
-    <div className="md:container px-2 md:px-4" id="about">
-        <div
-            className="prose dark:prose-invert max-w-none"
-            dangerouslySetInnerHTML={{ __html: aboutData?.[`detail_${locale}`] || '' }}
-        />
+    <div >
+        <div className="container px-2 md:px-0" id="about" dangerouslySetInnerHTML={{ __html: aboutData?.[`detail_${locale}`] || '' }}/>
         {/* <div className="grid grid-cols-12 gap-10">
             <div className="col-span-12 xl:mb-5">
                 <div className="text-black font-bold text-xl xl:text-[36px]">IBS Machinex (Thailand) Company Limited</div>
