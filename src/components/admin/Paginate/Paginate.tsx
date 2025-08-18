@@ -32,10 +32,11 @@ export const Paginate: React.FC<PaginateProps> = ({meta,prevPage,handlePageChang
                     id="" 
                     title="Current Page"
                     onChange={()=>handlePageChange}
+                    value={meta?.current_page || 1}
                     className="w-[4.5rem] h-9 dark:bg-dark-900 shadow-theme-xs focus:ring-indigo-500 focus:border-indigo-500 dark:focus:border-indigo-800 rounded-lg border border-gray-300 bg-transparent text-sm text-center text-gray-800 placeholder:text-gray-400 focus:ring-3 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 focus:outline-none"
                 >
                     {Array.from({length: meta?.last_page || 1}, (_, i) => i + 1).map((page, index) => (
-                        <option key={index} value={`${page}`} selected={meta?.current_page === page}>{page}</option>
+                        <option key={index} value={`${page}`}>{page}</option>
                     ))}
                 </select>
                 <button 

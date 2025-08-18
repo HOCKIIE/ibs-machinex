@@ -25,14 +25,11 @@ const config: Config = {
       inter: ['var(--font-inter)'],
     },
     screens: {
-      // sm: '600px',
-      // md: '728px',
-      // lg: '984px',
-      // xl: '1240px',
-      // "2xsm": "375px",
-      // xsm: "425px",
-      // '2xl': '1496px'
-      ...defaultTheme.screens,
+      sm: '640px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1326px',
+      // ...defaultTheme.screens,
     },
     extend: {
       colors: {
