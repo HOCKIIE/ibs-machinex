@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 
 import { IoMdPricetag, IoMdClose } from "react-icons/io";
 import { HiExclamation } from "react-icons/hi";
+import { itemsEqual } from '@dnd-kit/sortable/dist/utilities';
 
 const BlogForm = ({
     itemState,
@@ -327,7 +328,7 @@ const BlogForm = ({
                                             name="detail_th"
                                             control={control}
                                             defaultValue={itemState.detail_th}
-                                            render={({field}) => <TextEditor name={field.name} value={field.value} onChange={field.onChange} /> }
+                                            render={({field}) => <TextEditor name={field.name} value={field.value} type="blog" id={itemState.id} onChange={field.onChange} /> }
                                         />                        
                                         {errors?.detail_th?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
@@ -369,7 +370,7 @@ const BlogForm = ({
                                             name="detail_en"
                                             control={control}
                                             defaultValue={itemState.detail_en}
-                                            render={({field}) => (<TextEditor name={field.name} value={field.value} onChange={field.onChange} />) }
+                                            render={({field}) => <TextEditor name={field.name} value={field.value} type="blog" id={itemState.id} onChange={field.onChange} /> }
                                         />                        
                                         {errors?.detail_en?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
@@ -410,7 +411,7 @@ const BlogForm = ({
                                             name="detail_ja"
                                             control={control}
                                             defaultValue={itemState.detail_ja}
-                                            render={({field}) => (<TextEditor name={field.name} value={field.value} onChange={field.onChange} />) }
+                                            render={({field}) => <TextEditor name={field.name} value={field.value} type="blog" id={itemState.id} onChange={field.onChange} /> }
                                         />                        
                                         {errors?.detail_ja?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>

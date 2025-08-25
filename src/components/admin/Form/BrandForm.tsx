@@ -231,7 +231,7 @@ return (
                                             name="detail_th"
                                             control={control}
                                             defaultValue={itemState.detail_th}
-                                            render={({field}) => (<TextEditor name={field.name} value={field.value} onChange={field.onChange} />) }
+                                            render={({field}) => (<TextEditor name={field.name} value={field.value} type="brand" id={itemState.id} onChange={field.onChange} />) }
                                         />                        
                                         {errors?.detail_th?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
@@ -283,7 +283,7 @@ return (
                                             name="detail_en"
                                             control={control}
                                             defaultValue={itemState.detail_en}
-                                            render={({field}) => (<TextEditor name={field.name} value={field.value} onChange={field.onChange} />) }
+                                            render={({field}) => (<TextEditor name={field.name} value={field.value} type="brand" id={itemState.id} onChange={field.onChange} />) }
                                         />                        
                                         {errors?.detail_en?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
@@ -335,7 +335,7 @@ return (
                                             name="detail_ja"
                                             control={control}
                                             defaultValue={itemState.detail_ja}
-                                            render={({field}) => (<TextEditor name={field.name} value={field.value} onChange={field.onChange} />) }
+                                            render={({field}) => (<TextEditor name={field.name} value={field.value} type="brand" id={itemState.id} onChange={field.onChange} />) }
                                         />                        
                                         {errors?.detail_ja?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
