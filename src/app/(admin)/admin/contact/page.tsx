@@ -11,11 +11,21 @@ import { BiTrash } from "react-icons/bi";
 import { LuPencil } from "react-icons/lu";
 import { IoSearchOutline } from "react-icons/io5";
 import SearchBar from '@/components/admin/Paginate/SearchBar';
+import ActionModal from '@/components/admin/Modal/ActionModal';
 import useContactStore from '@/store/useContactStore';
 import Link from 'next/link';
 
 interface SelectDeleteProps { event: React.MouseEvent<HTMLButtonElement>; }
 const show = [10, 25, 50, 100];
+interface ContactUcType {
+    id: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    message: string;
+    source: string;
+    createdAt: string;
+}
 
 const Contact = () => 
 {
@@ -35,7 +45,7 @@ const Contact = () =>
         handlePageChange
     } = usePagination({ 
         initialLimit: show[0],
-        endpoint: '/contact'
+        endpoint: '/admin/contact-us'
     });
     const { isLoading, error, deleteData, response } = useContactStore();
 
@@ -91,6 +101,10 @@ const Contact = () =>
         response.message = null;
         setModalOpen(!isOpen);
     }
+    const closeModal = () => {
+        setModalOpen(false);
+        successProgress();
+    }
     
     return (
         <DefaultLayout>
@@ -130,11 +144,12 @@ const Contact = () =>
                                 <th scope="col" className="px-6 py-3" style={{width:'15%'}}>First name</th>
                                 <th scope="col" className="px-6 py-3" style={{width:'15%'}}>Last name</th>
                                 <th scope="col" className="px-6 py-3" style={{width:'15%'}}>Email</th>
-                                <th scope="col" className="px-6 py-3">MEssage</th>
+                                <th scope="col" className="px-6 py-3" style={{width:'15%'}}>Source</th>
+                                <th scope="col" className="px-6 py-3" style={{width:'37%'}}>Message</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {data && data.map((v,k)=> 
+                            {data && data.map((v:ContactUcType,k:number)=> 
                                 <tr key={k}>
                                     <td className="px-6 py-4">
                                         {loading
@@ -158,6 +173,12 @@ const Contact = () =>
                                         {loading
                                             ? <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
                                             : v.email
+                                        }
+                                    </td>
+                                    <td className="px-6 py-4">
+                                        {loading
+                                            ? <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
+                                            : v.source
                                         }
                                     </td>
                                     <td className="px-6 py-4">
@@ -204,12 +225,12 @@ const Contact = () =>
                     </div>
                 </div>
             </div>
-            <ConfirmModal 
+            <ActionModal 
                 isOpen={isOpen} 
                 action={isAction}
-                toggleModal={successProgress}
                 onClose={() => setModalOpen(false)}
                 onAfterClose={()=>fetchData}
+                closeModal={closeModal}
                 data={{
                     confirm: deleteRecord,
                     progress: isLoading,

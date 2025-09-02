@@ -30,6 +30,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
         detail_en: ``,
         detail_ja: ``,
         updated_at: "",
+        pathName: "",
         status: false, // Add default value for status
         published_at: "", // Add default value for published_at
         created_at: "", // Add default value for created_at
@@ -90,6 +91,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) => {
                 detail_ja: items[0].detail_ja ?? "",
                 updated_at: items[0].updated_at ?? "",
                 status: items[0].status ?? false,
+                pathName: items[0].pathName ?? false,
                 published_at: items[0].published_at ?? "",
                 created_at: items[0].created_at ?? ""
             });

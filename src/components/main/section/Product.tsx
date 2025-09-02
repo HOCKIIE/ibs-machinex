@@ -178,7 +178,7 @@ const ProductSection = () => {
                                 {item.brand?.map((brand: BrandType, k:number) => (
                                     <div key={k} className="flex items-center group-hover:text-white">
                                         <Link
-                                            href={`/product/?category=${item.title_en.replace(' ','-').toLowerCase()}&brand=${brand.title_en.replace(' ','-').toLowerCase()}`}
+                                            href={`/brand/${brand.apiName}`}
                                             className="rounded-full overflow-hidden w-[107px] h-[107px] flex justify-center items-center mb-2 border shadow-md hover:outline hover:outline-offset-[-4px] outline-red-700 hover:outline-[5px] transition-all duration-300 ease-in-out"
                                         >
                                             <img src={brand.image} alt={brand.title_en} className="w-full h-full object-contain"/>

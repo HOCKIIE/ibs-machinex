@@ -16,7 +16,7 @@ const page = () => {
         }}
     >
         <>
-            <ProductSection/>
+            <ProductSection />
             <BlogSection />
             <AboutMeSection />
             <ContactSection />

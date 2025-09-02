@@ -43,6 +43,8 @@ function serializeNode(node: any): string {
     switch (node.type) {
         case 'paragraph':
             return `<p class="mb-3" style="text-align: ${node.align || 'left'};">${children}</p>`;
+        case 'image':
+            return `<img src="${node.src || ""}" alt="${node.alt || ""}" class="${node.className || "max-w-full h-auto"}" style="${node.style ? Object.entries(node.style).map(([k,v]) => `${k}:${v}`).join(";") : ""}" />`;
         case 'grid':
             return `<div class="grid grid-cols-${node.columns || 12} gap-4 mb-4">${children}</div>`;
         case 'grid-column':
@@ -88,7 +90,6 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[]
             };
         });
     }
-
     switch (nodeName) {
         case "p":
             return {
@@ -96,6 +97,16 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[]
                 style: styleObj,
                 className,
                 children: children.length ? children : [{ text: "" }],
+            };
+
+        case "img":
+            return {
+                type: "image",
+                src: el.getAttribute("src") || "",
+                alt: el.getAttribute("alt") || "",
+                style: styleObj,
+                className,
+                children: [{ text: "" }],
             };
 
         case "strong":

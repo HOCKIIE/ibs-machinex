@@ -5,7 +5,11 @@ import { useForm  } from "react-hook-form";
 import { ErrorMessage } from './Validation';
 import { useTranslations } from 'next-intl';
 
-const ContactUsForm = () => {
+const ContactUsForm = ({
+    source
+}:{
+    source:string
+}) => {
     const t = useTranslations('ContactUsForm');
     const vt = useTranslations('Validation');
     const { createData } = useContactUsStore();
@@ -13,6 +17,7 @@ const ContactUsForm = () => {
     const [message, setMessage] = useState<string>('');
     const didSubmit = useRef(false);
     const [contactData, setContactData] = useState({
+        source: source,
         firstName: "",
         lastName: "",
         email: "",
@@ -25,6 +30,7 @@ const ContactUsForm = () => {
         formState: { errors }
     } = useForm({
         defaultValues: {
+            source: contactData.source,
             firstName: contactData.firstName,
             lastName: contactData.lastName,
             email: contactData.email,
@@ -38,7 +44,7 @@ const ContactUsForm = () => {
     const onSubmit = async (data: any) => {
         const res = await createData(data);
         setStatus(res.status);
-        if(res.status === true){
+        if(res?.status === true){
             if (didSubmit.current) return;
             didSubmit.current = true;
             setMessage(t('successMessage'));
@@ -60,6 +66,7 @@ const ContactUsForm = () => {
                     </div></div>
                 }
                 <div className="col-span-12 xl:col-span-6">
+                    <input type="hidden" {...register('source')} defaultValue={source}/>
                     <div>
                         <label htmlFor="first_name" className="block mb-2 text-sm text-gray-900 dark:text-white">{t('firstName')}</label>
                         <input 

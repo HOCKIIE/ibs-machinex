@@ -173,7 +173,7 @@ const Blog = () => {
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 w-10 h-10">
                                                     <img className="w-10 h-10 rounded-full" 
-                                                        src={`${process.env.NEXT_PUBLIC_API_URL}${v.image}` || '/storage/fallback-image.jpg'} 
+                                                        src={`${v.image}` || '/storage/fallback-image.jpg'} 
                                                         alt={v.title_en} 
                                                     />
                                                 </div>

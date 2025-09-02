@@ -2,15 +2,17 @@
 import React,{ useState, useEffect, useCallback,useRef} from 'react';
 import Link from 'next/link';
 import axios from 'axios';
-import { blogsType } from '@/types/BlogType';
+import { BlogType } from '@/types/BlogType';
 import {H1,H2,H3} from '@/utils/Title';
+import { useLocale } from 'next-intl';
 
 const Blog = () => 
 {
+    const locale = useLocale();
     const hasFetched = useRef(false);
     const [screenWidth, setScreenWidth] = useState(window.innerWidth);
-    const [blogs, setBlogs] = useState<blogsType[] | null>(null); 
-    const [blog2, setBlog2] = useState<blogsType[] | null>(null); 
+    const [blogs, setBlogs] = useState<BlogType[] | null>(null); 
+    const [blog2, setBlog2] = useState<BlogType[] | null>(null); 
     const windowResized = () => setScreenWidth(window.innerWidth);
 
     const fetchBlogSection2 = useCallback(async() => {
@@ -25,9 +27,9 @@ const Blog = () =>
     
     useEffect(() => {
         if (hasFetched.current) return;
+        hasFetched.current = true;
         fetchAndSetBlogs();
         fetchBlogSection2()
-        hasFetched.current = true;
     }, []);
     useEffect(() => {
         window.addEventListener('resize', windowResized);

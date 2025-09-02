@@ -38,5 +38,8 @@
     "ReadMore":"Read More",
     "ViewAll":"View All",
     "viewMore":"View More"
+  },
+  "alert":{
+    "iframe":"Some buttons/content may not work in this preview mode. Please see the full version on the actual website."
   }
 }

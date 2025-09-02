@@ -1,3 +1,5 @@
+import { useRouter } from "next/navigation";
+
 export interface ContactType {
     id: string;
     title_th: string;
@@ -12,20 +14,48 @@ export interface ContactType {
     gmap: string;
 }
 
+export interface contactUsType {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    message: string;
+    source: string;
+    created_at: string;
+}
+
 export type ResponseType = {
     status: boolean;
     message: string;
 };
+
+export interface ContactUsProps {
+    id: string;
+    first_name: string;
+    last_name: string;
+    message: string;
+    source: string;
+}
+
+export interface ApiResponse {
+    total: number;
+    lastPage: number;
+    currentPage: number;
+    rows: contactUsType[];
+}
 export interface ContactState {
-    contact: ContactType | null;
+    items: contactUsType[];
     isLoading: boolean;
     error: string | null;
     token: string | null;
 
     id: string;
-    role: string;
-    response: { status: boolean | null; message: string | null; action:string | null; } | null;
-    getData: () => void;
-    updateData: ( data: ContactType ) => Promise<void>;
-    deleteData: (id: string) => void;
+    total: number;
+    lastPage: number;
+    currentPage: number;
+    response: { status: boolean | null; message: string | null };
+
+    fetchData: (page: number) => Promise<void>;
+    updateData: (id: string, data: ContactUsProps, router: ReturnType<typeof useRouter>) => Promise<void>;
+    deleteData: (id: string) => Promise<void>;
 }

@@ -12,6 +12,7 @@ export interface BrandType {
     detail_en: string;
     detail_ja: string;
     website: string;
+    apiName: string;
     category?: [];
     categories: Array<CategoryType>;
     status: boolean;
@@ -33,6 +34,7 @@ export interface BrandFormProps {
     detail_en: string;
     detail_ja: string;
     website: string;
+    apiName: string;
     status: boolean;
     brands: BrandType[];
     category?: Array<string>;
