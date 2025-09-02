@@ -1,9 +1,10 @@
 "use client"
 
-import axios from 'axios'
+// import axios from 'axios'
 import React, { useEffect, useState, useRef, use } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { useLocale } from 'next-intl';
 // import Link from 'next/link';
 import { Link } from '@/i18n/routing';
 import { Swiper, SwiperSlide } from 'swiper/react';
@@ -13,31 +14,42 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/autoplay';
 import 'swiper/css/controller';
+import Api from '@/services/Api';
 
 interface blogsType {
     id:string;
-    title:string;
-    updated_at:string;
-    summary:string;
-    featured_image:string;
+    image: string;
+    title_th: string;
+    title_en: string;
+    title_ja: string;
+    description_th: string;
+    description_en: string;
+    description_ja: string;
+    pathName: string;
+    published_at: string;
+    created_at: string;
+    updated_at: string;
 }
 
 const BlogSection = () => {
     const t = useTranslations('blog');
+    const locale = useLocale();
     const [blogs, setBlogs] = useState<blogsType[] | null>(null);
     const swiperRef = useRef<SwiperType>();
     
     useEffect(() => {
         const fetchAndSetBlogs = async () => {
             const response = await fectchBlogs();
+            console.log(response.data);
             setBlogs(response.data);
         };
         fetchAndSetBlogs();
     }, []);
     
     const fectchBlogs = async () => {
-        const request = await axios('https://jsonfakery.com/blogs/random/5');
-        return request;
+        // const request = await axios('https://jsonfakery.com/blogs/random/5');
+        const request = await Api.get<{data: blogsType[]}>('/blog/recent');
+        return request.data;
     };
     return (
         <div className="container px-2 lg:px-0" id="blog">
@@ -64,16 +76,19 @@ const BlogSection = () => {
                         }}
                         onSwiper={(swiper) => (swiperRef.current = swiper)}
                     >
-                        {blogs.map((item,k) => 
-                            <SwiperSlide key={k} virtualIndex={k} className=''>
+                        {blogs.map((item:blogsType,k:number) => 
+                            <SwiperSlide key={k} virtualIndex={k}>
                                 <div className="bg-white rounded-2xl overflow-hidden">
                                     <div className="h-[180px] overflow-hidden">
-                                        <img src={item.featured_image} alt={item.title} height={180} className="object-cover"/>
+                                        <img src={item.image} alt={item[`title_${locale}`]} height={180} className="object-cover"/>
                                     </div>
                                     <div className="min-h-[260px] p-4">
-                                        <span className="text-gray-500">{item.updated_at}</span>
-                                        <p className="text-black font-bold line-clamp-3 text-xl mt-1">{item.title}</p>
-                                        <p className="text-black line-clamp-5 mt-1">{item.summary}</p>
+                                        <span className="text-gray-500">{item.published_at}</span>
+                                        <Link 
+                                            className="text-black font-bold line-clamp-3 text-xl mt-1" 
+                                            href={`/blog/${item.pathName}`}
+                                        >{item[`title_${locale}`]}</Link>
+                                        <p className="text-black line-clamp-5 mt-1">{item[`description_${locale}`]}</p>
                                     </div>
                                 </div>
                             </SwiperSlide>

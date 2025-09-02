@@ -31,7 +31,7 @@ const BrandForm = ({
     const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
     const create = type === "create";
     const edit = type === "edit";
-
+    
     const {
         register,
         handleSubmit: handleSubmitForm,
@@ -44,7 +44,8 @@ const BrandForm = ({
         mode: 'onChange',
         criteriaMode: 'all'
     });
-
+    
+    const Required = () => <span className="text-rose-500">*</span>;
     const BadgeLang = ({lng}:{lng:string}) => <div className="bg-blue-200 text-indigo-500 rounded-md text-xs flex items-center px-1">{lng}</div>
     const Exclamation = () => <HiExclamation className="text-rose-500" fontSize={18}/>;
     const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
@@ -90,6 +91,7 @@ const BrandForm = ({
                 detail_en: itemState.detail_en,
                 detail_ja: itemState.detail_ja,
                 website: itemState.website,
+                apiName: itemState.apiName,
                 categories: itemState.categories,
                 status: itemState.status ?? false,
                 published_at: itemState.published_at,
@@ -145,8 +147,9 @@ return (
                                     defaultValue={!!itemState?.status}
                                     render={({ field }) => (
                                         <label className="inline-flex items-center cursor-pointer">
-                                            <input type="checkbox" value="1" className="sr-only peer" checked={Boolean(field.value)} onChange={(e) => field.onChange(e.target.checked)} title="Status"/>
+                                            <input type="checkbox" value="1" className="sr-only peer" checked={Boolean(field.value)} onChange={(e) => field.onChange(e.target.checked)}/>
                                             <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600 dark:peer-checked:bg-indigo-600"></div>
+                                            <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Status: </span>
                                         </label>
                                     )}
                                 />
@@ -163,7 +166,7 @@ return (
                                 </div>
                                 <div className="col-span-6">
                                     <div className="space-y-3">
-                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Cateogry</label>
+                                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Cateogry <Required/></label>
                                         <select
                                             {...register("category", { required: true })}
                                             className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.category ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
@@ -173,6 +176,14 @@ return (
                                                 <option key={cat.id} value={cat.id}>{cat.title_en}</option>
                                             ))}
                                         </select>
+                                        <div className="flex items-center gap-2">
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Path Name <Required/></label>
+                                        </div>
+                                        <input 
+                                            {...register("apiName", { required: true })} 
+                                            type="text"
+                                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.website ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                                        />
                                         <div className="flex items-center gap-2">
                                             <label className="text-sm text-gray-700 dark:text-gray-400">Website</label>
                                         </div>
@@ -193,7 +204,7 @@ return (
                                 <div className="col-span-12">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2">
-                                            <label className="text-sm text-gray-700 dark:text-gray-400">Title</label> <BadgeLang lng="TH"/>
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Title <Required/></label> <BadgeLang lng="TH"/>
                                         </div>
                                         <input 
                                             type="text"
@@ -209,7 +220,7 @@ return (
                                 <div className="col-span-12">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2">
-                                            <label className="text-sm text-gray-700 dark:text-gray-400">Description</label> <BadgeLang lng="TH"/>
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Description <Required/></label> <BadgeLang lng="TH"/>
                                         </div>
                                         <textarea 
                                             {...register("description_th", { required: true })}
@@ -225,7 +236,7 @@ return (
                                 <div className="col-span-12">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2">
-                                            <label className="text-sm text-gray-700 dark:text-gray-400">Detail</label> <BadgeLang lng="TH"/>
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Detail </label> <BadgeLang lng="TH"/>
                                         </div>
                                         <Controller
                                             name="detail_th"
@@ -245,7 +256,7 @@ return (
                                 <div className="col-span-12">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2">
-                                            <label className="text-sm text-gray-700 dark:text-gray-400">Title</label> <BadgeLang lng="EN"/>
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Title <Required/></label> <BadgeLang lng="EN"/>
                                         </div>
                                         <input 
                                             type="text"
@@ -261,7 +272,7 @@ return (
                                 <div className="col-span-12">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2">
-                                            <label className="text-sm text-gray-700 dark:text-gray-400">Description</label> <BadgeLang lng="EN"/>
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Description <Required/></label> <BadgeLang lng="EN"/>
                                         </div>
                                         <textarea 
                                             {...register("description_en", { required: true })}
@@ -277,7 +288,7 @@ return (
                                 <div className="col-span-12">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2">
-                                            <label className="text-sm text-gray-700 dark:text-gray-400">Detail</label> <BadgeLang lng="EN"/>
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Detail </label> <BadgeLang lng="EN"/>
                                         </div>
                                         <Controller
                                             name="detail_en"
@@ -297,7 +308,7 @@ return (
                                 <div className="col-span-12">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2">
-                                            <label className="text-sm text-gray-700 dark:text-gray-400">Title</label> <BadgeLang lng="JA"/>
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Title <Required/></label> <BadgeLang lng="JA"/>
                                         </div>
                                         <input 
                                             type="text"
@@ -313,7 +324,7 @@ return (
                                 <div className="col-span-12">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2">
-                                            <label className="text-sm text-gray-700 dark:text-gray-400">Description</label> <BadgeLang lng="JA"/>
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Description <Required/></label> <BadgeLang lng="JA"/>
                                         </div>
                                         <textarea 
                                             {...register("description_ja", { required: true })}
@@ -329,7 +340,7 @@ return (
                                 <div className="col-span-12">
                                     <div className="space-y-3">
                                         <div className="flex items-center gap-2">
-                                            <label className="text-sm text-gray-700 dark:text-gray-400">Detail</label> <BadgeLang lng="JA"/>
+                                            <label className="text-sm text-gray-700 dark:text-gray-400">Detail </label> <BadgeLang lng="JA"/>
                                         </div>
                                         <Controller
                                             name="detail_ja"

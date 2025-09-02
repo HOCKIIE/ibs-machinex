@@ -25,7 +25,7 @@ import {
 } from "react-icons/ri";
 import { LuLayoutTemplate, LuTable, LuAlignJustify, LuChevronDown } from "react-icons/lu";
 import { PiTextIndentBold, PiTextOutdentBold } from "react-icons/pi";
-import { IoRefresh, IoClose } from "react-icons/io5";
+import { IoRefresh, IoClose, IoTrashBinOutline } from "react-icons/io5";
 import Api from "@/services/Api";
 import { set } from "lodash";
 
@@ -345,9 +345,9 @@ const ImageModal = ({
     const [uploading, setUploading] = useState(false);
     const [selected, setSelected] = useState<string[] | null>([]);
     const [message, setMessage] = useState<{status: string; message: string} | null>(null);
-    const [error, setError] = useState<string | null>(null)
     const [thisId, setId] = useState<string | null>(id || "");
     const [thisType, setType] = useState<string | null>(type || "");
+    const [deleteConfirm, setDelete] = useState(false);
     const didFetchGallery = useRef(false);
     
     const getGallery = async () => {
@@ -469,10 +469,12 @@ const ImageModal = ({
                             Upload
                         </button>
                     </div>
-                    <div>
+                    {tab === "gallery" &&
+                    <div className="flex gap-2">
                         <button type="button" className="p-2 bg-transparent rounded-md hover:ring-2 hover:ring-gray-300/50" onClick={getGallery}><IoRefresh/></button>
-                        <button type="button" className="p-2 bg-transparent rounded-md hover:ring-2 hover:ring-gray-300/50" onClick={deleteImage}><IoRefresh/></button>
+                        <button type="button" className="p-2 bg-transparent rounded-md hover:ring-2 hover:ring-gray-300/50 disabled:text-gray-300" disabled onClick={deleteImage}><IoTrashBinOutline/></button>
                     </div>
+                    }
                 </div>
                 {tab === "upload" && (
                     <div className="h-[87%]">
@@ -641,7 +643,7 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
             case 'image':
                 return (
                     <div {...attributes} className={element.className}>
-                        <img src={element.url} alt="image" style={{ maxWidth: '100%', height: 'auto' }} />
+                        <img src={element.src} alt="image" style={{ maxWidth: '100%', height: '100%' }} />
                         {children}
                     </div>
                 );
@@ -839,14 +841,16 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                     type={type}
                     id={id}
                     onClose={() => setShowModal(false)} 
-                    onInsert={(url: string) => {
-                        const imageNode = {
-                            type: 'image',
-                            url,
-                            className: 'max-w-full h-auto',
-                            children: [{ text: '' }],
-                        };
-                        Transforms.insertNodes(editor, imageNode);
+                    onInsert={(urls: string[]) => {
+                        urls.forEach(url => {
+                            const imageNode = {
+                                type: 'image',
+                                url,
+                                className: 'max-w-full h-auto',
+                                children: [{ text: '' }],
+                            };
+                            Transforms.insertNodes(editor, imageNode);
+                        });
                     }} 
                 />
             )}

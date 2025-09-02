@@ -21,7 +21,6 @@ const AboutMeSection = () => {
     const handleResise = () => {
         if (boxRef.current) {
             const inner = boxRef.current.querySelector(".about-media");
-            console.log(inner?.children[3]);
             const img = inner?.children[2].querySelector('.overflow-hidden') as HTMLElement;
             const img3 = inner?.children[3].querySelector('.overflow-hidden') as HTMLElement;
             if (screen.orientation.angle === 0 && screen.width <= 430) {
@@ -30,9 +29,9 @@ const AboutMeSection = () => {
                 img.style.height = "280px";
                 img3.style.top = "21%";
             }else{
-                (inner as HTMLElement).style.height = "unset";
-                img.removeAttribute('style');
-                img3.removeAttribute('style');
+                (inner as HTMLElement)?.removeAttribute('style');
+                img?.removeAttribute('style');
+                img3?.removeAttribute('style');
             }
         }
     }

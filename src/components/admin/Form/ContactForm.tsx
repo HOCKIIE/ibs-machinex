@@ -29,7 +29,7 @@ const ContactForm = () =>
         gmap: ""
     });
     
-    const { contact, getData, updateData, response } = useContactStore();
+    const { contact, fetchData, updateData, response } = useContactStore();
     const {
         register,
         reset,
@@ -48,7 +48,7 @@ const ContactForm = () =>
             gmap: contactData.gmap
         }
     });
-    const fetchData = useCallback(() => getData(), [getData]);
+    const getData = useCallback(() => fetchData(), [fetchData]);
     const EditContact = () => setEditContact(!isEditContact);
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => 
     {

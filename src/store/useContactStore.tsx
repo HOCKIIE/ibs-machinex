@@ -2,38 +2,37 @@
 import Api from "@/services/Api";
 import { create } from "zustand";
 import toast from "react-hot-toast";
-import { ContactState, ContactType } from "@/types/ContactType";
-import { stat } from "fs";
+import { ContactState, ContactType, ApiResponse } from "@/types/ContactType";
 
 const prefix = '/admin/contact';
 
 const useContactStore = create<ContactState>((set) => ({
-    contact: null,
+    items: [],
     isLoading: false,
-    response:{ status: null, message: null, action:null},
     error: null,
     token: null,
-    role: "",
-    user: "",
-    id: "",
     
-    getData: async () => {
+    id: "",
+    total: 1,
+    lastPage: 1,
+    currentPage: 1,
+    response: { status: null, message: null },
+    
+    fetchData: async (page: number) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.get<ContactType>(prefix);
+            const response = await Api.get<ApiResponse>(`${prefix}?page=${page}`);
+            const { total, lastPage, currentPage, rows } = response.data;
             set({
-                contact: response.data,
+                items: rows,
+                total,
+                lastPage,
+                currentPage,
                 isLoading: false,
             });
-            return {
-                status: true,
-                message: "Data fetched successfully",
-                data: response.data,
-            }
         } catch (error: unknown) {
-            const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
-            const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage);
+            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+            set({ error: errorMessage, isLoading: false });
         }
     },
 
@@ -43,7 +42,6 @@ const useContactStore = create<ContactState>((set) => ({
             const response = await Api.put(`${prefix}/update`,data);
             set({
                 response: {
-                    action: "update",
                     status : response.data.status,
                     message : response.data.message,
                 }
@@ -63,7 +61,6 @@ const useContactStore = create<ContactState>((set) => ({
             set({
                 isLoading: false,
                 response: {
-                    action: "delete",
                     status : response.data.status,
                     message : response.data.message,
                 }

@@ -16,6 +16,7 @@ export interface BlogType {
     status: boolean;
     category?: [];
     categories: Array<CategoryType>;
+    pathName: string;
     published_at: string;
     created_at: string;
     updated_at: string;
@@ -43,6 +44,7 @@ export interface BlogFormProps {
     status: boolean;
     category?: Array<string>;
     categories: Array<{id: string;}>;
+    pathName: string;
     published_at: string;
     created_at: string;
     updated_at: string;
