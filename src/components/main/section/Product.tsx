@@ -15,12 +15,13 @@ const ProductSection = () => {
     const [category, setCategory] = useState<CategoryType | []>([]);    
     const [keyword, setKeyword] = useState<string>("");
     const [loading, setLoading] = useState<boolean>(true);
-
+    
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     const didfetchAllCategory = useRef(false);
     const didfetchCategory = useRef<string | null>(null);
+    const searchRef = useRef<HTMLElement>(null);
     const queryString = searchParams.toString();
 
     const getQueryParam = useCallback(() => {
@@ -36,7 +37,8 @@ const ProductSection = () => {
 
     const fetchAndSetProducts = useCallback(async () => {
         setLoading(true);
-        const path = `/category/brand?${getQueryParam()}`;
+        const params = getQueryParam();
+        const path = `/category/brand?${params}`;
         const request = await Api.get(path);
         return request;
     }, [getQueryParam]);
@@ -45,6 +47,7 @@ const ProductSection = () => {
         try {
             const response = await fetchAndSetProducts();
             setCategory(response.data);
+            ScrollToSearchEl()
         } catch (error) {
             console.error("Error fetching category:", error);
         } finally {
@@ -64,6 +67,18 @@ const ProductSection = () => {
             setLoading(false);
         }
     }, []);
+
+    const ScrollToSearchEl = () => {
+        const queryString = searchParams.toString();
+        if (queryString !== '') {
+            if (searchRef.current) {
+                const y = searchRef.current.getBoundingClientRect().top - 100;
+                setTimeout(()=>{
+                    window.scrollTo({ top: y, behavior: 'smooth'});
+                },800)
+            }
+        }
+    }
 
     const setMultipleParams = (newParams: Record<string, string>) => 
     {
@@ -163,7 +178,7 @@ const ProductSection = () => {
             <div className="flex justify-center mt-2">
                 <h3 className="text-black text-xl">{t('subtitle')}</h3>
             </div>
-            <div className="mt-20">
+            <div className="mt-20" ref={searchRef}>
                 {Array.isArray(category) && category.map((item: any) => (
                     <div key={item.id} id={`category-${item.id}`} className="grid grid-cols-12 gap-5 mt-5 group">
                         <div className="col-span-12 xl:col-span-4 p-5 rounded-3xl border border-blue-800 bg-white group-hover:bg-blue-800/90 transition-all duration-300 ease-in-out">

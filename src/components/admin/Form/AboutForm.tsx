@@ -1,6 +1,6 @@
 "use client";
 import { inter } from "@/fonts/fonts";
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import sanitizeHtml from "sanitize-html";
 import { EditButton, CancelButton, SaveButton } from '@/components/main/button/Buttons';
 import { useForm, Controller } from "react-hook-form";
@@ -11,12 +11,10 @@ import { DefaultTab } from "../Tabs/Tabs";
 
 const AboutForm = () => {
 
-    const editableRef = useRef<HTMLDivElement>(null);
     const [isEditAbout, setEditAbout] = useState<boolean>(false);
     const [setfont, setFontState] = useState<boolean>(true);
     const [active, SetActive] = useState<string>('th');
-
-    const [content_th, setContentTH] = useState("");
+    const didFetchData = useRef(false);
 
     const EditAbout = () => setEditAbout(!isEditAbout);
     const toggle = () => setFontState(!setfont);
@@ -40,9 +38,7 @@ const AboutForm = () => {
             detail_ja: sanitizeHtml(aboutData.detail_ja)
         },
     });
-    const fetchData = useCallback(async () => {
-        await getData();
-    }, [getData]);
+
 
     const tabToggle = async (language: string): Promise<void> => {
         SetActive(language);
@@ -55,7 +51,6 @@ const AboutForm = () => {
     const handleChange = ({ name, value }: HandleChangeParams): void => 
     {
         setAboutData((prevState) => ({ ...prevState, [name]: value }));
-        setContentTH(value || "")
     }
     const CalcelEdit = () => {
         reset({
@@ -66,12 +61,15 @@ const AboutForm = () => {
         EditAbout()
     }
     const handleSubmit = async (formData: any) => {
-        console.log(errors)
         const modifiedData = { ...formData };
         await updateData(modifiedData);
     }
 
-    useEffect(()=>{ fetchData() },[]);
+    useEffect(()=>{ 
+        if(didFetchData.current) return;
+        didFetchData.current = true;
+        getData();
+    },[]);
     useEffect(() => {
         if (about) {
             const data = {

@@ -42,7 +42,8 @@ const Contact = () =>
         prevPage,
         fetchData,
         handleSearch, 
-        handlePageChange
+        handlePageChange,
+        OrderBy
     } = usePagination({ 
         initialLimit: show[0],
         endpoint: '/admin/contact-us'
@@ -128,6 +129,7 @@ const Contact = () =>
                                 ><BiTrash fontSize={24}/></button>
                             </div>
                             <div className='flex'>
+                                <OrderBy />
                                 <div className="relative">
                                     <button className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400" title="Keyword">
                                         <IoSearchOutline fontSize={20}/>
