@@ -9,6 +9,7 @@ import BackToTop from "../button/BackToTop";
 import { useGlobal } from "@/contexts/PageSettingsContext";
 import { useEffect } from "react";
 import LanguageSwitcher from "../dropdown/LanguageSwitcher";
+import { Link } from "@/i18n/routing";
 
 import {useTranslations} from 'next-intl';
 
@@ -39,7 +40,11 @@ export const Header = () => {
                 </div>
                 <div className="hidden lg:flex items-center gap-20">
                     <ul className="flex md:text-sm xl:text-base">
-                        {MenuItem.map((item, index) => <li key={index}><a className="block py-4 px-4 uppercase font-light text-black hover:bg-red-700 hover:text-white transition-all" href={item.href} onClick={scrollTo}>{t(`${item.key}`)}</a></li>)}
+                        {MenuItem.map((item, index) => 
+                            <li key={index}>
+                                <Link className="block py-4 px-4 uppercase font-light text-black hover:bg-red-700 hover:text-white transition-all" href={item.href} onClick={scrollTo}>{t(`${item.key}`)}</Link>
+                            </li>
+                        )}
                     </ul>
                     <div>
                         <LanguageSwitcher/>

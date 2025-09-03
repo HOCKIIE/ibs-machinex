@@ -148,6 +148,32 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
         );
     };
 
+    const HandlerOrderBy = (value:string) => {
+        const params = new URLSearchParams(searchParams.toString());
+        params.set('orderBy',value)
+    }
+    const OrderBy = () => {
+        const orderBy = [
+            {'key':'latest','value' : 'Latest'},
+            {'key':'oldest','value' : 'Oldest'},
+        ]
+        return <div className="flex items-center gap-3">
+                <span className="text-gray-500 dark:text-gray-400">Order By</span>
+                <select 
+                    name="orderBy" 
+                    id="orderBy" onChange={(e)=>HandlerOrderBy(e.currentTarget.value)}
+                    className="dark:bg-dark-900 h-9 w-34 z-0 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none py-2 pl-3 pr-8 text-sm text-gray-800 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-theme-xs placeholder:text-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 focus:outline-none"
+                >
+                    {orderBy.map((v,k)=><option key={k} value={v.key}>{v.value}</option>)}
+                </select>
+                <span className="absolute right-2 top-1/2 z-0 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                    <svg className="stroke-current" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3.8335 5.9165L8.00016 10.0832L12.1668 5.9165" stroke="" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"></path>
+                    </svg>
+                </span>
+        </div>
+    }
+
     return {
         keyword,
         data,
@@ -163,7 +189,8 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
         updateLimit,
         handleSearch, 
         handlePageChange, 
-        StatusTab
+        StatusTab,
+        OrderBy
     };
     
 };

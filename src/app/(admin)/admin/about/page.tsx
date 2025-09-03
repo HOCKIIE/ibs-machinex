@@ -2,7 +2,7 @@ import React from 'react';
 import "../custom.scss";
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
-import ContactForm from '@/components/admin/Form/ContactForm';
+import OwnerForm from '@/components/admin/Form/OwnerForm';
 import AboutForm from '@/components/admin/Form/AboutForm';
 
 const About = () => 
@@ -22,7 +22,7 @@ const About = () =>
                 </div>
                 <div className="grid grid-cols-1 mt-6">
                     <div className="col-span-12">
-                        <ContactForm />
+                        <OwnerForm />
                     </div>
                 </div>
             </div>
