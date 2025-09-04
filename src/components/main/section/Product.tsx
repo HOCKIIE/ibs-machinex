@@ -8,6 +8,7 @@ import { CategoryType } from '@/types/CategoryType';
 import { BrandType } from '@/types/BrandType';
 import { useLocale, useTranslations } from 'next-intl';
 
+
 const ProductSection = () => {
     const locale = useLocale();
     const t = useTranslations('sectionHead');
@@ -21,7 +22,7 @@ const ProductSection = () => {
     const searchParams = useSearchParams();
     const didfetchAllCategory = useRef(false);
     const didfetchCategory = useRef<string | null>(null);
-    const searchRef = useRef<HTMLElement>(null);
+    const searchRef = useRef<HTMLDivElement>(null);
     const queryString = searchParams.toString();
 
     const getQueryParam = useCallback(() => {
@@ -189,18 +190,21 @@ const ProductSection = () => {
                             <div className="text-black text-xl mt-5 group-hover:text-white">{item[`description_${locale}`]}</div>
                         </div>
                         <div className="col-span-12 xl:col-span-8 p-5 rounded-3xl border border-blue-800 bg-white group-hover:bg-blue-800/90 transition-all duration-300 ease-in-out">
-                            <div className="grid grid-cols-3 md:grid-cols-5 xl:grid-cols-7 gap-3">
-                                {item.brand?.map((brand: BrandType, k:number) => (
-                                    <div key={k} className="flex items-center group-hover:text-white">
-                                        <Link
-                                            href={`/brand/${brand.apiName}`}
-                                            className="rounded-full overflow-hidden w-[107px] h-[107px] flex justify-center items-center mb-2 border shadow-md hover:outline hover:outline-offset-[-4px] outline-red-700 hover:outline-[5px] transition-all duration-300 ease-in-out"
-                                        >
-                                            <img src={brand.image} alt={brand.title_en} className="w-full h-full object-contain"/>
-                                        </Link>
-                                    </div>)
-                                )}
-                            </div>
+                            {item.brand.length > 0 
+                                ?<div className="grid grid-cols-3 md:grid-cols-5 xl:grid-cols-7 gap-3">
+                                    {item.brand?.map((brand: BrandType, k:number) => (
+                                        <div key={k} className="flex items-center group-hover:text-white">
+                                            <Link
+                                                href={`/brand/${brand.apiName}`}
+                                                className="rounded-full overflow-hidden w-[107px] h-[107px] flex justify-center items-center mb-2 border shadow-md hover:outline hover:outline-offset-[-4px] outline-red-700 hover:outline-[5px] transition-all duration-300 ease-in-out"
+                                            >
+                                                <img src={brand.image} alt={brand.title_en} className="w-full h-full object-contain"/>
+                                            </Link>
+                                        </div>)
+                                    )}
+                                </div>
+                                :<div className="flex justify-center text-gray-800 group-hover:text-white"><span>Coming soon</span></div>
+                            }
                         </div>
                         <div className="col-span-12 relative my-10">
                             <div className="absolute top-[-5px] w-3 h-3 bg-blue-200 rounded-full "></div>

@@ -3,9 +3,8 @@
 import React, {useState, useEffect} from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
-import { Paginate, LimitPerPage } from '@/components/admin/Paginate/Paginate';
+import { Paginate, LimitPerPage, OrderBy } from '@/components/admin/Paginate/Paginate';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
-import ConfirmModal from '@/components/admin/Modal/ConfirmModal';
 import usePagination from '@/hooks/usePagination';
 import { BiTrash } from "react-icons/bi";
 import { LuPencil } from "react-icons/lu";
@@ -43,7 +42,7 @@ const Contact = () =>
         fetchData,
         handleSearch, 
         handlePageChange,
-        OrderBy
+        handlerOrderBy
     } = usePagination({ 
         initialLimit: show[0],
         endpoint: '/admin/contact-us'
@@ -128,8 +127,8 @@ const Contact = () =>
                                     className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-error-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"
                                 ><BiTrash fontSize={24}/></button>
                             </div>
-                            <div className='flex'>
-                                <OrderBy />
+                            <div className='flex gap-2'>
+                                <OrderBy handlerOrderBy={(e) => handlerOrderBy(e)}/>
                                 <div className="relative">
                                     <button className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400" title="Keyword">
                                         <IoSearchOutline fontSize={20}/>

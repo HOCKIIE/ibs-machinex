@@ -10,7 +10,7 @@ const OwnerForm = () =>
 {
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const [isEditContact, setEditContact] = useState<boolean>(false);
-    const [map, setMap] = useState<string|''>('');
+    const [map, setMap] = useState<string|null>(null);
     const [tab, setTab] = useState<string>('th')
     const didFetchOwner = useRef<boolean>(false);
     const [itemState, setContactData] = useState<OwnerType>({
@@ -279,10 +279,10 @@ const OwnerForm = () =>
                                         <iframe 
                                             ref={iframeRef} 
                                             className="w-full mt-3 rounded-xl overflow-hidden bg-gray-50"
-                                            src={itemState.gmap ? itemState.gmap : map}
+                                            src={itemState.gmap ? itemState.gmap : map || undefined}
                                             // src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.0617695789147!2d100.55523204113399!3d13.714708698203433!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29fd4c61f02af%3A0xe0d19e4fc5356b1e!2sSSP%20Tower%202!5e0!3m2!1sth!2sth!4v1742971953317!5m2!1sth!2sth" 
                                             height="280" 
-                                            loading="lazy" 
+                                            title="Google Map Location"
                                             referrerPolicy="no-referrer-when-downgrade"
                                         ></iframe>
                                     </div>
