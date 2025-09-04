@@ -14,7 +14,7 @@ export const Paginate: React.FC<PaginateProps> = ({meta,prevPage,handlePageChang
         <div className="flex justify-between px-6 py-2 bg-white dark:bg-gray-800">
             <div className="flex items-center">
                 <span className="text-sm font-normal text-gray-500 dark:text-gray-400 mb-4 md:mb-0 block w-full md:inline md:w-auto">
-                    Showing <span className="font-semibold text-gray-900 dark:text-white">{meta?.from || 0} - {meta?.to}</span> of <span className="font-semibold text-gray-900 dark:text-white">{meta?.total || 0}</span> Records
+                    Showing <span className="font-semibold text-gray-900 dark:text-white">{meta?.from || 0} - {meta?.to || 0}</span> of <span className="font-semibold text-gray-900 dark:text-white">{meta?.total || 0}</span> Records
                 </span>
             </div>
             <div className="flex items-center justify-center gap-1 xl:justify-end">
@@ -72,7 +72,7 @@ export const LimitPerPage:React.FC<LimitPerPageProps> = ({show,limit,updateLimit
                 defaultValue={getLimit?`${getLimit}`:`${limit}`}
                 className="dark:bg-dark-900 h-9 w-18 z-0 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none py-2 pl-3 pr-8 text-sm text-gray-800 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-theme-xs placeholder:text-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 focus:outline-none"
             >
-                {Array.from(show).map((v:number,k:number)=><option key={k} value={v} className="text-gray-500 dark:bg-gray-900 dark:text-gray-400">{v}</option>)}
+                {show && Array.from(show).map((v:number,k:number)=><option key={k} value={v} className="text-gray-500 dark:bg-gray-900 dark:text-gray-400">{v}</option>)}
             </select>
             <span className="absolute right-2 top-1/2 z-0 -translate-y-1/2 text-gray-500 dark:text-gray-400">
                 <svg className="stroke-current" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -81,5 +81,37 @@ export const LimitPerPage:React.FC<LimitPerPageProps> = ({show,limit,updateLimit
             </span>
         </div>
         <span className="text-gray-500 dark:text-gray-400"> entries </span>
+    </div>
+}
+
+interface OrderByProps {
+    handlerOrderBy?: <HTMLSelectElement>(e: React.ChangeEvent<HTMLSelectElement>) => void;
+}
+export const OrderBy:React.FC<OrderByProps> = ({handlerOrderBy}) => {
+    const searchParams = useSearchParams();
+    const getOrderBy = searchParams.get('orderBy');
+    const orderByOptions = [
+        {'key':'desc','value' : 'Latest'},
+        {'key':'asc','value' : 'Oldest'},
+    ];
+    return <div className="flex items-center gap-3">
+        <span className="text-gray-500 dark:text-gray-400">Order By</span>
+        <div className="relative">
+            <select 
+                id="orderBy" 
+                name="orderBy" 
+                title="Order By"
+                defaultValue={getOrderBy||""}
+                onChange={(e) => handlerOrderBy && handlerOrderBy(e)}
+                className="dark:bg-dark-900 h-9 w-34 z-0 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none py-2 pl-3 pr-8 text-sm text-gray-800 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-theme-xs placeholder:text-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 focus:outline-none"
+            >
+                {orderByOptions.map((v,k)=><option key={k} value={v.key}>{v.value}</option>)}
+            </select>
+            <span className="absolute right-2 top-1/2 z-0 -translate-y-1/2 text-gray-500 dark:text-gray-400">
+                <svg className="stroke-current" width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M3.8335 5.9165L8.00016 10.0832L12.1668 5.9165" stroke="" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"></path>
+                </svg>
+            </span>
+        </div>
     </div>
 }
