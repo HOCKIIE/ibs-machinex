@@ -3,13 +3,11 @@
 import React, {useState, useEffect} from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
-import { Paginate, LimitPerPage, OrderBy } from '@/components/admin/Paginate/Paginate';
+import { Paginate, LimitPerPage, SearchBar, OrderBy } from '@/components/admin/Paginate/Paginate';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import usePagination from '@/hooks/usePagination';
 import { BiTrash } from "react-icons/bi";
 import { LuPencil } from "react-icons/lu";
-import { IoSearchOutline } from "react-icons/io5";
-import SearchBar from '@/components/admin/Paginate/SearchBar';
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import useContactStore from '@/store/useContactStore';
 import Link from 'next/link';
@@ -129,12 +127,7 @@ const Contact = () =>
                             </div>
                             <div className='flex gap-2'>
                                 <OrderBy handlerOrderBy={(e) => handlerOrderBy(e)}/>
-                                <div className="relative">
-                                    <button className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400" title="Keyword">
-                                        <IoSearchOutline fontSize={20}/>
-                                    </button>
-                                    <SearchBar keyword={keyword} handleSearch={(e) => handleSearch(e)} />
-                                </div>
+                                <SearchBar keyword={keyword} handleSearch={(e) => handleSearch(e)} />
                             </div>
                         </div>
                     </div>

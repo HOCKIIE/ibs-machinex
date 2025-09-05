@@ -1,5 +1,6 @@
 import { useSearchParams } from 'next/navigation';
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
+import { IoSearchOutline } from "react-icons/io5";
 
 interface PaginateProps {
     meta: any;
@@ -84,6 +85,24 @@ export const LimitPerPage:React.FC<LimitPerPageProps> = ({show,limit,updateLimit
     </div>
 }
 
+interface SearchBarProps {
+    keyword: string,
+    handleSearch: (e: React.KeyboardEvent<HTMLInputElement>) => void
+}
+export const SearchBar:React.FC<SearchBarProps> = ({keyword,handleSearch}) => {
+    return <div className="flex items-center relative">
+        <button className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 dark:text-gray-400" title="Keyword">
+            <IoSearchOutline fontSize={20}/>
+        </button>
+        <input type="text" 
+            defaultValue={keyword}
+            onKeyUp={(e) => handleSearch && handleSearch(e)}
+            placeholder="Search..." 
+            className="dark:bg-dark-900 h-9 w-full z-0 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none py-3 pl-12 pr-8 text-sm text-gray-800 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-theme-xs placeholder:text-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 focus:outline-none" 
+        />
+    </div>
+}
+
 interface OrderByProps {
     handlerOrderBy?: <HTMLSelectElement>(e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
@@ -91,8 +110,8 @@ export const OrderBy:React.FC<OrderByProps> = ({handlerOrderBy}) => {
     const searchParams = useSearchParams();
     const getOrderBy = searchParams.get('orderBy');
     const orderByOptions = [
-        {'key':'desc','value' : 'Latest'},
-        {'key':'asc','value' : 'Oldest'},
+        {'key':'desc','value':'Latest'},
+        {'key':'asc','value':'Oldest'}
     ];
     return <div className="flex items-center gap-3">
         <span className="text-gray-500 dark:text-gray-400">Order By</span>

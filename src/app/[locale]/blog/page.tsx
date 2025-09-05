@@ -5,6 +5,7 @@ import axios from 'axios';
 import { BlogType } from '@/types/BlogType';
 import {H1,H2,H3} from '@/utils/Title';
 import { useLocale } from 'next-intl';
+import Api from '@/services/Api';
 
 const Blog = () => 
 {
@@ -17,10 +18,12 @@ const Blog = () =>
 
     const fetchBlogSection2 = useCallback(async() => {
         const request = await axios('https://jsonfakery.com/blogs/random/6');
+        // const request = await Api.get('/blog/recent/4');
         setBlog2(request.data);
     }, [])
     const fetchAndSetBlogs = useCallback(async() => {
-        const request = await axios('https://jsonfakery.com/blogs/random/4');
+        // const request = await axios('https://jsonfakery.com/blogs/random/4');
+        const request = await Api.get('/blog/recent/4');
         console.log(request.data);
         setBlogs(request.data);
     },[]);
@@ -52,20 +55,20 @@ const Blog = () =>
                             <div className="grid gap-5 overflow-hidden">
                                 <div className="overflow-hidden rounded-t-2xl max-h-[200px] xl:max-h-[300px]">
                                     <Link href={'/blog/' + blogs[0].id}>
-                                        <img src={blogs[0].featured_image} title={blogs[0].title} className="w-full object-cover"/>
+                                        <img src={blogs[0].image} title={(blogs[0] as any)[`title_${locale}`]} className="w-full object-cover"/>
                                     </Link>
                                 </div>
                                 <div className="">
-                                    <p className="text-black">{blogs[0].updated_at}</p>
-                                    <Link href={'/blog/' + blogs[0].id}>
-                                        <H3 custom={true} className="text-[20px] text-black font-bold hover:text-red-600">{blogs[0].title}</H3>
-                                        <p className="text-gray-700">{blogs[0].subtitle}</p>
+                                    <p className="text-black">{(blogs[0] as any).updated_at}</p>
+                                    <Link href={'/blog/' + (blogs[0] as any).id}>
+                                        <H3 custom={true} className="text-[20px] text-black font-bold hover:text-red-600">{(blogs[0] as any)[`title_${locale}`]}</H3>
+                                        <p className="text-gray-700">{(blogs[0] as any)[`description_${locale}`]}</p>
                                     </Link>
                                 </div>
                             </div>
                         </div>
                         { screenWidth > 1280
-                            && <div className="col-span-12 md:col-span-6 xl:col-span-7">
+                            ? <div className="col-span-12 md:col-span-6 xl:col-span-7">
                                 <div className="grid grid-cols-1 gap-5 ">
                                     {Array.from(blogs).slice(1).map((item, index) => {
                                         return (
@@ -73,15 +76,15 @@ const Blog = () =>
                                                 <div className="xl:w-1/2">
                                                     <div className="rounded-l-2xl max-h-[200px] overflow-hidden">
                                                         <Link href={'/blog/' + item.id}>
-                                                            <img src={item.featured_image} title={item.title} className="h-full object-cover"/>
+                                                            <img src={item.image} title={(blogs[0] as any)[`title_${locale}`]} className="h-full object-cover"/>
                                                         </Link>
                                                     </div>
                                                 </div>
                                                 <div className="xl:w-1/2 overflow-hidden">
                                                     <p className="text-black">{item.updated_at}</p>
                                                     <Link href={'/blog/' + item.id} >
-                                                        <H3 custom={true} className="text-[20px] text-black font-bold hover:text-red-600">{item.title}</H3>
-                                                        <p className="text-gray-700">{item.subtitle}</p>
+                                                        <H3 custom={true} className="text-[20px] text-black font-bold hover:text-red-600">{(blogs[0] as any)[`title_${locale}`]}</H3>
+                                                        <p className="text-gray-700">{(blogs[0] as any)[`description_${locale}`]}</p>
                                                     </Link>
                                                 </div>
                                             </div>
@@ -89,21 +92,19 @@ const Blog = () =>
                                     })}
                                 </div>
                             </div>
-                        }
-                        { screenWidth <= 1280
-                            && Array.from(blogs).slice(1).map((item, index) => 
+                            : Array.from(blogs).slice(1).map((item, index) => 
                                 <div key={index} className="col-span-12 md:col-span-6 xl:col-span-5">
                                     <div className="grid gap-5 overflow-hidden">
                                         <div className="overflow-hidden rounded-t-2xl max-h-[200px] xl:max-h-[300px]">
                                             <Link href={'/blog/' + item.id}>
-                                                <img src={item.featured_image} title={item.title} className="w-full object-cover"/>
+                                                <img src={item.image} title={(blogs[0] as any)[`title_${locale}`]} className="w-full object-cover"/>
                                             </Link>
                                         </div>
                                         <div className="">
                                             <p className="text-black">{item.updated_at}</p>
                                             <Link href={'/blog/' + item.id}>
-                                                <H3 custom={true} className="text-[20px] text-black font-bold hover:text-red-600">{item.title}</H3>
-                                                <p className="text-gray-700">{item.subtitle}</p>
+                                                <H3 custom={true} className="text-[20px] text-black font-bold hover:text-red-600">{(blogs[0] as any)[`title_${locale}`]}</H3>
+                                                <p className="text-gray-700">{(blogs[0] as any)[`description_${locale}`]}</p>
                                             </Link>
                                         </div>
                                     </div>
@@ -112,7 +113,7 @@ const Blog = () =>
                         }
                     </div>
                     <div className='border-t-4 border-black my-15'></div>
-                    <H2 custom={true} className="text-4xl font-bold text-black pb-15">Looking for High-Quality Industrial Machinery?</H2>
+                    {/* <H2 custom={true} className="text-4xl font-bold text-black pb-15">Looking for High-Quality Industrial Machinery?</H2>
                     <div className="grid grid-cols-12 gap-6">
                         {blog2 && blog2.length > 0 &&
                             blog2.map((item)=>
@@ -134,7 +135,7 @@ const Blog = () =>
                                 </div>
                             )}
                         }
-                    </div>
+                    </div> */}
                 </>
                 }
             </div>
