@@ -9,21 +9,22 @@ import Api from '@/services/Api';
 
 const Blog = () => 
 {
+    const recent = 4;
     const locale = useLocale();
     const hasFetched = useRef(false);
-    const [screenWidth, setScreenWidth] = useState(window.innerWidth);
+    const [screenWidth, setScreenWidth] = useState(window?.innerWidth);
     const [blogs, setBlogs] = useState<BlogType[] | null>(null); 
     const [blog2, setBlog2] = useState<BlogType[] | null>(null); 
     const windowResized = () => setScreenWidth(window.innerWidth);
 
     const fetchBlogSection2 = useCallback(async() => {
-        const request = await axios('https://jsonfakery.com/blogs/random/6');
-        // const request = await Api.get('/blog/recent/4');
+        // const request = await axios('https://jsonfakery.com/blogs/random/6');
+        const request = await Api.get('/blog');
         setBlog2(request.data);
     }, [])
     const fetchAndSetBlogs = useCallback(async() => {
         // const request = await axios('https://jsonfakery.com/blogs/random/4');
-        const request = await Api.get('/blog/recent/4');
+        const request = await Api.get(`/blog/recent/${recent}`);
         console.log(request.data);
         setBlogs(request.data);
     },[]);
