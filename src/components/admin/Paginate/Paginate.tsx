@@ -1,16 +1,9 @@
 import { useSearchParams } from 'next/navigation';
+import { PaginationType } from '@/types/PaginationType';
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";
 import { IoSearchOutline } from "react-icons/io5";
 
-interface PaginateProps {
-    meta: any;
-    totalItems?: number;
-    prevPage: () => void;
-    nextPage: () => void;
-    currentPage?: number;
-    handlePageChange?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
-}
-export const Paginate: React.FC<PaginateProps> = ({meta,prevPage,handlePageChange,nextPage}) => {
+export const Paginate: React.FC<PaginationType> = ({meta,prevPage,handlePageChange,nextPage}) => {
     return (
         <div className="flex justify-between px-6 py-2 bg-white dark:bg-gray-800">
             <div className="flex items-center">
