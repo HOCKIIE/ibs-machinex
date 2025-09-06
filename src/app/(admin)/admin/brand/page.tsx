@@ -12,8 +12,7 @@ import { IoSearchOutline } from "react-icons/io5";
 import useProductStore from '@/store/useProductStore';
 import usePagination from '@/hooks/usePagination';
 import Format from '@/utils/Format';
-import { Paginate, LimitPerPage } from '@/components/admin/Paginate/Paginate';
-import SearchBar from '@/components/admin/Paginate/SearchBar';
+import { Paginate, LimitPerPage, SearchBar } from '@/components/admin/Paginate/Paginate';
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import { BrandType } from '@/types/BrandType';
 
