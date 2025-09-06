@@ -9,9 +9,8 @@ import { LuPencil } from "react-icons/lu";
 import { IoSearchOutline } from "react-icons/io5";
 import Link from 'next/link';
 import usePagination from '@/hooks/usePagination';
-import { Paginate, LimitPerPage } from '@/components/admin/Paginate/Paginate';
+import { Paginate, LimitPerPage, SearchBar } from '@/components/admin/Paginate/Paginate';
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
-import SearchBar from '@/components/admin/Paginate/SearchBar';
 import useUserStore from '@/store/useUserStore';
 import ActionModal from '@/components/admin/Modal/ActionModal';
 

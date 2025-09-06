@@ -6,10 +6,9 @@ import { BiTrash } from "react-icons/bi";
 import { LuPencil } from "react-icons/lu";
 import { IoSearchOutline } from "react-icons/io5";
 import usePagination from '@/hooks/usePagination';
-import { Paginate, LimitPerPage } from '@/components/admin/Paginate/Paginate';
+import { Paginate, LimitPerPage, SearchBar } from '@/components/admin/Paginate/Paginate';
 import useCategoryStore from "@/store/useCategoryStore"
 import AddButton from '@/components/admin/Button/AddButton';
-import SearchBar from '@/components/admin/Paginate/SearchBar';
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
