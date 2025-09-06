@@ -7,6 +7,7 @@ import {H1,H2,H3} from '@/utils/Title';
 import { useLocale } from 'next-intl';
 import Api from '@/services/Api';
 import { usePathname } from 'next/navigation';
+import Pagination from '@/components/main/pagination/Pagination';
 
 const Blog = () => 
 {
@@ -151,35 +152,7 @@ const Blog = () =>
                 </>
                 }
             </div>
-            <div className="flex justify-center mt-6 space-x-2">
-                <button
-                    onClick={() => setPage(p => Math.max(p - 1, 1))}
-                    disabled={page === 1}
-                    className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-                >
-                    Prev
-                </button>
-
-                {Array.from({ length: lastPage }, (_, i) => i + 1).map(num => (
-                <button
-                    key={num}
-                    onClick={() => setPage(num)}
-                    className={`px-3 py-1 rounded ${
-                    num === page ? "bg-blue-500 text-white" : "bg-gray-200"
-                    }`}
-                >
-                    {num}
-                </button>
-                ))}
-
-                <button
-                    onClick={() => setPage(p => Math.min(p + 1, lastPage))}
-                    disabled={page === lastPage}
-                    className="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
-                >
-                    Next
-                </button>
-            </div>
+            <Pagination />
         </div>
     )
 }
