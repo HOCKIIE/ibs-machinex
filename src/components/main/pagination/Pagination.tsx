@@ -6,7 +6,7 @@ import { IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
 const Pagination:React.FC<PaginationType> = ({meta,prevPage,nextPage,totalItems,handlePageChange}) => {
     const searchParams = useSearchParams();
     const page = parseInt(searchParams.get('page') || '1', 10);
-
+    const defaultClass = `flex items-center justify-center w-10 h-10 text-white text-xl shadow-1 border border-red-600 bg-red-600 hover:bg-white hover:text-black hover:border-black transition-colors duration-300 ease-linear rounded-full disabled:opacity-50`;
     return (
         <div className="flex justify-center mt-6 space-x-2">
             <button
@@ -14,7 +14,7 @@ const Pagination:React.FC<PaginationType> = ({meta,prevPage,nextPage,totalItems,
                 title="Previous Page"
                 onClick={prevPage}
                 disabled={meta?.current_page === 1} 
-                className="flex items-center justify-center w-10 h-10 text-white text-xl shadow-1 bg-red-600 rounded-full disabled:opacity-50"
+                className={defaultClass}
             >
                 <IoChevronBackOutline/>
             </button>
@@ -22,7 +22,7 @@ const Pagination:React.FC<PaginationType> = ({meta,prevPage,nextPage,totalItems,
                 <button
                     key={num}
                     onClick={() => handlePageChange(num)}
-                    className={`flex items-center justify-center w-10 h-10 text-md shadow-1 rounded-full ${num === page ? "bg-red-700 text-white" : "text-gray-100 bg-red-600"
+                    className={`flex items-center justify-center w-10 h-10 text-md shadow-1 rounded-full border border-red-600 hover:bg-white hover:text-black hover:border-black transition-colors duration-300 ease-linear ${num === page ? "bg-red-700 text-white" : "text-gray-100 bg-red-600"
                     }`}
                 >
                     {num}
@@ -33,7 +33,7 @@ const Pagination:React.FC<PaginationType> = ({meta,prevPage,nextPage,totalItems,
                 title="Next Page"
                 onClick={nextPage}
                 disabled={meta?.current_page === meta?.last_page}
-                className="flex items-center justify-center w-10 h-10 text-white text-xl shadow-1 bg-red-600 rounded-full disabled:opacity-50"
+                className={defaultClass}
             >
                 <IoChevronForwardOutline/>
             </button>
