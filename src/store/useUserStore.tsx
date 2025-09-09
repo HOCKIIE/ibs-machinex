@@ -21,27 +21,27 @@ const useUserStore = create<UserState>((set) => ({
     lastPage: 0,
     currentPage: 1,
 
-    fetchUsers: async (page: number) => {
+    fetchUsers: async () => {
         set({ isLoading: true, error: null });
         try {
-          const response = await Api.get<ApiResponse>(`${prefix}?page=${page}`);
-    
-          const { total, lastPage, currentPage, rows } = response.data;
-    
-          let filteredRows = rows;
-          const userData = JSON.parse(localStorage.getItem("user") || "{}");
-          if (userData?.role != "super") {
-                filteredRows = rows.filter((item) => item?.role !== "super");
-          } else if (userData?.role === "user") {
-                filteredRows = [];
-          }
-          set({
-                users: filteredRows,
-                total,
-                lastPage,
-                currentPage,
-                isLoading: false,
-          });
+            const response = await Api.get<ApiResponse>(`${prefix}`);
+        
+            const { total, lastPage, currentPage, rows } = response.data;
+        
+            let filteredRows = rows;
+            const userData = JSON.parse(localStorage.getItem("user") || "{}");
+            if (userData?.role != "super") {
+                    filteredRows = rows.filter((item) => item?.role !== "super");
+            } else if (userData?.role === "user") {
+                    filteredRows = [];
+            }
+            set({
+                    users: filteredRows,
+                    total,
+                    lastPage,
+                    currentPage,
+                    isLoading: false,
+            });
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({ error: errorMessage, isLoading: false });
