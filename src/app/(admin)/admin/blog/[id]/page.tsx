@@ -9,10 +9,10 @@ import useBlogStore from '@/store/useBlogStore';
 import { BlogFormProps, BlogType } from '@/types/BlogType';
 import { debounce } from 'lodash';
 import toast from 'react-hot-toast';
+import { useAuth } from '@/contexts/AdminContext';
 
-
-const Page = ({ params }: { params: Promise<{ id: string }> }) => {
-
+const Page = ({ params }: { params: Promise<{ id: string }> }) => 
+{
     const { id } = use(params);
     const router = useRouter();
     const { items, fetchDataById, updateData } = useBlogStore();

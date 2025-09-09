@@ -1,3 +1,4 @@
+"use client"
 import React,{ useContext,useEffect,useRef  } from 'react';
 import { AdminContext } from '@/contexts/AdminContext';
 import { CiMenuBurger } from "react-icons/ci";

@@ -9,6 +9,7 @@ import { getUser } from "@/services/Auth";
 interface AuthContextType {
     user: UserType | null;
     loading: boolean;
+    toggleLoading: () => void;
     menuActive: string;
     setMenuActive: (menu: string) => void;
     isSidebarOpen: boolean;
@@ -19,7 +20,8 @@ interface AuthContextType {
 
 export const AdminContext = createContext<AuthContextType>({
     user: null,
-    loading: true,
+    loading: false,
+    toggleLoading: () => {},
     menuActive: '',
     setMenuActive: () => {},
     isSidebarOpen: false,
@@ -39,6 +41,7 @@ export default function AdminContextProvider({ children }: { children: ReactNode
     const didFetchUserData = useRef(false);
 
     const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
+    const toggleLoading = () => setLoading(!loading)
     const fetchUser = async () => {
         try {
             const res = await getUser();
@@ -57,7 +60,7 @@ export default function AdminContextProvider({ children }: { children: ReactNode
 
 
     return (
-        <AdminContext.Provider value={{ user, loading, menuActive, setMenuActive, isSidebarOpen, toggleSidebar, userMenu, setUserMenu }}>
+        <AdminContext.Provider value={{ user, loading, toggleLoading, menuActive, setMenuActive, isSidebarOpen, toggleSidebar, userMenu, setUserMenu }}>
         {children}
         </AdminContext.Provider>
     );

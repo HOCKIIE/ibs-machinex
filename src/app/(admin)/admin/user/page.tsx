@@ -1,18 +1,19 @@
 "use client"
 
-import React,{ useState } from 'react';
+import React,{ useState, useEffect } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
-import AddButton from '@/components/admin/Button/AddButton';
-import { BiTrash } from "react-icons/bi";
-import { LuPencil } from "react-icons/lu";
-import { IoSearchOutline } from "react-icons/io5";
-import Link from 'next/link';
 import usePagination from '@/hooks/usePagination';
 import { Paginate, LimitPerPage, SearchBar } from '@/components/admin/Paginate/Paginate';
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
 import useUserStore from '@/store/useUserStore';
 import ActionModal from '@/components/admin/Modal/ActionModal';
+import AddButton from '@/components/admin/Button/AddButton';
+import { BiTrash } from "react-icons/bi";
+import { LuPencil } from "react-icons/lu";
+import { IoSearchOutline } from "react-icons/io5";
+import Link from 'next/link';
+import { useCurrentUrl } from '@/utils/useCurrentUrl';
 
 const show = [10, 50, 100];
 const recordStatus = [
@@ -43,15 +44,14 @@ const Users = () =>
         endpoint: '/admin/user'
     });
 
-    const {  isLoading, error, deleteUser, response } = useUserStore();
-
+    const { isLoading, error, deleteUser, response } = useUserStore();
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [isAction, setAction] = useState<string>("delete");
-
     const [id, setId] = useState<number[] | null>(null);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
-
+    const [redirect, setRedirect] = useState<string|null>(null)
     const isAllSelected = selectedIds.length > 0;
+    const currentUrl = useCurrentUrl();
 
     const toggleSelectAll = () => {
         if (isAllSelected) {
@@ -88,6 +88,12 @@ const Users = () =>
         setModalOpen(false);
         successProgress();
     }
+    
+
+    useEffect(() => {
+        console.log("🔄 URL changed:", currentUrl);
+        setRedirect(currentUrl)
+    }, [currentUrl,setRedirect]);
     return (
         <DefaultLayout>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -97,7 +103,7 @@ const Users = () =>
                         <div><Breadcrumb /></div>
                         <div className="flex gap-3 right">
                             <StatusTab status={recordStatus}/>
-                            <AddButton title="Add User" href="/admin/user/add"/>
+                            <AddButton title="Add User" href={`/admin/user/add?redirect=${redirect}`}/>
                         </div>
                         
                     </div>
@@ -183,7 +189,7 @@ const Users = () =>
                                             </button>
                                             <Link 
                                                 type="button"
-                                                href={`user/edit/${v.id}`}
+                                                href={`user/${v.id}?redirect=${redirect}`}
                                                 className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-500 dark:hover:text-white/90">
                                                 <LuPencil fontSize={20}/>
                                             </Link>                                                

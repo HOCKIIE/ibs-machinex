@@ -79,17 +79,16 @@ const BlogSection = () => {
                         {blogs.map((item:blogsType,k:number) => 
                             <SwiperSlide key={k} virtualIndex={k}>
                                 <div className="bg-white rounded-2xl overflow-hidden">
-                                    <div className="h-[180px] overflow-hidden">
-                                        <img src={item.image} alt={item[`title_${locale}`]} height={180} className="object-cover"/>
-                                    </div>
-                                    <div className="min-h-[260px] p-4">
-                                        <span className="text-gray-500">{item.published_at}</span>
-                                        <Link 
-                                            className="text-black font-bold line-clamp-3 text-xl mt-1" 
-                                            href={`/blog/${item.pathName}`}
-                                        >{item[`title_${locale}`]}</Link>
-                                        <p className="text-black line-clamp-5 mt-1">{item[`description_${locale}`]}</p>
-                                    </div>
+                                    <Link href={`/blog/${item.pathName}`}>
+                                        <div className="h-[180px] overflow-hidden">
+                                            <img src={item.image} alt={item[`title_${locale}`]} height={180} className="object-cover"/>
+                                        </div>
+                                        <div className="min-h-[260px] p-4">
+                                            <span className="text-gray-500">{item.published_at}</span>
+                                            <h3 className="text-black font-bold line-clamp-3 text-xl mt-1">{item[`title_${locale}`]}</h3>
+                                            <p className="text-black line-clamp-5 mt-1">{item[`description_${locale}`]}</p>
+                                        </div>
+                                    </Link>
                                 </div>
                             </SwiperSlide>
                         )}

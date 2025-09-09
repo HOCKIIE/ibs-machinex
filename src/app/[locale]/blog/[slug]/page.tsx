@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState, useEffect, useRef, use } from 'react';
-import { H1 } from '@/utils/Title';
+import { H1, H2, H3 } from '@/utils/Title';
 import Api from '@/services/Api';
 import { useLocale } from 'next-intl';
+import { Link } from '@/i18n/routing';
 import { itemsEqual } from '@dnd-kit/sortable/dist/utilities';
 import { BlogType } from '@/types/BlogType';
 
@@ -11,20 +12,20 @@ const BlogDetail = ({ params }:{ params: Promise<{slug:string}> }) => {
     const locale = useLocale();
     const { slug } = use(params);
     const [itemState, setData] = useState(null);
+    const [recommend, setRecommend] = useState<BlogType|[]>();
     const didFetchData = useRef(false);
-
     
     const fetchBlog = async () => {
         const request = await Api.get(`/blog/show/${slug}`);
-        console.log(request);
-        setData(request.data.data[0]);
+        console.log(request.data);
+        setData(request.data.data);
+        setRecommend(request.data.recommend)
     }
     useEffect(() => {
         document.title = "Blog Detail - IBS MachineX";
-        if (!didFetchData.current) {
-            didFetchData.current = true;
-            fetchBlog();
-        }
+        if (didFetchData.current) return;
+        didFetchData.current = true;
+        fetchBlog();
     }, []); 
     return (
         <div>
@@ -34,6 +35,13 @@ const BlogDetail = ({ params }:{ params: Promise<{slug:string}> }) => {
                         <>
                             <H1>{itemState?.[`title_${locale}`]}</H1>
                             <p className="text-black">Published on: {itemState?.published_at}</p>
+                            <div className="grid grid-cols-12 mt-10">
+                                <div className="col-span-2"></div>
+                                <div className="col-span-8">
+                                    <img src={itemState.image} alt={itemState[`title_${locale}`]} height={180} className="object-cover"/>
+                                </div>
+                                <div className="col-span-2"></div>
+                            </div>
                             {itemState && <div dangerouslySetInnerHTML={{ __html: itemState?.[`detail_${locale}`] ?? "" }} />}
                         </>
                     }
@@ -63,6 +71,31 @@ const BlogDetail = ({ params }:{ params: Promise<{slug:string}> }) => {
                             <p className="text-gray-700 py-3">Or even jobs that require high-level skills, such as the position of CFO (Chief Financial Officer) who will take care of the finances of the business, but it may not be necessary to hire a permanent employee. You may also use the services of an Outsource CFO who will come to help us once or twice a month as appropriate. Before choosing an Outsource, consider what our Core Value is and choose to do it yourself as best as possible. Anything that is beyond the Core Value can be outsourced.</p>
                         </div>
                     </div> */}
+                    {recommend && 
+                    <>
+                        <hr className='py-6'/>
+                        <div className="flex">
+                            <H2 custom={true} className="font-bold text-3xl bg-gradient-to-r to-[#00a5cb] from-[#0055d3] text-transparent bg-clip-text">
+                                Looking for Hight-Quality Industrial Industry?
+                            </H2>
+                        </div>
+                        <div className="grid grid-cols-12 gap-9 px-5 mt-10">
+                            {recommend.map((item:BlogType[], k:number)=>(
+                                <div className="col-span-12 xl:col-span-4 bg-white rounded-2xl overflow-hidden">
+                                    <Link href={`/blog/${item.pathName}`}>
+                                        <div className="h-[180px] overflow-hidden">
+                                            <img src={item.image} alt={item[`title_${locale}`]} height={180} className="object-cover"/>
+                                        </div>
+                                        <div className="min-h-[260px] p-4">
+                                            <span className="text-gray-500">{item.published_at}</span>
+                                            <H3 className="text-black font-bold line-clamp-3 text-xl mt-1">{item[`title_${locale}`]}</H3>
+                                            <p className="text-black line-clamp-5 mt-1">{item[`description_${locale}`]}</p>
+                                        </div>
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                    </>}
                 </div>
             </div>
         </div>

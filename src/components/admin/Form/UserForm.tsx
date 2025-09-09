@@ -1,12 +1,12 @@
 "use client";
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { useForm, Controller  } from "react-hook-form";
 // import { InputPassword } from './Inputs';
 import { FaCheck } from "react-icons/fa6";
 import CancelButton from '@/components/admin/Button/CancelBotton';
 import CreateButton from '@/components/admin/Button/CreateButton';
 import UpdateButton from '@/components/admin/Button/UpdateButton';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams, useParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AdminContext';
 
 
@@ -20,7 +20,8 @@ const UserForm = ({
     const { user } = useAuth();
     const password = useRef({});
     const router = useRouter();
-    
+    const params = useSearchParams();
+    const [redirect, setRedirect] = useState(null)
     const {
         register,
         handleSubmit: handleSubmitForm,
@@ -62,16 +63,9 @@ const UserForm = ({
     const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
     const roleList = [{value:"super",title:"Super Administrator"},{value:"admin",title:"Administrator"},{value:"user",title:"User"}];
 
-    const CancelUpdate = () =>{
-        reset({ 
-            role: itemState.role,
-            title: itemState.title,
-            contact_sale: itemState.contact_sale,
-            name: itemState.name,
-            phone: itemState.phone,
-            email: itemState.email,
-            status: itemState.status,
-        });
+    const CancelUpdate = () => {
+        const redirect = params.get('redirect')
+        if (redirect) router.push(redirect);
     }
 
     useEffect(() => {

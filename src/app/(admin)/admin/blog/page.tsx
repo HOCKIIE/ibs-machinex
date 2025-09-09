@@ -14,6 +14,7 @@ import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
 import useBlogStore from '@/store/useBlogStore';
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import { BlogType } from '@/types/BlogType';
+import { useCurrentUrl } from '@/utils/useCurrentUrl';
 
 const show = [10, 25, 50, 100];
 const recordStatus = [
@@ -45,7 +46,8 @@ const Blog = () => {
     });
 
     const {  isLoading, error, deleteData, response } = useBlogStore();
-
+    const currentUrl = useCurrentUrl();
+    const [redirect, setRedirect] = useState<string|null>(null);
     const [isAction, setAction] = useState<string>("delete");
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -100,7 +102,7 @@ const Blog = () => {
         setModalOpen(false);
         successProgress();
     }
-
+    useEffect(()=>{ setRedirect(currentUrl) },[currentUrl,setRedirect])
     useEffect(() => {
         setMounted(true);
     }, []);
@@ -115,7 +117,7 @@ const Blog = () => {
                         <div><Breadcrumb /></div>
                         <div className="flex gap-3 right">
                             <StatusTab status={recordStatus}/>
-                            <AddButton title="Add Blog" href="/admin/blog/add"/>
+                            <AddButton title="Add Blog" href={`/admin/blog/add?redirect=${redirect}`}/>
                         </div>
                         
                     </div>
@@ -200,7 +202,7 @@ const Blog = () => {
                                                 </button>
                                                 <Link 
                                                     type="button"
-                                                    href={`blog/${v.id}`}
+                                                    href={`blog/${v.id}?redirect=${redirect}`}
                                                     className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-500 dark:hover:text-white/90">
                                                     <LuPencil fontSize={20}/>
                                                 </Link>                                                

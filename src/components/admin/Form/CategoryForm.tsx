@@ -12,6 +12,7 @@ import { HiExclamation } from "react-icons/hi";
 import { ErrorMessage } from './Validation';
 import CoverImageUpload from '../Dropzon/CoverImageUpload';
 
+
 const CategoryForm = ({
     itemState,
     setItemState: setData,
@@ -22,6 +23,7 @@ const CategoryForm = ({
     const rounter = useRouter();
     const [category, setCategory] = useState<ApiResponse[]>([]);
     const [lng, setLang] = useState<string>('th');
+    const BadgeLang = ({lng}:{lng:string}) => <div className="bg-blue-200 text-indigo-500 rounded-md text-xs flex items-center px-1">{lng}</div>
     const activeLng = `bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800`;
     const invalidClass = "border-rose-300 text-rose-600 border-rose-300 focus:border-rose-500 focus:ring-rose-500/40 dark:border-rose dark:border-rose-500";
     const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
@@ -114,7 +116,9 @@ return (
             <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-12">
                     <div className="space-y-3">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label>
+                        <div className="flex gap-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label> <BadgeLang lng={'TH'}/>
+                        </div>
                         <input 
                             type="text"
                             {...register("title_th", { required: true })}
@@ -128,7 +132,9 @@ return (
                 </div>
                 <div className="col-span-12">
                     <div className="space-y-3">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label>
+                        <div className="flex gap-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label> <BadgeLang lng={'EN'}/>
+                        </div>
                         <input 
                             type="text"
                             {...register("title_en", { required: true })}
@@ -142,7 +148,9 @@ return (
                 </div>
                 <div className="col-span-12">
                     <div className="space-y-3">
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label>
+                        <div className="flex gap-2">
+                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label> <BadgeLang lng={'JA'}/>
+                        </div>
                         <input 
                             type="text"
                             {...register("title_ja", { required: true })}
@@ -155,40 +163,46 @@ return (
                     </div>
                 </div>
                 <div className="col-span-12">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
-                        <textarea 
-                            {...register("description_th", { required: true })}
-                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                            placeholder="Description TH"
-                            rows={5}
-                        ></textarea>
-                        {errors?.description_th?.type === "required" && (
-                            <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
-                        )}
+                    <div className="flex gap-2 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label> <BadgeLang lng={'TH'}/>
+                    </div>
+                    <textarea 
+                        {...register("description_th", { required: true })}
+                        className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                        placeholder="Description TH"
+                        rows={5}
+                    ></textarea>
+                    {errors?.description_th?.type === "required" && (
+                        <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
+                    )}
                 </div>
                 <div className="col-span-12">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
-                        <textarea 
-                            {...register("description_en", { required: true })}
-                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_en ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                            placeholder="Description TH"
-                            rows={5}
-                        ></textarea>
-                        {errors?.description_en?.type === "required" && (
-                            <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
-                        )}
+                    <div className="flex gap-2 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label> <BadgeLang lng={'EN'}/>
+                    </div>
+                    <textarea 
+                        {...register("description_en", { required: true })}
+                        className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_en ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                        placeholder="Description TH"
+                        rows={5}
+                    ></textarea>
+                    {errors?.description_en?.type === "required" && (
+                        <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
+                    )}
                 </div>
                 <div className="col-span-12">
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label>
-                        <textarea 
-                            {...register("description_ja", { required: true })}
-                            className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_ja ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                            placeholder="Description TH"
-                            rows={5}
-                        ></textarea>
-                        {errors?.description_ja?.type === "required" && (
-                            <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
-                        )}
+                    <div className="flex gap-2 mb-2">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Description</label> <BadgeLang lng={'JA'}/>
+                    </div>
+                    <textarea 
+                        {...register("description_ja", { required: true })}
+                        className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.description_ja ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                        placeholder="Description TH"
+                        rows={5}
+                    ></textarea>
+                    {errors?.description_ja?.type === "required" && (
+                        <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
+                    )}
                 </div>
                 <div className="col-span-12">
                     <div className="flex gap-4 items-center justify-center">

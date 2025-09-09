@@ -109,14 +109,35 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
         
     };
 
-    const handlePageChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    const handlePageChange = useCallback(async(e: React.ChangeEvent<HTMLSelectElement>) => {
+        console.log('event target >> ',e.currentTarget.value)
+        if (debounceTimeout.current) {
+            clearTimeout(debounceTimeout.current);
+        }
+        const value = e.currentTarget.value;
+        const queryString = await searchParams.toString();
+        const params = new URLSearchParams(queryString);
+        console.log('queryString',queryString)
+        if(!isNaN(Number(value))){
+            setPage(Number(value))
+            params.set('page',value);
+            const newUrl = `${pathname}?${params.toString()}`;
+            router.push(newUrl);
+        }else{
+            toast.error("Invalid number.")
+            return;
+        }
+
+    },[setPage,router])
+
+    const handlerPageChangeFromBtn = (page:number) => {
         if (debounceTimeout.current) {
             clearTimeout(debounceTimeout.current);
         }
         debounceTimeout.current = setTimeout(()=>{
-            const value = (e.target as HTMLInputElement).value;
-            if(!isNaN(Number(value))){
-                setPage(Number(value))
+            console.log('page >> ',page)
+            if(!isNaN(Number(page))){
+                setPage(Number(page))
             }else{
                 toast.error("Invalid number.")
                 return;
@@ -179,6 +200,7 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
         updateLimit,
         handleSearch, 
         handlePageChange,
+        handlerPageChangeFromBtn,
         handlerOrderBy,
         StatusTab
     };

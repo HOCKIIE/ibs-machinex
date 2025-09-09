@@ -15,7 +15,6 @@ import { useRouter } from 'next/navigation';
 
 import { IoMdPricetag, IoMdClose } from "react-icons/io";
 import { HiExclamation } from "react-icons/hi";
-import { itemsEqual } from '@dnd-kit/sortable/dist/utilities';
 
 const BlogForm = ({
     itemState,
@@ -40,7 +39,6 @@ const BlogForm = ({
         formState: { errors },
         setValue,
         control,
-        trigger,
         watch,
         reset
     } = useForm<BlogFormProps>({
@@ -57,20 +55,13 @@ const BlogForm = ({
         const value = e.target.value;
         console.log(value)
     }
-
-    const onCreate = async (data: any) => {
-        // console.log(typeof errors)
-        onSubmit(data);
-    };
-
+    const onCreate = async (data: any) => onSubmit(data);
     const onEdit = async (formData: any) => {
         console.log(errors)
         const modifiedData = { ...formData };
         onSubmit(modifiedData);
     };
-
     const cancelAdd = () => router.back();
-
     const formatDate = (date: Date): string => {
         const now = new Date();
         const bangkokTime = new Intl.DateTimeFormat('en-GB', {
@@ -88,7 +79,6 @@ const BlogForm = ({
         const [day, month, year] = datePart.split('/');
         return `${year}-${month}-${day} ${timePart}`;
     };
-
     const fetchCategory = useCallback(async()=>{
         const res = await Api.get('/category');
         setCategory(res.data);

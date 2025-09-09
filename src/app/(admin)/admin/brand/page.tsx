@@ -15,6 +15,8 @@ import Format from '@/utils/Format';
 import { Paginate, LimitPerPage, SearchBar } from '@/components/admin/Paginate/Paginate';
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import { BrandType } from '@/types/BrandType';
+import { useCurrentUrl } from '@/utils/useCurrentUrl';
+import { current } from 'tailwindcss/colors';
 
 interface SelectDeleteProps { event: React.MouseEvent<HTMLButtonElement>; }
 const show = [10, 25, 50, 100];
@@ -50,6 +52,8 @@ const Brand = () =>
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [selectDelete, setSelectDelete] = useState<boolean>(true)
     const isAllSelected = selectedIds.length > 0;
+    const currentUrl = useCurrentUrl();
+    const [redirect ,setRedirect] = useState<string|null>(null);
 
     const toggleSelectAll = () => {
         if (isAllSelected) {
@@ -101,6 +105,9 @@ const Brand = () =>
         setModalOpen(false);
         successProgress();
     }
+    useEffect(()=>{
+        setRedirect(currentUrl)
+    },[currentUrl, setRedirect])
 
     return (
         <DefaultLayout>
@@ -110,7 +117,7 @@ const Brand = () =>
                         <div><Breadcrumb /></div>
                         <div className="flex gap-3 right">
                             <StatusTab status={recordStatus}/>
-                            <AddButton title="Add Brand" href="/admin/brand/add"/>
+                            <AddButton title="Add Brand" href={`/admin/brand/add?redirect=${redirect}`}/>
                         </div>
                         
                     </div>
@@ -216,7 +223,7 @@ const Brand = () =>
                                         </button>
                                         <Link 
                                             type="button"
-                                            href={`brand/${v.id}`}
+                                            href={`brand/${v.id}?redirect=${redirect}`}
                                             className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-500 dark:hover:text-white/90">
                                             <LuPencil fontSize={20}/>
                                         </Link>                                                

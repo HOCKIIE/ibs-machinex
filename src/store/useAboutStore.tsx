@@ -2,8 +2,8 @@
 
 import Api from "@/services/Api";
 import { create } from "zustand";
-import toast from "react-hot-toast";
 import { AboutType,AboutState } from "@/types/AboutType";
+import { ProcessToast } from "@/utils/ProcessToast";
 
 const apiPrefix = '/admin/about';
 
@@ -24,10 +24,11 @@ const useAboutStore = create<AboutState>((set) => ({
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage);
+            ProcessToast.error(errorMessage);
         }
     },
     updateData: async (data) => {
+        ProcessToast.show('Saving data...')
         set({ error: null });
         try {
             const response = await Api.put(`${apiPrefix}/update`,data);
@@ -38,11 +39,11 @@ const useAboutStore = create<AboutState>((set) => ({
                     message : response.data.message,
                 }
             });
-            
+            ProcessToast.success(response.data.message,2000)
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage);
+            ProcessToast.error(errorMessage,2000);
         }
     },
 }));

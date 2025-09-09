@@ -1,7 +1,8 @@
 export interface AboutType {
-    detail_th:string;
-    detail_en:string;
-    detail_ja:string;
+    id: string;
+    detail_th: string;
+    detail_en: string;
+    detail_ja: string;
 }
 
 export interface AboutState {

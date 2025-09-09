@@ -1,6 +1,6 @@
 "use client";
 import "./TextEditor.scss"
-import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
+import React, { useCallback, useMemo, useState, useEffect, useRef, Children } from 'react';
 import { 
     createEditor, 
     BaseElement, 
@@ -27,7 +27,6 @@ import { LuLayoutTemplate, LuTable, LuAlignJustify, LuChevronDown } from "react-
 import { PiTextIndentBold, PiTextOutdentBold } from "react-icons/pi";
 import { IoRefresh, IoClose, IoTrashBinOutline } from "react-icons/io5";
 import Api from "@/services/Api";
-import { set } from "lodash";
 
 
 const isMarkActive = (editor: Editor, format: string) => {
@@ -63,17 +62,16 @@ const toggleBlock = (editor: Editor, format: string) => {
         Transforms.setNodes(editor, { type: 'paragraph' });
     } 
     else if(format == 'grid-template') {
-        console.log('Insert grid template');
         const block = {
             type: 'grid',
             children: [
                 {
                     type: 'grid-column', // สร้าง type ใหม่สำหรับ col
-                    children: [{ type: 'paragraph', children: [{ text: 'Column 1' }] }],
+                    children: [{ type: 'paragraph', class: 'text-black', children: [{ text: 'Column 1' }] }],
                 },
                 {
                     type: 'grid-column',
-                    children: [{ type: 'paragraph', children: [{ text: 'Column 2' }] }],
+                    children: [{ type: 'paragraph', class: 'text-black', children: [{ text: 'Column 2' }] }],
                 }
             ],
         };
@@ -85,6 +83,7 @@ const toggleBlock = (editor: Editor, format: string) => {
                 type: format,
                 children: [{
                     type: 'list-item',
+                    class: 'text-black',
                     children: [{ text: '' }],
                 }],
             };
@@ -615,23 +614,23 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
         const { attributes, children, element } = props;
         switch (element.type) {
             case 'paragraph':
-                return <p {...attributes} className={element.className}>{children}</p>;
+                return <p {...attributes} className={`text-black ${element.className}`}>{children}</p>;
             case 'heading-one':
-                return <h1 {...attributes} className={`text-4xl ${element.className}`}>{children}</h1>;
+                return <h1 {...attributes} className={`text-black text-4xl ${element.className}`}>{children}</h1>;
             case 'heading-two':
-                return <h2 {...attributes} className={`text-3xl ${element.className}`}>{children}</h2>;
+                return <h2 {...attributes} className={`text-black text-3xl ${element.className}`}>{children}</h2>;
             case 'heading-three':
-                return <h3 {...attributes} className={`text-2xl ${element.className}`}>{children}</h3>;
+                return <h3 {...attributes} className={`text-black text-2xl ${element.className}`}>{children}</h3>;
             case 'heading-four':
-                return <h4 {...attributes} className={`text-xl ${element.className}`}>{children}</h4>;
+                return <h4 {...attributes} className={`text-black text-xl ${element.className}`}>{children}</h4>;
             case 'heading-five':
-                return <h5 {...attributes} className={`text-lg ${element.className}`}>{children}</h5>;
+                return <h5 {...attributes} className={`text-black text-lg ${element.className}`}>{children}</h5>;
             case 'heading-six':
-                return <h6 {...attributes} className={`text-md ${element.className}`}>{children}</h6>;
+                return <h6 {...attributes} className={`text-black text-md ${element.className}`}>{children}</h6>;
             case 'bulleted-list':
-                return <ul {...attributes} className="marker:text-gray-700 list-disc pl-5 space-y-1 text-slate-700 text-md">{children}</ul>;
+                return <ul {...attributes} className="marker:text-gray-700 list-disc pl-5 space-y-1 text-gray-800 text-md">{children}</ul>;
             case 'numbered-list':
-                return <ol {...attributes} className="marker:text-gray-700 list-decimal pl-5 space-y-1 text-slate-700 text-md">{children}</ol>;
+                return <ol {...attributes} className="marker:text-gray-700 list-decimal pl-5 space-y-1 text-gray-800 text-md">{children}</ol>;
             case 'list-item':
                 return <li {...attributes}>{children}</li>;
             case 'link':
@@ -647,6 +646,12 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                         {children}
                     </div>
                 );
+            case 'bold':
+                return (<strong>{children}</strong>);
+            case 'italic' :
+                return (<em>{children}</em>);
+            case 'underline':
+                return (<u>{children}</u>);
             case 'table':
                 return (
                     <table 
@@ -667,16 +672,16 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
         }
     }, []);
     
-    const renderLeaf = useCallback((props: any) => {
+    const renderLeaf = (props: any) => {
         const { attributes, children, leaf } = props;
         let el = children;
-        if (leaf.bold)el = <strong>{el}</strong>;
+        if (leaf.bold) el = <strong>{el}</strong>;
         if (leaf.italic) el = <em>{el}</em>;
         if (leaf.underline) el = <u>{el}</u>; 
         if (leaf.strikethrough) el = <s>{el}</s>;
         if (leaf.fontSize) el = <span style={{ fontSize: `${leaf.fontSize}px` }}>{el}</span>;
         return <span {...attributes}>{el}</span>;
-    }, []);
+    };
     
     const handleKeyDown = (event: React.KeyboardEvent) => {
         if (event.key === 'Enter' && event.shiftKey) {
@@ -737,6 +742,7 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
     const handleChange = (newValue: Descendant[]) => {
         setEditorValue(newValue);
         const html = serialize(newValue);
+        console.log('Handler Change => ',html);
         onChange(html); // 🔁 ส่งกลับให้ react-hook-form
     };
     useEffect(() => {
@@ -790,8 +796,8 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                                         <Button format="indent" action="mark" title="Indent"  label={<PiTextIndentBold />} />
                                     </div>
                                     <div className="flex px-1">
-                                        <Button format="bulleted-list" action="block" title="Bulleted list"  label={<RiListUnordered />} />
-                                        <Button format="numbered-list" action="block" title="Numbered list"  label={<RiListOrdered2 />} />
+                                        <Button format="bulleted-list" action="block" title="Unordered list"  label={<RiListUnordered />} />
+                                        <Button format="numbered-list" action="block" title="Ordered list"  label={<RiListOrdered2 />} />
                                         <Button format="table" action="block" title="Insert table" label={<LuTable />} />
                                     </div>
                                     
