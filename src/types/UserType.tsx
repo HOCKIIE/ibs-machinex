@@ -57,5 +57,5 @@ export interface UserState {
     updateUser: (id: string, data: UsersFormProps, router: ReturnType<typeof useRouter>) => Promise<void>;
     onChangeStatus: (id: string, status: boolean) => Promise<void>;
     deleteUser: (id: string) => Promise<void>;
-  
+
 }
