@@ -4,6 +4,7 @@ import Api from "@/services/Api";
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import { BrandState, BrandType, ApiResponse } from "@/types/BrandType";
+import { ProcessToast } from "@/utils/ProcessToast";
 
 const prefix = '/admin/brand';
 
@@ -55,6 +56,7 @@ const useBrandStore = create<BrandState>((set) => ({
 
     createData: async (newData, router) => {
         try {
+            ProcessToast.show('Saving data...');
             const formData = new FormData();
             Object.entries(newData).forEach(([key, value]) => {
                 if (key === "category" && Array.isArray(value)) {
@@ -74,22 +76,23 @@ const useBrandStore = create<BrandState>((set) => ({
             }));
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
-                toast.success(message,{position: "top-center"});
+                ProcessToast.success(message,2000);
                 setTimeout(() => { 
                     router.push(`${prefix}`); 
                 }, 1000);
             } else { 
-                toast.error(message,{position: "top-center"});
+                ProcessToast.error(message,2000);
             }
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage,{position: "top-center"});
+            ProcessToast.error(errorMessage,2000);
         }
     },
 
     updateData: async (id, data) => {
         try {
+            ProcessToast.show('Saving data...');
             const formData = new FormData();
             Object.entries(data).forEach(([key, value]) => {
                 if (key === "image" && value instanceof File) {
@@ -113,14 +116,14 @@ const useBrandStore = create<BrandState>((set) => ({
             }));
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
-                toast.success(message,{position: "top-center"});
+                ProcessToast.success(message,2000);
             } else { 
-                toast.error(message,{position: "top-center"});
+                ProcessToast.error(message,2000);
             }
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage,{position: "top-center"});
+            ProcessToast.error(errorMessage,2000);
         }
     },
 
@@ -136,6 +139,7 @@ const useBrandStore = create<BrandState>((set) => ({
                     message: "The user was deleted successfully!"
                 }
             }));
+            ProcessToast.error('The user was deleted successfully!',2000)
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({
@@ -146,6 +150,7 @@ const useBrandStore = create<BrandState>((set) => ({
                     message: errorMessage
                 }
             });
+            ProcessToast.error(errorMessage,2000)
         }
     }
 

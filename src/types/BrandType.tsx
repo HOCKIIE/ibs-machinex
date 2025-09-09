@@ -51,7 +51,7 @@ export interface ApiResponse {
 }
 
 export interface BrandState {
-    items: BrandType[];
+    items: BrandType[] | null;
     isLoading: boolean;
     error: string | null;
     token: string | null;

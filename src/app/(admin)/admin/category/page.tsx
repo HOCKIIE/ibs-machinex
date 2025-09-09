@@ -14,6 +14,7 @@ import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
 import { CategoryType } from '@/types/CategoryType';
+import { useCurrentUrl } from '@/utils/useCurrentUrl';
 
 interface SelectDeleteProps { event: React.MouseEvent<HTMLButtonElement>; }
 const show = [10, 25, 50, 100];
@@ -43,7 +44,7 @@ const Category = () =>
         initialLimit: show[0],
         endpoint: '/admin/category'
     });
-
+    const currentUrl = useCurrentUrl();
     const { isLoading, error, deleteData, response } = useCategoryStore();
     const [id, setId] = useState<number[] | null>(null);
     const [isOpen, setModalOpen] = useState<boolean>(false);
@@ -51,6 +52,7 @@ const Category = () =>
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [selectDelete, setSelectDelete] = useState<boolean>(true)
     const isAllSelected = selectedIds.length > 0;
+    const [redirect,setRedirect] = useState<string|null>(null)
 
     const toggleSelectAll = () => {
         if (isAllSelected) {
@@ -96,11 +98,11 @@ const Category = () =>
         setModalOpen(false);
         successProgress();
     }
-
+    
+    useEffect(()=> setRedirect(currentUrl), [currentUrl,setRedirect])
     useEffect(() => {
         setMounted(true);
     }, []);
-
     if (!mounted) return null; // Prevent SSR mismatches
 
     return (
@@ -111,7 +113,7 @@ const Category = () =>
                         <div><Breadcrumb /></div>
                         <div className="flex gap-3 right">
                             <StatusTab status={recordStatus}/>
-                            <AddButton title="Add Category" href="/admin/category/add"/>
+                            <AddButton title="Add Category" href={`/admin/category/add?redirect=${redirect}`}/>
                         </div>
                         
                     </div>
@@ -206,7 +208,7 @@ const Category = () =>
                                                 </button>
                                                 <Link 
                                                     type="button"
-                                                    href={`category/${v.id}`}
+                                                    href={`category/${v.id}?redirect=${redirect}`}
                                                     className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-500 dark:hover:text-white/90">
                                                     <LuPencil fontSize={20}/>
                                                 </Link>                                                

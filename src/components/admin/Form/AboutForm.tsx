@@ -20,6 +20,7 @@ const AboutForm = () => {
     const toggle = () => setFontState(!setfont);
 
     const [aboutData, setAboutData] = useState<AboutType>({
+        id:"",
         detail_th: "",
         detail_en: "",
         detail_ja: ""
@@ -33,6 +34,7 @@ const AboutForm = () => {
         formState: { errors },
     } = useForm({
         defaultValues: {
+            id: aboutData.id,
             detail_th: sanitizeHtml(aboutData.detail_th),
             detail_en: sanitizeHtml(aboutData.detail_en),
             detail_ja: sanitizeHtml(aboutData.detail_ja)
@@ -73,6 +75,7 @@ const AboutForm = () => {
     useEffect(() => {
         if (about) {
             const data = {
+                id: about.detail_en,
                 detail_th: about.detail_th,
                 detail_en: about.detail_en,
                 detail_ja: about.detail_ja,
@@ -81,16 +84,16 @@ const AboutForm = () => {
             reset(data); // ✅ sync form input กับค่าที่โหลดมา
         }
     }, [about, reset]);
-    useEffect(()=>{
-        if (response && response.status) {
-            if(response.action == "update"){
-                toast.success(response.message);
-                setTimeout(()=> { setEditAbout(false); },1000);
-            } else {
-                toast.error(response.message);
-            }
-        }
-    }, [response])
+    // useEffect(()=>{
+    //     if (response && response.status) {
+    //         if(response.action == "update"){
+    //             toast.success(response.message);
+    //             setTimeout(()=> { setEditAbout(false); },1000);
+    //         } else {
+    //             toast.error(response.message);
+    //         }
+    //     }
+    // }, [response])
     
     return (
         <>

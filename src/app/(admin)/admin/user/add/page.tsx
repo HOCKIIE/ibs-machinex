@@ -14,10 +14,11 @@ const FormAdd = () => {
         id: "",
         role: "",
         title: "",
+        contact_sale: "",
         name: "",
         phone: "",
         email: "",
-        password: "",
+        status: ""
     });
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => 

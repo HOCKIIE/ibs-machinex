@@ -2,7 +2,7 @@ export interface Meta {
     total: string | number,
     per_page: string | number,
     current_page: string | number,
-    last_page: string | number,
+    last_page: number | 1,
     current_page_url: string,
     first_page_url: string,
     last_page_url: string,
@@ -18,5 +18,6 @@ export interface PaginationType {
     prevPage: () => void;
     nextPage: () => void;
     currentPage?: number;
-    handlePageChange?: (e: React.KeyboardEvent<HTMLInputElement>) => void;
+    handlerPageChangeFromBtn?: (e: number) => void;
+    handlePageChange?: (e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => void;
 }

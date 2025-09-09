@@ -25,7 +25,7 @@ export interface CategoryFormProps {
     title_ja: string;
     description_th: string;
     description_en: string;
-    description_jp: string;
+    description_ja: string;
     status: boolean;
     brands: BrandType[];
     published_at: string;

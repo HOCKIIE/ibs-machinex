@@ -53,7 +53,7 @@ const EditUser = ({ params }: { params:  Promise<{ id: string }> }) => {
     },[]);
     useEffect(() => {
         if (users?.length > 0) {
-          setUserState({
+            setUserState({
             id: String(users[0]?.id),
             title: users[0]?.title,
             contact_sale: users[0]?.contact_sale,
@@ -62,7 +62,7 @@ const EditUser = ({ params }: { params:  Promise<{ id: string }> }) => {
             phone: users[0]?.phone,
             email: users[0]?.email,
             status: users[0]?.status,
-          });
+            });
         }
     }, [users]);
     return (
@@ -71,7 +71,7 @@ const EditUser = ({ params }: { params:  Promise<{ id: string }> }) => {
                 {/* <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"> */}
                 <div className="control-button mb-3">
                     <div className="flex justify-between">
-                        <div><Breadcrumb /></div>
+                        <div><Breadcrumb current={userState.name}/></div>
                     </div>
                 </div>
         

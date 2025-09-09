@@ -3,7 +3,7 @@ import Api from "@/services/Api";
 import { create } from "zustand";
 import toast from "react-hot-toast";
 import { UserType, UserState, ApiResponse } from "@/types/UserType";
-// Removed incorrect import of setTimeout
+import { ProcessToast } from "@/utils/ProcessToast";
 
 const prefix = '/admin/user';
 
@@ -62,10 +62,11 @@ const useUserStore = create<UserState>((set) => ({
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({ error: errorMessage, isLoading: false });
         }
-      },
+    },
     
-      createUser: async (newUser, router) => {
+    createUser: async (newUser, router) => {
         try {
+            ProcessToast.show('Creating data...')
             const response = await Api.post(`${prefix}/store`, newUser);
             set((state) => ({
                 users: [...state.users, response.data],
@@ -73,47 +74,45 @@ const useUserStore = create<UserState>((set) => ({
             }));
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
-                toast.success(message);
-                setTimeout(() => { 
-                    router.push(`${prefix}`); 
-                }, 1000);
+                ProcessToast.success(message,2000);
+                router.push(`${prefix}`);
             } else { 
-                toast.error(message);
+                ProcessToast.error(message,2000);
             }
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage);
+            ProcessToast.error(errorMessage,2000);
         }
     },
     
     updateUser: async (id, data, router) => {
+        ProcessToast.show('Saving data...')
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.put<UserType>(`${prefix}/update/${id}`,data);
+            const response = await Api.put(`${prefix}/update/${id}`,data);
             set((state) => ({
                 users: state.users.map((item) => item.id === Number(id) ? response.data : item  ),
                 isLoading: false,
             }));
-            setTimeout(()=>{
-                router.push(prefix); 
-            },1000)
+            ProcessToast.success(response.data.message,2000)
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage);
+            ProcessToast.error(errorMessage,2000);
         }
     },
 
     onChangeStatus: async (id, status) => {
         set({ isLoading: true, error: null });
         try {
+            ProcessToast.show('Saving data...');
             const response = await Api.put<UserType>(`${prefix}/status/${id}`,{ status });
             set((state) => ({
                 banners: state.users.map((item) => item.id === Number(id) ? response.data : item ),
                 isLoading: false,
             }));
-            toast.success("The User status change successfully!");
+            ProcessToast.success("The User status change successfully!",2000);
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({ 
@@ -128,6 +127,7 @@ const useUserStore = create<UserState>((set) => ({
     },
     
     deleteUser: async (id) => {
+        ProcessToast.show('Deleting data...')
         set({ isLoading: true, error: null });
         try {
             await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
@@ -139,7 +139,7 @@ const useUserStore = create<UserState>((set) => ({
                     message: "The user was deleted successfully!"
                 }
             }));
-            // toast.success("The user was deleted successfully!");
+            ProcessToast.success("The user was deleted successfully!",2000);
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({
@@ -150,6 +150,7 @@ const useUserStore = create<UserState>((set) => ({
                     message: errorMessage
                 }
             });
+            ProcessToast.error(errorMessage,2000)
         }
     }
 
