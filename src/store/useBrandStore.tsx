@@ -23,9 +23,9 @@ const useBrandStore = create<BrandState>((set) => ({
         set({ isLoading: true, error: null });
         try {
             const response = await Api.get<ApiResponse>(`${prefix}?page=${page}`);
-            const { total, lastPage, currentPage, rows } = response.data;
+            const { total, lastPage, currentPage, items } = response.data;
             set({
-                items: rows,
+                items: items,
                 total,
                 lastPage,
                 currentPage,
@@ -53,7 +53,7 @@ const useBrandStore = create<BrandState>((set) => ({
     },
     
 
-    createData: async (newData, router) => {
+    createData: async (newData) => {
         try {
             ProcessToast.show('Saving data...');
             const formData = new FormData();
@@ -76,9 +76,6 @@ const useBrandStore = create<BrandState>((set) => ({
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
                 ProcessToast.success(message,2000);
-                setTimeout(() => { 
-                    router.push(`${prefix}`); 
-                }, 1000);
             } else { 
                 ProcessToast.error(message,2000);
             }
@@ -89,7 +86,7 @@ const useBrandStore = create<BrandState>((set) => ({
         }
     },
 
-    updateData: async (id, data) => {
+    updateData: async (data) => {
         try {
             ProcessToast.show('Saving data...');
             const formData = new FormData();
@@ -104,7 +101,7 @@ const useBrandStore = create<BrandState>((set) => ({
                 }
             });
             formData.append("_method", "PUT");
-            const response = await Api.post(`${prefix}/update/${id}`,formData, {
+            const response = await Api.post(`${prefix}/update`,formData, {
                 headers: {
                     "X-Requested-With": "XMLHttpRequest"
                 },

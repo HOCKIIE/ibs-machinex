@@ -1,16 +1,16 @@
 "use client";
 
 import React from 'react'
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { ConfirmModalProps } from '@/types/ConfirmModal';
 import { IoIosCheckmarkCircleOutline } from "react-icons/io";
 
 const Spinner = () => <div className="h-4 w-4 animate-spin rounded-full border-2 border-solid border-white border-t-transparent mr-2"></div>;
-const backdropVariants = {
+const backdropVariants:Variants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 }
 };
-const modalVariants = {
+const modalVariants:Variants = {
     hidden: {
         opacity: 0,
         scale: 0.5

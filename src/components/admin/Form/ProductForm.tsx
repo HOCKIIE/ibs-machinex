@@ -83,20 +83,16 @@ const ProductForm = ({
         const [day, month, year] = datePart.split('/');
         return `${year}-${month}-${day} ${timePart}`;
     };
-
     const cancelAction = () => router.back();
-
     const fetchCategory = async ()=>{
         const res = await Api.get('/category/product');
         setCategory(res.data);
     };
-
     useEffect(()=>{
         if(didFetchData.current) return;
         didFetchData.current = true;
         fetchCategory();
-    }, [fetchCategory]);
-
+    });
     useEffect(() => {
         if (itemState) {
             reset({

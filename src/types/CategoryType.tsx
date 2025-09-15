@@ -10,12 +10,14 @@ export interface CategoryType {
     description_th: string;
     description_en: string;
     description_ja: string;
-    brands?: [];
+    brands?: Array<BrandType>;
     status: boolean;
     created_at: string;
     updated_at: string;
     deleted_at?: string;
     published_at: string | null;
+    [key: `title_${string}`]: string;
+    [key: `description_${string}`]: string;
 }
 
 export interface CategoryFormProps {
@@ -32,6 +34,8 @@ export interface CategoryFormProps {
     created_at: string;
     updated_at: string;
     published_at: string | null;
+    [key: `title_${string}`]: string;
+    [key: `description_${string}`]: string;
 }
 
 export interface ApiResponse {

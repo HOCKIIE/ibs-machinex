@@ -15,17 +15,16 @@ const ContactSection = () => {
     const iframeRef = useRef<HTMLIFrameElement | null>(null);
     const [iframeWidth, setIframeWidth] = useState<number>(0);
     const [owner, setOwner] = useState<ContactType>();
-    const [sales, setSales] = useState<ContactType>();
+    const [sales, setSales] = useState<UserType[]>([]);
     const t = useTranslations('ContactUsForm');
     const didFetchData = useRef(false);
 
     const fetchData = async () => {
-        // Fetch any necessary data here if needed
         const owner = await Api.get('/owner');
         setOwner(owner.data);
 
         const sales = await Api.get('/sales');
-        setSales(sales.data);
+        setSales(Array.isArray(sales.data) ? sales.data : []);
     };
 
     useEffect(() => {
@@ -46,13 +45,14 @@ const ContactSection = () => {
             iframe?.contentWindow?.removeEventListener("resize", updateIframeWidth);
             iframe?.contentWindow?.removeEventListener("orientationchange", updateIframeWidth);
         };
-    }, []);
+    });
     useEffect(() => {
         if (didFetchData.current) return;
         didFetchData.current = true;
         fetchData();
-    }, []);
-    const address = owner?.[`address_${locale}` as keyof ContactType] || ''
+    });
+    const address = owner?.[`address_${locale}` as keyof ContactType] || '';
+
     return (
     <div className='md:container px-2 xl:px-4' id="contact">
         <hr className="my-14" />
@@ -85,12 +85,12 @@ const ContactSection = () => {
                     </p>
                 </div>
             </div>
-            { sales && sales.map((item:UserType, index:number) => (
-            <div key={index} className="col-span-12 xl:col-span-4">
+            { sales && sales.map((item:UserType, k:number) => (
+            <div key={k} className="col-span-12 xl:col-span-4">
                 <div className="h-full bg-white text-gray-800 rounded-2xl shadow-[0_0px_1px_2px_rgba(0,0,0,0.05)] p-4">
                     <span className="font-semibold">{item.name}</span><br/>
                     <a className="mt-1" href={`mailto:${item.email}`}> {item.email}</a><br/>
-                    <a href="tel:{item.phone}">{item.phone}</a><br/>
+                    <a href={`tel:${item.phone}`}>{item.phone}</a><br/>
                 </div>
             </div>
             ))}

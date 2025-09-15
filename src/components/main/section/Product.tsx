@@ -12,8 +12,8 @@ import Image from 'next/image';
 const ProductSection = () => {
     const locale = useLocale();
     const t = useTranslations('sectionHead');
-    const [allCategory, setAllCategory] = useState<CategoryType | []>([]);    
-    const [category, setCategory] = useState<CategoryType | []>([]);    
+    const [allCategory, setAllCategory] = useState<CategoryType[]>([]);    
+    const [category, setCategory] = useState<CategoryType[]>([]);    
     const [keyword, setKeyword] = useState<string>("");
     const router = useRouter();
     const pathname = usePathname();
@@ -181,9 +181,8 @@ const ProductSection = () => {
                             <div className="text-black text-xl mt-5 group-hover:text-white">{item[`description_${locale}`]}</div>
                         </div>
                         <div className="col-span-12 xl:col-span-8 p-5 rounded-3xl border border-blue-800 bg-white group-hover:bg-blue-800/90 transition-all duration-300 ease-in-out">
-                            {item.brand.length > 0 
-                                ?<div className="grid grid-cols-3 md:grid-cols-5 xl:grid-cols-7 gap-3">
-                                    {item.brand?.map((brand: BrandType, k:number) => (
+                            {item.brands ?<div className="grid grid-cols-3 md:grid-cols-5 xl:grid-cols-7 gap-3">
+                                    {item.brands?.map((brand: BrandType, k:number) => (
                                         <div key={k} className="flex items-center group-hover:text-white">
                                             <Link
                                                 href={`/brand/${brand.apiName}`}

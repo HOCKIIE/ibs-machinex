@@ -98,9 +98,10 @@ Api.interceptors.response.use((response) =>
 
                 return Api(originalRequest);
             } catch (refreshError) {
-                failedQueue.forEach((p) => p.reject(refreshError));
+                const errorMessage = refreshError instanceof Error ? refreshError.message : String(refreshError);
+                failedQueue.forEach((p) => p.reject(errorMessage));
                 failedQueue = [];
-                return Promise.reject(refreshError);
+                return Promise.reject(errorMessage);
             } finally {
                 isRefreshing = false;
             }

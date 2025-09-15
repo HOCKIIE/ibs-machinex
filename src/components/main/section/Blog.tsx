@@ -5,7 +5,7 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLocale } from 'next-intl';
-// import Link from 'next/link';
+import { BlogType } from '@/types/BlogType';
 import { Link } from '@/i18n/routing';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import type { Swiper as SwiperType } from "swiper";
@@ -16,39 +16,25 @@ import 'swiper/css/autoplay';
 import 'swiper/css/controller';
 import Api from '@/services/Api';
 
-interface blogsType {
-    id:string;
-    image: string;
-    title_th: string;
-    title_en: string;
-    title_ja: string;
-    description_th: string;
-    description_en: string;
-    description_ja: string;
-    pathName: string;
-    published_at: string;
-    created_at: string;
-    updated_at: string;
-}
-
 const BlogSection = () => {
     const t = useTranslations('blog');
     const locale = useLocale();
-    const [blogs, setBlogs] = useState<blogsType[] | null>(null);
+    const [blogs, setBlogs] = useState<BlogType[] | null>(null);
     const swiperRef = useRef<SwiperType>();
+    const didFetchBlogs = useRef(false);
     
+    const fetchAndSetBlogs = async () => {
+        const response = await fectchBlogs();
+        setBlogs(response.data);
+    };
     useEffect(() => {
-        const fetchAndSetBlogs = async () => {
-            const response = await fectchBlogs();
-            console.log(response.data);
-            setBlogs(response.data);
-        };
+        if(didFetchBlogs.current) return;
+        didFetchBlogs.current = true;
         fetchAndSetBlogs();
-    }, []);
+    });
     
     const fectchBlogs = async () => {
-        // const request = await axios('https://jsonfakery.com/blogs/random/5');
-        const request = await Api.get<{data: blogsType[]}>('/blog/recent');
+        const request = await Api.get<{data: BlogType[]}>('/blog/recent');
         return request.data;
     };
     return (
@@ -76,7 +62,7 @@ const BlogSection = () => {
                         }}
                         onSwiper={(swiper) => (swiperRef.current = swiper)}
                     >
-                        {blogs.map((item:blogsType,k:number) => 
+                        {blogs.map((item:BlogType, k:number) => 
                             <SwiperSlide key={k} virtualIndex={k}>
                                 <div className="bg-white rounded-2xl overflow-hidden">
                                     <Link href={`/blog/${item.pathName}`}>
@@ -97,12 +83,16 @@ const BlogSection = () => {
                 </div>
                 <div className="absolute inset-0 flex items-center justify-between pointer-events-none">
                     <button
+                        type="button"
+                        title="Previous"                        
                         onClick={() => swiperRef.current?.slidePrev()}
                         className="text-white bg-gray-500 hover:bg-gray-400 rounded-lg py-2 shadow-lg transition pointer-events-auto"
                     >
                         <ChevronLeft className="w-6 h-6 text-bold" />
                     </button>
                     <button
+                        type="button"
+                        title="Next"  
                         onClick={() => swiperRef.current?.slideNext()}
                         className="text-white bg-gray-500 hover:bg-wgray-400 rounded-lg py-2 shadow-lg transition pointer-events-auto"
                     >
