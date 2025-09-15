@@ -3,7 +3,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Api from '@/services/Api';
 import { toast } from "react-hot-toast";
-import { PaginationMeta } from "@/types/PaginationProps";
+import { Meta } from "@/types/PaginationType";
 
 interface UsePaginationProps {
     initialLimit?: number;
@@ -17,7 +17,7 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
     
     const [data, setData] = useState([]);
     const [limit, setLimit] = useState(initialLimit);
-    const [meta, setMeta] = useState<PaginationMeta | null>(null);
+    const [meta, setMeta] = useState<Meta | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [page, setPage] = useState<number>(1);
 
@@ -109,15 +109,11 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
         
     };
 
-    const handlePageChange = useCallback(async(e: React.ChangeEvent<HTMLSelectElement>) => {
-        console.log('event target >> ',e.currentTarget.value)
-        if (debounceTimeout.current) {
-            clearTimeout(debounceTimeout.current);
-        }
+    const handlePageChange = async(e: React.ChangeEvent<HTMLSelectElement>) => {
+        if (debounceTimeout.current) clearTimeout(debounceTimeout.current);
         const value = e.currentTarget.value;
         const queryString = await searchParams.toString();
         const params = new URLSearchParams(queryString);
-        console.log('queryString',queryString)
         if(!isNaN(Number(value))){
             setPage(Number(value))
             params.set('page',value);
@@ -128,7 +124,7 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
             return;
         }
 
-    },[setPage,router])
+    }
 
     const handlerPageChangeFromBtn = (page:number) => {
         if (debounceTimeout.current) {
@@ -157,7 +153,6 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
             router.push(`?${params.toString()}`);
 
         },DEBOUNCE_DELAY);
-
     }
 
     useEffect(() => {

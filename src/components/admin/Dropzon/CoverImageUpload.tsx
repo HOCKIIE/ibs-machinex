@@ -1,16 +1,14 @@
-import React, { useEffect } from 'react';
+import React, { useEffect,useState } from 'react';
 import { LiaTimesSolid } from "react-icons/lia";
-import { UseFormRegister, UseFormSetValue, UseFormStateReturn, UseFormWatch } from 'react-hook-form';
-import { BlogFormProps } from '@/types/BlogType';
+import { UseFormRegister, UseFormSetValue, UseFormStateReturn, UseFormWatch, Path } from 'react-hook-form';
 import { ErrorMessage } from '@/components/admin/Form/Validation';
-import { set } from 'lodash';
 import { FieldValues } from "react-hook-form";
 
 interface CoverImageUploadFormValues {
     image: File | string | null;
 }
 
-interface CoverImageUploadProps<T extends FieldValues = FieldValues> {
+interface CoverImageUploadProps<T extends FieldValues> {
     register: UseFormRegister<T>;
     watch: UseFormWatch<T>;
     setValue: UseFormSetValue<T>;
@@ -20,19 +18,22 @@ interface CoverImageUploadProps<T extends FieldValues = FieldValues> {
 
 const CoverImageUpload =  <T extends FieldValues>({ register, setValue, defaultValue, errors }: CoverImageUploadProps<T>) => {
 
-    const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
-    const [dragActive, setDragActive] = React.useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [dragActive, setDragActive] = useState(false);
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
-        if (file) {
-            setPreviewUrl(URL.createObjectURL(file));
-            setValue("image" as Parameters<typeof setValue>[0], file as any, {
+        if (!file) return;
+        const objectUrl = URL.createObjectURL(file);
+        setPreviewUrl(objectUrl);
+        if (file instanceof File) {
+            setValue("image" as Path<T>, file as unknown as T[keyof T], {
                 shouldValidate: true,
                 shouldTouch: true,
                 shouldDirty: true,
-            }); // ✅ make sure error gets cleared if valid
+        });
         }
+        
     };
 
     const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
@@ -42,18 +43,18 @@ const CoverImageUpload =  <T extends FieldValues>({ register, setValue, defaultV
         const file = e.dataTransfer.files?.[0];
         if (file && file.type.startsWith("image/")) {
             setPreviewUrl(URL.createObjectURL(file));
-            setValue("image" as Parameters<typeof setValue>[0], file as any, { shouldValidate: true });
+            setValue("image" as Path<T>,  file as unknown as T[keyof T] , { shouldValidate: true });
         }
     };
 
     const handleResetImage = () => {
-        setValue("image" as Parameters<typeof setValue>[0], null as any); // reset field
-        setPreviewUrl(null); // reset preview
+        setValue("image" as Path<T>, "" as unknown as T[keyof T]);
+        setPreviewUrl(null);
     };
     useEffect(() => {
         if (defaultValue) {
             if (typeof defaultValue === "string") {
-                setPreviewUrl(`${defaultValue}`);
+                setPreviewUrl(defaultValue);
             } else if (defaultValue instanceof File) {
                 setPreviewUrl(URL.createObjectURL(defaultValue));
             }
@@ -77,7 +78,8 @@ const CoverImageUpload =  <T extends FieldValues>({ register, setValue, defaultV
                 <div className="text-center">
                     {previewUrl ? (
                         <div className="relative">
-                            <img src={previewUrl} alt="Preview" className="h-auto min-h-[300px] max-h-[300px] w-auto max-w-full rounded-md shadow" /> 
+                            <img src={previewUrl} alt="Preview" className="h-auto min-h-[300px] max-h-[300px] w-auto max-w-full rounded-md shadow" />
+                            {/* <Image src={previewUrl} alt="Preview" width={300} height={300} className="h-auto min-h-[300px] max-h-[300px] w-auto max-w-full rounded-md shadow" />  */}
                             <button
                                 title="Reset"
                                 type="button"
@@ -107,30 +109,12 @@ const CoverImageUpload =  <T extends FieldValues>({ register, setValue, defaultV
                                         validate: {
                                             required: (value) => value ? true : "This field is required.",
                                             fileType: (value) => {
-                                                let file: File | null = null;
-                                                if (value && typeof value === "object") {
-                                                    // @ts-expect-error
-                                                    if (typeof FileList !== "undefined" && value instanceof FileList) {
-                                                        file = value[0];
-                                                    // @ts-expect-error
-                                                    } else if (typeof File !== "undefined" && value instanceof File) {
-                                                        file = value;
-                                                    }
-                                                }
-                                                return file && file.type.startsWith("image/") || "Only image files are allowed.";
+                                                if (value && typeof value === "object" && "type" in value) return value.type.startsWith("image/") || "Only image files are allowed.";
+                                                return true;
                                             },
                                             fileSize: (value) => {
-                                                let file: File | null = null;
-                                                if (value && typeof value === "object") {
-                                                    // @ts-expect-error
-                                                    if (value instanceof FileList) {
-                                                        file = value[0];
-                                                    // @ts-expect-error
-                                                    } else if (value instanceof File) {
-                                                        file = value;
-                                                    }
-                                                }
-                                                return file ? file.size <= 2 * 1024 * 1024 || "File size must be less than 2MB." : "This field is required.";
+                                                if (value && typeof value === "object" && "type" in value) return value.size <= 2 * 1024 * 1024 || "Max 2MB";
+                                                return true;
                                             },
                                         },
 

@@ -15,6 +15,7 @@ import useBlogStore from '@/store/useBlogStore';
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import { BlogType } from '@/types/BlogType';
 import { useCurrentUrl } from '@/utils/useCurrentUrl';
+// import Image from 'next/image';
 
 const show = [10, 25, 50, 100];
 const recordStatus = [
@@ -60,7 +61,7 @@ const Blog = () => {
             setSelectedIds([]);
             setSelectDelete(true)
         }else{
-            setSelectedIds(data.map((item) => item.id));
+            setSelectedIds(data.map((item:BlogType) => Number(item.id)));
             setSelectDelete(false)
         }
     };
@@ -83,11 +84,6 @@ const Blog = () => {
         return null;
     };
 
-    const setDeleteRecords = async() => {
-        if(selectedIds.length > 0){
-            setId(selectedIds)
-        }
-    }
 
     const deleteRecord = async() => {
         const ids = id?.join(',');
@@ -196,7 +192,7 @@ const Blog = () => {
                                             <div className="flex gap-2">
                                                 <button 
                                                     title="Delete"
-                                                    onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([v.id])}}
+                                                    onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([Number(v.id)])}}
                                                     className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
                                                     <BiTrash fontSize={24}/>
                                                 </button>

@@ -13,18 +13,18 @@ export interface ProductType {
     detail_th: string,
     detail_en: string,
     detail_ja: string,
-    image: string;
+    image: File | string | null;
     image_alt: string;
     color: string;
-    brand?: [];
-    category?: [];
+    brand?: Array<number> | [];
+    category?: Array<number> | [];
     price: number;
     quantity: number;
     isActive: boolean;
     categories: Array<CategoryType>;
     published_at: string;
     created_at: string;
-    updated_at: string;
+    updated_at: string | null;
     deleted_at: string;
 }
 export interface ApiResponse {
@@ -34,7 +34,7 @@ export interface ApiResponse {
     rows: ProductType[];
 }
 
-export interface PropductFormProps {
+export interface ProductFormProps {
     id: string;
     title_th: string;
     title_en: string;
@@ -46,18 +46,18 @@ export interface PropductFormProps {
     detail_th: string,
     detail_en: string,
     detail_ja: string,
-    image: File | null;
-    image_alt: string;
+    image: File | string | null;
+    image_alt: string | null;
     color: string;
-    brand?: [];
-    category?: [];
+    brand?: Array<number> | [];
+    category?: Array<number> | [];
     price: number;
     quantity: number;
     isActive: boolean;
     categories: Array<{id: string;}>;
     published_at: string;
     created_at: string;
-    updated_at: string;
+    updated_at: string | null;
 }
 export interface ProductState {
     items: ProductType[];
@@ -74,10 +74,10 @@ export interface ProductState {
     fetchData: (page: number) => Promise<void>;
     fetchDataById: (id: string) => Promise<void>;
     createData: (
-        newData: PropductFormProps, 
+        newData: ProductFormProps, 
         router: ReturnType<typeof useRouter>
     ) => Promise<void>;
-    updateData: (id: string, data: PropductFormProps, router: ReturnType<typeof useRouter>) => Promise<void>;
+    updateData: (id: string, data: ProductFormProps, router: ReturnType<typeof useRouter>) => Promise<void>;
     onChangeStatus: (id: string, status: boolean) => Promise<void>;
     deleteData: (id: string) => Promise<void>;
 

@@ -14,6 +14,7 @@ import { LuPencil } from "react-icons/lu";
 import { IoSearchOutline } from "react-icons/io5";
 import Link from 'next/link';
 import { useCurrentUrl } from '@/utils/useCurrentUrl';
+import { UserType } from '@/types/UserType';
 
 const show = [10, 50, 100];
 const recordStatus = [
@@ -31,8 +32,6 @@ const Users = () =>
         loading,
         limit,
         updateLimit,
-        setLoading,
-        setPage,
         nextPage,
         prevPage,
         fetchData,
@@ -57,7 +56,7 @@ const Users = () =>
         if (isAllSelected) {
             setSelectedIds([]);
         }else{
-            setSelectedIds(data.map((item) => item.id));
+            setSelectedIds(data.map((item:UserType) => Number(item.id)));
         }
     };
     const toggleSelect = (id: number) => {
@@ -144,12 +143,12 @@ const Users = () =>
                             </tr>
                         </thead>
                         <tbody>
-                            {data && data.map((v,k)=>
+                            {data && data.map((v:UserType,k:number)=>
                                 <tr key={k}>
                                     <td className="px-6 py-4">
                                         {loading
                                             ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
-                                            :<AnimatedCheckbox className="select" checked={selectedIds.includes(v.id)} onChange={()=>toggleSelect(v.id)}/>
+                                            :<AnimatedCheckbox className="select" checked={selectedIds.includes(Number(v.id))} onChange={()=>toggleSelect(Number(v.id))}/>
                                         }
                                     </td>
                                     <td className="px-6 py-4">
@@ -170,7 +169,7 @@ const Users = () =>
                                     <td className="px-6 py-4">
                                         {loading 
                                             ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
-                                            :(v.status == 1 ? 'Active':'Not Active')
+                                            :(v.status == "1" ? 'Active':'Not Active')
                                         }
                                     </td>
                                     <td className="px-6 py-4">
@@ -183,7 +182,7 @@ const Users = () =>
                                         <div className="flex gap-2">
                                             <button 
                                                 title="Delete"
-                                                onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([v.id])}}
+                                                onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([Number(v.id)])}}
                                                 className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
                                                 <BiTrash fontSize={24}/>
                                             </button>

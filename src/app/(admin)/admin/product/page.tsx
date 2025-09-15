@@ -14,6 +14,8 @@ import usePagination from '@/hooks/usePagination';
 import Format from '@/utils/Format';
 import { Paginate, LimitPerPage, SearchBar } from '@/components/admin/Paginate/Paginate';
 import ActionModal from '@/components/admin/Modal/ActionModal';
+import Image from 'next/image';
+import { ProductType } from '@/types/ProductType';
 
 interface SelectDeleteProps { event: React.MouseEvent<HTMLButtonElement>; }
 const show = [10, 25, 50, 100];
@@ -58,7 +60,7 @@ const Product = () =>
             setSelectDelete(true)
         }else{
             if(data && data.length>0){
-                setSelectedIds(data.map((item) => item.id));
+                setSelectedIds(data.map((item:ProductType) => Number(item.id)));
                 setSelectDelete(false)
             }
         }
@@ -78,12 +80,6 @@ const Product = () =>
 
         return null;
     };
-
-    const setDeleteRecords = async() => {
-        if(selectedIds.length > 0){
-            setId(selectedIds)
-        }
-    }
 
     const deleteRecord = async() => {
         const ids = id?.join(',');
@@ -152,12 +148,12 @@ const Product = () =>
                                 </tr>
                             </thead>
                             <tbody>
-                                {data && data.map((v: any,index) => 
+                                {data && data.map((v: ProductType,index) => 
                                     <tr key={index} className={`bg-white dark:bg-gray-800 hover:bg-slate-100 dark:hover:bg-gray-900 transition-all ease-in-out ${loading ? ' animate-pulse' : ''}`}>
                                         <td className="px-6 py-4">
                                             {loading
                                                 ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded col-span-2"></div>
-                                                :<AnimatedCheckbox className="select" checked={selectedIds.includes(v.id)} onChange={()=>toggleSelect(v.id)}/>
+                                                :<AnimatedCheckbox className="select" checked={selectedIds.includes(Number(v.id))} onChange={()=>toggleSelect(Number(v.id))}/>
                                             }
                                         </td>
                                         <td className="px-6 py-4" width={720}>
@@ -177,7 +173,7 @@ const Product = () =>
                                             :
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 w-10 h-10">
-                                                    <img className="w-10 h-10 rounded-full" 
+                                                    <Image className="w-10 h-10 rounded-full" 
                                                         src={`${process.env.NEXT_PUBLIC_API_URL}${v.image}` || '/storage/fallback-image.jpg'} 
                                                         alt={v.title_en}
                                                     />
@@ -220,7 +216,7 @@ const Product = () =>
                                         </td> */}
                                         <td className="px-6 py-4">
                                             {!loading?
-                                            <div className="text-sm text-gray-900 dark:text-gray-200">{Format.number(v.price,2)}</div>
+                                            <div className="text-sm text-gray-900 dark:text-gray-200">{v?.price ? Format.number(v.price, 2) : '0'}</div>
                                             :
                                             <div className="flex-1 space-y-6 py-1">
                                                 <div className="space-y-3">
@@ -247,7 +243,7 @@ const Product = () =>
                                         </td>
                                         <td className="px-6 py-4">
                                             { !loading ?
-                                                <div className="text-sm text-gray-900 dark:text-gray-200">{Format.date(v.created_at)}</div>
+                                                <div className="text-sm text-gray-900 dark:text-gray-200">{Format.date(new Date(v.created_at))}</div>
                                             :
                                                 <div className="flex-1 space-y-6 py-1">
                                                     <div className="space-y-3">
@@ -262,7 +258,7 @@ const Product = () =>
                                             <div className="flex gap-2">
                                                 <button 
                                                     title="Delete"
-                                                    onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([v.id])}}
+                                                    onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([Number(v.id)])}}
                                                     className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
                                                     <BiTrash fontSize={24}/>
                                                 </button>

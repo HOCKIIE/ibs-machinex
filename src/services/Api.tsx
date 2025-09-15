@@ -1,10 +1,17 @@
-import axios, { AxiosRequestConfig } from "axios";
-import { useRouter } from "next/navigation";
-import { refreshToken } from "./Auth";
+"use client"
 
+import { refreshToken } from "./Auth";
+import axios, { AxiosRequestConfig } from "axios";
+import { useRouter, usePathname } from "next/navigation";
+
+interface FailedRequest<T> {
+    resolve: (value: T | PromiseLike<T>) => void;
+    reject: (reason?: string) => void;
+}
 let accessToken: string | null = null;
 let isRefreshing = false;
-let failedQueue: any[] = [];
+let failedQueue: FailedRequest<string>[] = [];
+
 
 export const setAccessToken = (token: string | null) => {
     accessToken = token;
@@ -69,12 +76,14 @@ Api.interceptors.response.use((response) =>
             isRefreshing = true;
 
             try {
-                // const res = await axios.put(`${API_URL}/api/refresh`,{},{ withCredentials: true });
-                console.log('debug request refresh token');
+
                 const newToken = await refreshToken();
+                const pathName = usePathname();
+                const router = useRouter();
                 console.log('debug refreshToken',newToken);
-                if(newToken === null){
-                    window.location.href = "/admin/signin";
+                if (newToken === null) {
+                    const redirectTo = pathName === "/admin/signin" ? "/" : pathName;
+                    router.push(redirectTo);
                     return;
                 }
                 setAccessToken(newToken);

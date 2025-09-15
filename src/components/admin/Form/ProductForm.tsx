@@ -1,49 +1,49 @@
 import Api from "@/services/Api";
-import React, { useState, useCallback, useEffect, Children } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
-import { PropductFormProps } from "@/types/ProductType";
+import { ProductFormProps } from "@/types/ProductType";
 import { useForm, Controller  } from "react-hook-form";
 import { useRouter } from "next/navigation";
 import { MdRemoveRedEye } from "react-icons/md";
-import { ApiResponse as CategoryApiResponse } from '@/types/CategoryType';
-import { BrandType } from '@/types/BrandType'
+import { CategoryFormProps } from '@/types/CategoryType';
 import CoverImageUpload from '../Dropzon/CoverImageUpload';
 import TextEditor from '../Editor/TextEditor';
 import { ErrorMessage } from './Validation';
-import SearchableCombobox from "../Combobox/SearchableCombobox";
 
 import { IoChevronForwardSharp } from "react-icons/io5";
-import { FaCheck, FaMapPin } from 'react-icons/fa6';
+import { FaMapPin } from 'react-icons/fa6';
 import { BiSolidCategoryAlt } from "react-icons/bi";
 import { LiaLanguageSolid } from "react-icons/lia";
 import { HiExclamation } from "react-icons/hi";
 
 const ProductForm = ({
     itemState,
-    setItemState: setData,
     onSubmit,
     type
-}:any) => {
+}:{
+    itemState: ProductFormProps;
+    onSubmit: (data:ProductFormProps) => Promise<void>;
+    type: string;
+}) => {
 
     const router = useRouter();
-    const [category, setCategory] = useState<CategoryApiResponse[]>([]);
+    const [category, setCategory] = useState<CategoryFormProps[]>([]);
     const [lng, setLang] = useState<string>('th');
     const activeLng = `bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800`;
     const invalidClass = "border-rose-300 text-rose-600 border-rose-300 focus:border-rose-500 focus:ring-rose-500/40 dark:border-rose dark:border-rose-500";
     const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
     const create = type === "create";
     const edit = type === "edit";
-
+    const didFetchData = useRef(false);
     const {
         register,
         handleSubmit: handleSubmitForm,
         formState: { errors },
         setValue,
         control,
-        trigger,
         watch,
         reset
-    } = useForm<PropductFormProps>({
+    } = useForm<ProductFormProps>({
         mode: 'onChange',
         criteriaMode: 'all'
     });
@@ -53,8 +53,6 @@ const ProductForm = ({
     const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
     const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
 
-    const [selectedCategory, setSelectedCategory] = useState<{ id: number; name: string } | null>(null);
-
     const collapsed = (e: React.MouseEvent<HTMLAnchorElement>) => {
         e.preventDefault();
         const el = e.currentTarget;
@@ -62,24 +60,14 @@ const ProductForm = ({
         el.nextElementSibling?.classList.toggle('h-0');
     }
 
-    const search = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        console.log(value)
-    }
-
-    const onCreate = async (data: any) => {
-        // console.log(typeof errors)
-        onSubmit(data);
-    };
-
-    const onEdit = async (formData: any) => {
-        console.log(errors)
+    const onCreate = async (data: ProductFormProps) => onSubmit(data);
+    const onEdit = async (formData: ProductFormProps) => {
         const modifiedData = { ...formData };
         onSubmit(modifiedData);
     };
 
     const formatDate = (date: Date): string => {
-        const now = new Date();
+        const now = date ?? new Date();
         const bangkokTime = new Intl.DateTimeFormat('en-GB', {
             timeZone: 'Asia/Bangkok',
             year: 'numeric',
@@ -98,13 +86,14 @@ const ProductForm = ({
 
     const cancelAction = () => router.back();
 
-    const fetchCategory = useCallback(async()=>{
+    const fetchCategory = async ()=>{
         const res = await Api.get('/category/product');
-        console.log('category >>> ',res.data)
         setCategory(res.data);
-    }, [setCategory]);
+    };
 
     useEffect(()=>{
+        if(didFetchData.current) return;
+        didFetchData.current = true;
         fetchCategory();
     }, [fetchCategory]);
 
@@ -128,11 +117,12 @@ const ProductForm = ({
                 published_at: itemState.published_at,
             });
             if (itemState?.categories) {
-                const categoryIds = itemState.categories.map((c: any) => String(c.id));
-                setValue("category", categoryIds); // set react-hook-form field
+                const categoryIds = itemState.categories.map((c) => Number(c.id));
+                setValue("category", categoryIds);
             }
             if(itemState?.brand) {
-                const brandId = itemState.brand.map((v:any) => String(v.id));
+                // @ts-expect-error: skip v.id
+                const brandId = itemState.brand.map((v) => Number(v.id));
                 setValue('brand',brandId);
             }
         }
@@ -177,22 +167,21 @@ const ProductForm = ({
                             </div>
                             <div className="setting-body">
                                 <ul>
-                                {category?.map((v, k) => (
+                                {category?.map((v:CategoryFormProps, k:number) => (
                                     <li key={k} className="py-1">
                                         <a className="flex items-center text-left cursor-default" onClick={collapsed}>
                                             <IoChevronForwardSharp className="chevron transition-all duration-200 ease-in-out"/>
-                                            <span className="truncate overflow-x-hidden whitespace-nowrap w-full">{v.title_en}</span>
+                                            <span className="truncate overflow-x-hidden whitespace-nowrap w-full">{v?.title_en}</span>
                                         </a>
                                         <div className="pt-1 border-l ps-3 ms-2 transition-all duration-200 ease-in-out h-0 overflow-hidden">
-                                            {v.brand?.map((item:BrandType, i) =>
+                                            {v.brands?.map((item, i) =>
                                                 <div key={i} className="py-1">
                                                     <label>
                                                         <input 
                                                             type="checkbox" 
                                                             value={item.id}
                                                             {...register("brand", {
-                                                                validate: (value, allValues) =>
-                                                                allValues.brand?.length > 0 || "Please select at least 1 brand.",
+                                                                validate: (value, allValues) => (allValues.brand ?? []).length > 0 || "Please select at least 1 brand.",
                                                             })}
                                                         /> {item.title_en}
                                                     </label>
@@ -212,7 +201,7 @@ const ProductForm = ({
                         <div className="w-full">
                             <div className="grid grid-cols-12 gap-4">
                                 <div className="col-span-6">
-                                    <CoverImageUpload<PropductFormProps> register={register} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
+                                    <CoverImageUpload<ProductFormProps> register={register} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
                                 </div>
                                 <div className="col-span-6">
                                     <div className="space-y-3">

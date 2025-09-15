@@ -1,7 +1,6 @@
 "use client";
 import Api from "@/services/Api";
 import { create } from "zustand";
-import toast from "react-hot-toast";
 import { OwnerState, ApiResponse } from "@/types/OwnerType";
 import { ProcessToast } from "@/utils/ProcessToast";
 

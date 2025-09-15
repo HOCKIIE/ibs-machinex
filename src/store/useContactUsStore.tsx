@@ -3,12 +3,12 @@
 import Api from "@/services/Api";
 import { create } from "zustand";
 import toast from "react-hot-toast";
-import { ContactUsState, ResponseType } from "@/types/ContactUsType";
+import { ContactUsState, ResponseType, ContactUsType } from "@/types/ContactUsType";
 
 const prefix = '/contact-us';
 
-const useContactUsStore = create<ContactUsState>((set) =>  ({
-    createData: async (newData:any) => {
+const useContactUsStore = create<ContactUsState>(() =>  ({
+    createData: async (newData:ContactUsType) => {
         try {
             const formData = new FormData();
             Object.entries(newData).forEach(([key, value]) => formData.append(key, value as string));

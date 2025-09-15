@@ -1,24 +1,23 @@
 "use client"
 import React,{ useEffect,useState,useRef,use } from 'react';
-import { UseFormSetValue, UseFormTrigger, useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import ProductForm from '@/components/admin/Form/ProductForm';
 import useProductStore from '@/store/useProductStore';
-import { PropductFormProps, ProductType } from '@/types/ProductType';
-import { debounce } from 'lodash';
+import { ProductFormProps } from '@/types/ProductType';
 import toast from 'react-hot-toast';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }){
     const  { id } = use(params);
     const router = useRouter();
     const { items, fetchDataById, updateData } = useProductStore();
-    const [ itemState, setItemState ] = useState<ProductType>({
+    const didFetchData = useRef(false);
+    const [ itemState, setItemState ] = useState<ProductFormProps>({
         id: "",
         image: "",
         thumbnail: "",
-        image_alt: "",
+        image_alt: null,
         brand: [],
         categories: [],
         title_th: "",
@@ -34,51 +33,24 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
         price: 0,
         quantity: 0,
         updated_at: "",
-        isActive: false, // Add default value for status
-        published_at: "", // Add default value for published_at
-        created_at: "", // Add default value for created_at
-        deleted_at: "",
+        isActive: false,
+        published_at: "",
+        created_at: ""
     });
-    const { reset } = useForm();
-    const debouncedSetValueRef = useRef(
-        debounce((
-            name: keyof PropductFormProps,
-            value: string,
-            setValue: UseFormSetValue<PropductFormProps>,
-            trigger: UseFormTrigger<PropductFormProps>
-        ) => {
-            setValue(name, value, { shouldValidate: true });
-            trigger(name);
-        }, 500)
-    );
-
-    const handleChange = (
-        event: React.ChangeEvent<HTMLInputElement>,
-        setValue: UseFormSetValue<PropductFormProps>,
-        trigger: UseFormTrigger<PropductFormProps>
-    ) => {
-        const { name, value } = event.target;
-        setItemState((prev) => ({ ...prev, [name]: value }));
-        debouncedSetValueRef.current(name as keyof PropductFormProps, value, setValue, trigger)
-    };
-
-    const handleSubmit = async (data: any) => {
-        console.log(data);
-        await updateData(id, data, router);
-    };
-
-    const fetchData = React.useCallback(async () => {
-        await fetchDataById(id);
-    }, [fetchDataById, id]);
+    const handleSubmit = async (data: ProductFormProps) => await updateData(id, data, router);
+    const fetchData = async() => await fetchDataById(id);
     
     useEffect(() => {
+        if(didFetchData.current) return;
+        didFetchData.current = true;
         fetchData();
-    }, [fetchData]);
+    });
+
     useEffect(() => {
         if (items.length > 0) {
             setItemState({
                 id: items[0].id ?? "",
-                image: items[0].image ?? "",
+                image: items[0].image ?? null,
                 thumbnail: items[0].thumbnail ?? "",
                 image_alt: items[0].image_alt ?? "",
                 brand: items[0].brand ?? [],
@@ -98,8 +70,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
                 updated_at: items[0].updated_at ?? "",
                 isActive: typeof items[0].isActive !== "undefined" ? items[0].isActive : false,
                 published_at: items[0].published_at ?? "",
-                created_at: items[0].created_at ?? "",
-                deleted_at: items[0].deleted_at ?? "",
+                created_at: items[0].created_at ?? ""
             });
         }
         // @ts-expect-error: items may have a status property from API response
@@ -108,7 +79,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
             toast.success(items.message);
         }
         
-    }, [items, reset]);
+    }, [items]);
 
     return <DefaultLayout>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -126,7 +97,6 @@ export default function Page({ params }: { params: Promise<{ id: string }> }){
                 <hr />
                 <ProductForm 
                     itemState={itemState}
-                    setItemState={handleChange}
                     onSubmit={handleSubmit}
                     type="create"
                 />

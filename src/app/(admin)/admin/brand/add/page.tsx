@@ -1,21 +1,20 @@
 "use client";
 
-import React,{ useState, useRef } from 'react';
+import React from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import BrandForm from '@/components/admin/Form/BrandForm';
 import { useRouter } from 'next/navigation';
 import useBrandStore from '@/store/useBrandStore';
-import { BrandFormProps, BrandType } from '@/types/BrandType';
-import { UseFormSetValue, UseFormTrigger, useForm } from 'react-hook-form';
-import { debounce } from 'lodash';
+import { BrandFormProps } from '@/types/BrandType';
 
 const Page = () => {
 
     const router = useRouter();
     const { createData } = useBrandStore();
-    const [categoryState, setCategoryState] = useState<Omit<BrandType,"id"|"created_at"|"updated_at">>({
-        image: "",
+    const categoryState: BrandFormProps = {
+        id: "",
+        image:null,
         title_th: "",
         title_en: "",
         title_ja: "",
@@ -26,37 +25,17 @@ const Page = () => {
         detail_en: "",
         detail_ja: "",
         website: "",
+        apiName: "",
         status: false,
+        brands: [],
         category: [],
         categories: [],
-    });
-
-    const { formState: { errors } } = useForm()
-    const debouncedSetValueRef = useRef(
-        debounce((
-            name: keyof BrandFormProps,
-            value: string,
-            setValue: UseFormSetValue<BrandFormProps>,
-            trigger: UseFormTrigger<BrandFormProps>
-        ) => {
-            setValue(name, value, { shouldValidate: true });
-            trigger(name);
-        }, 500)
-    );
-    const handleChange = (
-        event: React.ChangeEvent<HTMLInputElement>,
-        setValue: UseFormSetValue<BrandFormProps>,
-        trigger: UseFormTrigger<BrandFormProps>
-    ) => {
-        const { name, value } = event.target;
-        setCategoryState((prev) => ({ ...prev, [name]: value }));
-        debouncedSetValueRef.current(name as keyof BrandFormProps, value, setValue, trigger)
+        published_at: "",
+        created_at: "",
+        updated_at: ""
     };
 
-    const handleSubmit = async (data: any) => {
-        console.log("errors", errors);
-        await createData(data,router);
-    };
+    const handleSubmit = async (data: BrandFormProps) => await createData(data,router);
 
     return (
     <DefaultLayout>
@@ -74,7 +53,6 @@ const Page = () => {
                 <hr />
                 <BrandForm 
                     itemState={categoryState}
-                    setItemState={handleChange}
                     onSubmit={handleSubmit}
                     type="create"
                 />

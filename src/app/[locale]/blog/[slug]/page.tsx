@@ -5,19 +5,18 @@ import { H1, H2, H3 } from '@/utils/Title';
 import Api from '@/services/Api';
 import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
-import { itemsEqual } from '@dnd-kit/sortable/dist/utilities';
-import { BlogType } from '@/types/BlogType';
+import { BlogType, BlogFormProps } from '@/types/BlogType';
 
 const BlogDetail = ({ params }:{ params: Promise<{slug:string}> }) => {
     const locale = useLocale();
     const { slug } = use(params);
-    const [itemState, setData] = useState(null);
-    const [recommend, setRecommend] = useState<BlogType|[]>();
+    const [itemState, setData] = useState<BlogFormProps>();
+    const [recommend, setRecommend] = useState<BlogType[]>();
     const didFetchData = useRef(false);
     
     const fetchBlog = async () => {
         const request = await Api.get(`/blog/show/${slug}`);
-        console.log(request.data);
+
         setData(request.data.data);
         setRecommend(request.data.recommend)
     }
@@ -26,7 +25,7 @@ const BlogDetail = ({ params }:{ params: Promise<{slug:string}> }) => {
         if (didFetchData.current) return;
         didFetchData.current = true;
         fetchBlog();
-    }, []); 
+    }); 
     return (
         <div>
             <div className="container py-20 px-2 lg:px-0">
@@ -34,11 +33,20 @@ const BlogDetail = ({ params }:{ params: Promise<{slug:string}> }) => {
                     {itemState &&
                         <>
                             <H1>{itemState?.[`title_${locale}`]}</H1>
-                            <p className="text-black">Published on: {itemState?.published_at}</p>
+                            <p className="text-black">Published on: {itemState?.published_at || '-'}</p>
                             <div className="grid grid-cols-12 mt-10">
                                 <div className="col-span-2"></div>
                                 <div className="col-span-8">
-                                    <img src={itemState.image} alt={itemState[`title_${locale}`]} height={180} className="object-cover"/>
+                                    <img src={
+                                            typeof itemState.image === "string"
+                                            ? itemState.image
+                                            : itemState.image instanceof File
+                                            ? URL.createObjectURL(itemState.image)
+                                            : "/placeholder.png" // fallback
+                                        } 
+                                        alt={itemState[`title_${locale}`]} 
+                                        height={180} className="object-cover"
+                                    />
                                 </div>
                                 <div className="col-span-2"></div>
                             </div>
@@ -80,8 +88,8 @@ const BlogDetail = ({ params }:{ params: Promise<{slug:string}> }) => {
                             </H2>
                         </div>
                         <div className="grid grid-cols-12 gap-9 px-5 mt-10">
-                            {recommend.map((item:BlogType[], k:number)=>(
-                                <div className="col-span-12 xl:col-span-4 bg-white rounded-2xl overflow-hidden">
+                            {recommend.map((item:BlogType, k:number)=>(
+                                <div key={k} className="col-span-12 md:col-span-6 lg:col-span-4 bg-white rounded-2xl overflow-hidden">
                                     <Link href={`/blog/${item.pathName}`}>
                                         <div className="h-[180px] overflow-hidden">
                                             <img src={item.image} alt={item[`title_${locale}`]} height={180} className="object-cover"/>

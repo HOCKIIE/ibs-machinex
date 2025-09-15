@@ -12,7 +12,7 @@ import { useRouter } from "next/navigation";
 const EditUser = ({ params }: { params:  Promise<{ id: string }> }) => {
     const {id} = use(params);
     const router = useRouter();
-    const { fetchUserById, updateUser, users, error } = useUserStore();
+    const { fetchUserById, updateUser, users } = useUserStore();
     const [userState, setUserState] = useState<UsersFormProps>({
         id: "",
         role: "",
@@ -50,7 +50,7 @@ const EditUser = ({ params }: { params:  Promise<{ id: string }> }) => {
             await fetchUserById(id);
         };
         fetchData();
-    },[]);
+    },[id,fetchUserById]);
     useEffect(() => {
         if (users?.length > 0) {
             setUserState({
@@ -85,9 +85,6 @@ const EditUser = ({ params }: { params:  Promise<{ id: string }> }) => {
                         setItemState={handleChange}
                         handleSubmit={handleSubmit}
                         type="edit"
-                        setState={setUserState}
-                        id={id}
-                        error={error}
                     />
                 </div>
 

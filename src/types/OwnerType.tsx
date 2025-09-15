@@ -1,5 +1,3 @@
-import { useRouter } from "next/navigation";
-
 export interface OwnerType {
     id: string;
     logo: string;

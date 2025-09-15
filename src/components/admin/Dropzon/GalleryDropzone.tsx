@@ -5,6 +5,7 @@ import { DndContext, closestCenter } from "@dnd-kit/core";
 import { SortableContext, arrayMove, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { DragEndEvent } from "@dnd-kit/core";
+import Image from "next/image";
 
 const GalleryDropzone = () => {
   const [files, setFiles] = useState<File[]>([]);
@@ -93,7 +94,7 @@ const SortableImage = ({ file, removeFile }: { file: File; removeFile: (file: Fi
 
     return (
         <div ref={setNodeRef} style={style} className="relative group cursor-grab" onClick={(e)=> e.stopPropagation() } onDrag={(e)=>e.stopPropagation()}>
-            <img src={URL.createObjectURL(file)} alt={file.name} className="w-full h-24 object-cover rounded-lg shadow" />
+            <Image src={URL.createObjectURL(file)} alt={file.name} className="w-full h-24 object-cover rounded-lg shadow" />
             <div {...listeners} {...attributes} className="absolute top-1 left-1 bg-gray-600 p-1 rounded-full opacity-70">
                 <GripVertical size={16} className="text-white" />
             </div>

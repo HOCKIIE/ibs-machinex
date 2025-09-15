@@ -17,17 +17,17 @@ const Format =
         const [month, day, year] = thisDate.split("/");
         return `${day}-${month}-${year}, ${time}`;
     },
-    number:(value:string,fixed:number) =>
+    number:(value:number,fixed:number) =>
     {
-        const num = parseFloat(value);
-        if (isNaN(num)) return "Invalid number";
+        // const num = parseFloat(value);
+        if (isNaN(value)) return "Invalid number";
 
-        const roundedNum = num.toFixed(fixed);
+        const roundedNum = value.toFixed(fixed);
 
         return new Intl.NumberFormat("en-US", {
             minimumFractionDigits: fixed,
             maximumFractionDigits: fixed,
-          }).format(parseFloat(roundedNum));
+        }).format(parseFloat(roundedNum));
     }
 }
 export default Format;

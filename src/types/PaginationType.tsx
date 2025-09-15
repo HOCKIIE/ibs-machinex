@@ -13,11 +13,11 @@ export interface Meta {
     to: string | number,
 }
 export interface PaginationType {
-    meta: Meta;
+    meta: Meta | null;
     totalItems?: number;
     prevPage: () => void;
     nextPage: () => void;
     currentPage?: number;
     handlerPageChangeFromBtn?: (e: number) => void;
-    handlePageChange?: (e: React.KeyboardEvent<HTMLInputElement> | React.MouseEvent<HTMLButtonElement>) => void;
+    handlePageChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }

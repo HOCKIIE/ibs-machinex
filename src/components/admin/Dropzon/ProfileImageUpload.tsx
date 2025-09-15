@@ -2,7 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-// import Image from "next/image";
+import Image from "next/image";
 import { X } from "lucide-react";
 
 interface ProfileImageUploadProps {
@@ -43,7 +43,7 @@ const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({currentImage}) =
         <input {...getInputProps()} />
         {image ? (
           <>
-            <img src={image} alt="Profile" width={128} height={128} className="w-full h-full object-cover" />
+            <Image src={image} alt="Profile" width={128} height={128} className="w-full h-full object-cover" />
             <button
               title="Reset"
               type="button"

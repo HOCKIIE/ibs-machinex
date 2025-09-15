@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import { CategoryType } from "./CategoryType";
 
 export interface BlogType {
@@ -17,9 +16,13 @@ export interface BlogType {
     category?: [];
     categories: Array<CategoryType>;
     pathName: string;
-    published_at: string;
+    published_at: string | null;
     created_at: string;
-    updated_at: string;
+    updated_at: string | null;
+    
+    [key: `title_${string}`]: string;
+    [key: `description_${string}`]: string;
+    [key: `detail_${string}`]: string;
 }
 
 export interface ApiResponse {
@@ -31,7 +34,7 @@ export interface ApiResponse {
 
 export interface BlogFormProps {
     id: string;
-    image: File | null;
+    image: File | string | null;
     title_th: string;
     title_en: string;
     title_ja: string;
@@ -45,9 +48,13 @@ export interface BlogFormProps {
     category?: Array<string>;
     categories: Array<{id: string;}>;
     pathName: string;
-    published_at: string;
+    published_at: string | null;
     created_at: string;
-    updated_at: string;
+    updated_at: string | null;
+
+    [key: `title_${string}`]: string;
+    [key: `description_${string}`]: string;
+    [key: `detail_${string}`]: string;
 }
 
 export interface BlogState {
@@ -64,11 +71,8 @@ export interface BlogState {
 
     fetchData: (page: number) => Promise<void>;
     fetchDataById: (id: string) => Promise<void>;
-    createData: (
-        newUser: BlogFormProps, 
-        router: ReturnType<typeof useRouter>
-    ) => Promise<void>;
-    updateData: (id: string, data: BlogFormProps, router: ReturnType<typeof useRouter>) => Promise<void>;
+    createData: (newUser: BlogFormProps) => Promise<void>;
+    updateData: (id: string, data: BlogFormProps) => Promise<void>;
     onChangeStatus: (id: string, status: boolean) => Promise<void>;
     deleteData: (id: string) => Promise<void>;
 

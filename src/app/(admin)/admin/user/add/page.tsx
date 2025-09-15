@@ -3,12 +3,10 @@ import React, { useState } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import UserForm from '@/components/admin/Form/UserForm';
-import { useRouter } from 'next/navigation';
 import { UsersFormProps } from '@/types/UserType';
 import useUserStore from '@/store/useUserStore';
 
 const FormAdd = () => {
-    const router = useRouter();
     const { createUser } = useUserStore();
     const [userState, setUserState] = useState<UsersFormProps>({
         id: "",
@@ -36,15 +34,11 @@ const FormAdd = () => {
         }));
         }
     };
+    const handleSubmit = async (data: UsersFormProps) => await createUser(data);
 
-    const handleSubmit = async (data: any) => {
-        await createUser(data,router);
-        // router.push("/admin/user");
-    };
     return (
         <DefaultLayout>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                {/* <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"> */}
                 <div className="control-button mb-3">
                     <div className="flex justify-between">
                         <div><Breadcrumb /></div>

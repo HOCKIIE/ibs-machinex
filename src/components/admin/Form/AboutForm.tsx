@@ -4,7 +4,6 @@ import React, { useState, useRef, useEffect } from 'react';
 import sanitizeHtml from "sanitize-html";
 import { EditButton, CancelButton, SaveButton } from '@/components/main/button/Buttons';
 import { useForm, Controller } from "react-hook-form";
-import toast from "react-hot-toast";
 import { AboutType } from "@/types/AboutType";
 import useAboutStore from "@/store/useAboutStore";
 import { DefaultTab } from "../Tabs/Tabs";
@@ -25,13 +24,11 @@ const AboutForm = () => {
         detail_en: "",
         detail_ja: ""
     });
-    const { about, getData, updateData, response } = useAboutStore();
+    const { about, getData, updateData } = useAboutStore();
     const {
-        register,
         handleSubmit: handleSubmitForm,
         reset,
-        control,
-        formState: { errors },
+        control
     } = useForm({
         defaultValues: {
             id: aboutData.id,
@@ -46,14 +43,6 @@ const AboutForm = () => {
         SetActive(language);
     }
 
-    interface HandleChangeParams {
-        name: keyof AboutType;
-        value: string | null;
-    }
-    const handleChange = ({ name, value }: HandleChangeParams): void => 
-    {
-        setAboutData((prevState) => ({ ...prevState, [name]: value }));
-    }
     const CalcelEdit = () => {
         reset({
             detail_th: about?.detail_th,
@@ -62,7 +51,7 @@ const AboutForm = () => {
         });
         EditAbout()
     }
-    const handleSubmit = async (formData: any) => {
+    const handleSubmit = async (formData: AboutType) => {
         const modifiedData = { ...formData };
         await updateData(modifiedData);
     }
@@ -71,7 +60,8 @@ const AboutForm = () => {
         if(didFetchData.current) return;
         didFetchData.current = true;
         getData();
-    },[]);
+    },[getData]);
+    
     useEffect(() => {
         if (about) {
             const data = {
@@ -84,16 +74,6 @@ const AboutForm = () => {
             reset(data); // ✅ sync form input กับค่าที่โหลดมา
         }
     }, [about, reset]);
-    // useEffect(()=>{
-    //     if (response && response.status) {
-    //         if(response.action == "update"){
-    //             toast.success(response.message);
-    //             setTimeout(()=> { setEditAbout(false); },1000);
-    //         } else {
-    //             toast.error(response.message);
-    //         }
-    //     }
-    // }, [response])
     
     return (
         <>

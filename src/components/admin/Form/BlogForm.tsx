@@ -2,7 +2,7 @@ import Api from '@/services/Api';
 import React, { useState, useCallback, useEffect } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
 import { useForm, Controller  } from "react-hook-form";
-import { ApiResponse } from '@/types/CategoryType';
+import { CategoryType } from '@/types/CategoryType';
 import { BiSolidCategoryAlt } from "react-icons/bi";
 import { LiaLanguageSolid } from "react-icons/lia";
 import { FaCheck, FaMapPin } from 'react-icons/fa6';
@@ -18,13 +18,16 @@ import { HiExclamation } from "react-icons/hi";
 
 const BlogForm = ({
     itemState,
-    setItemState: setData,
     onSubmit,
     type
-} : any) => {
+} : {
+    itemState: BlogFormProps;
+    onSubmit: (data: BlogFormProps) => Promise<void>;
+    type: string;
+}) => {
 
     const router = useRouter();
-    const [category, setCategory] = useState<ApiResponse[]>([]);
+    const [category, setCategory] = useState<CategoryType[]>([]);
     const [lng, setLang] = useState<string>('th');
     const BadgeLang = ({lng}:{lng:string}) => <div className="bg-blue-200 text-indigo-500 rounded-md text-xs flex items-center px-1">{lng}</div>
     const activeLng = `bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800`;
@@ -55,15 +58,13 @@ const BlogForm = ({
         const value = e.target.value;
         console.log(value)
     }
-    const onCreate = async (data: any) => onSubmit(data);
-    const onEdit = async (formData: any) => {
-        console.log(errors)
+    const onCreate = async (data: BlogFormProps) => onSubmit(data);
+    const onEdit = async (formData: BlogFormProps) => {
         const modifiedData = { ...formData };
         onSubmit(modifiedData);
     };
     const cancelAdd = () => router.back();
     const formatDate = (date: Date): string => {
-        const now = new Date();
         const bangkokTime = new Intl.DateTimeFormat('en-GB', {
             timeZone: 'Asia/Bangkok',
             year: 'numeric',
@@ -73,7 +74,7 @@ const BlogForm = ({
             minute: '2-digit',
             second: '2-digit',
             hourCycle: 'h23',
-        }).format(now);
+        }).format(date);
 
         const [datePart, timePart] = bangkokTime.split(', ');
         const [day, month, year] = datePart.split('/');
@@ -108,8 +109,8 @@ const BlogForm = ({
                 published_at: itemState.published_at,
             });
             if (itemState?.categories) {
-                const categoryIds = itemState.categories.map((c: any) => String(c.id));
-                setValue("category", categoryIds); // set react-hook-form field
+                const categoryIds = itemState.categories.map((c) => String(c.id));
+                setValue("category", categoryIds);
             }
         }
     }, [itemState, reset, setValue]);
@@ -160,7 +161,7 @@ const BlogForm = ({
                                 }}
                                 render={({field}) => (
                                     <>
-                                    {category?.map((v, k) => {
+                                    {category?.map((v: CategoryType, k: number) => {
                                         const isChecked = field.value?.includes(String(v.id));
                                         return (
                                             <label key={k} className="inline-flex items-center gap-2 cursor-pointer space-y-2">
@@ -282,7 +283,7 @@ const BlogForm = ({
                     <div className="w-full">
                         <div className="grid grid-cols-12">
                             <div className="col-span-12">
-                                <CoverImageUpload register={register} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
+                                <CoverImageUpload<BlogFormProps> register={register} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
                             </div>
                             <div className="col-span-12">
                                 <div className="space-y-3">

@@ -1,20 +1,18 @@
 "use client";
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useForm  } from "react-hook-form";
 import { ContactType } from '@/types/ContactType';
 import { EditButton, CancelButton, SaveButton } from '@/components/main/button/Buttons';
 import useContactStore from '@/store/useContactStore';
-import toast from "react-hot-toast";
 
 
 const ContactForm = () => 
 {
+    const didFetchData = useRef(false);
     const iframeRef = useRef<HTMLIFrameElement>(null);
     const [isEditContact, setEditContact] = useState<boolean>(false);
     const [map, setMap] = useState<string|''>('');
     const [tab, setTab] = useState<string>('th')
-    const didFetchContact = useRef<boolean>(false);
-    const didFetchAbout = useRef<boolean>(false);
     const [contactData, setContactData] = useState<ContactType>({
         id: "",
         title_th: "",
@@ -29,7 +27,7 @@ const ContactForm = () =>
         gmap: ""
     });
     
-    const { contact, fetchData, updateData, response } = useContactStore();
+    const { items, fetchData, updateData } = useContactStore();
     const {
         register,
         reset,
@@ -48,7 +46,6 @@ const ContactForm = () =>
             gmap: contactData.gmap
         }
     });
-    const getData = useCallback(() => fetchData(), [fetchData]);
     const EditContact = () => setEditContact(!isEditContact);
     const handleChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => 
     {
@@ -78,51 +75,45 @@ const ContactForm = () =>
     }
     const CalcelEdit = () => {
         reset({
-            title_th: contact?.title_th,
-            title_en: contact?.title_en,
-            title_ja: contact?.title_ja,
-            address_th: contact?.address_th,
-            address_en: contact?.address_en,
-            address_ja: contact?.address_ja,
-            phone: contact?.phone,
-            mobile: contact?.mobile,
-            email: contact?.email,
-            gmap: contact?.gmap
+            title_th: items[0]?.title_th,
+            title_en: items[0]?.title_en,
+            title_ja: items[0]?.title_ja,
+            address_th: items[0]?.address_th,
+            address_en: items[0]?.address_en,
+            address_ja: items[0]?.address_ja,
+            phone: items[0]?.phone,
+            mobile: items[0]?.mobile,
+            email: items[0]?.email,
+            gmap: items[0]?.gmap
         });
         EditContact()
     }
     const saveChange = async(data: ContactType) => await updateData(data);
 
-    useEffect(() => { fetchData(); }, [fetchData]);
+    useEffect(() => { 
+        if(didFetchData.current) return;
+        didFetchData.current = true;
+        fetchData(); 
+    }, [fetchData]);
     useEffect(() => {
-        if (contact && contact.title_th) {
+        if (items[0] && items[0].id) {
             const data = {
-                id: contact.id,
-                title_th: contact.title_th,
-                title_en: contact.title_en,
-                title_ja: contact.title_ja,
-                address_th: contact.address_th,
-                address_en: contact.address_en,
-                address_ja: contact.address_ja,
-                phone: contact.phone,
-                mobile: contact.mobile,
-                email: contact.email,
-                gmap: contact.gmap,
+                id: items[0].id,
+                title_th: items[0].title_th,
+                title_en: items[0].title_en,
+                title_ja: items[0].title_ja,
+                address_th: items[0].address_th,
+                address_en: items[0].address_en,
+                address_ja: items[0].address_ja,
+                phone: items[0].phone,
+                mobile: items[0].mobile,
+                email: items[0].email,
+                gmap: items[0].gmap,
             };          
             setContactData(data);
             reset(data); // ✅ sync form input กับค่าที่โหลดมา
         }
-    }, [contact, reset]);
-    useEffect(()=>{
-        if (response && response.status) {
-            if(response.action == "update"){
-                toast.success(response.message);
-                setTimeout(()=> { setEditContact(false); },1000);
-            } else {
-                toast.error(response.message);
-            }
-        }
-    }, [response])
+    }, [items, reset]);
 
     return (
         <>

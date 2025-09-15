@@ -2,8 +2,6 @@
 
 import React, { useEffect, useRef, useState,useCallback } from 'react';
 import Api from '@/services/Api';
-import Image from 'next/image';
-import { GoDotFill } from "react-icons/go";
 import { useLocale } from 'next-intl';
 
 const AboutMeSection = () => {

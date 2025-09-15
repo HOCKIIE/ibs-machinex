@@ -1,23 +1,20 @@
 "use client";
 
-import React,{ useEffect,useState,useRef,use } from 'react';
-import { UseFormSetValue, UseFormTrigger, useForm } from 'react-hook-form';
+import React,{ useEffect, useState, useRef, use } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import BrandForm from '@/components/admin/Form/BrandForm';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
+import { BrandFormProps } from '@/types/BrandType';
 import useBrandStore from '@/store/useBrandStore';
-import { useRouter } from 'next/navigation';
-import { BrandFormProps, BrandType } from '@/types/BrandType';
-import { debounce } from 'lodash';
 import toast from 'react-hot-toast';
 
 const Page = ({ params }:{ params: Promise<{id:string}> }) => {
-    const  { id } = use(params);
-    const router = useRouter();
+    const { id } = use(params);
     const { items, fetchDataById, updateData } = useBrandStore();
-    const [ itemState, setItemState ] = useState<BrandType>({
+    const didFetchData = useRef(false);
+    const [ itemState, setItemState ] = useState<BrandFormProps>({
         id: "",
-        image: "",
+        image: null,
         title_th: "",
         title_en: "",
         title_ja: "",
@@ -29,49 +26,23 @@ const Page = ({ params }:{ params: Promise<{id:string}> }) => {
         detail_ja: "",
         website: "",
         apiName: "",
+        brands: [],
         categories: [],
-        updated_at: "",
         status: false,
         created_at: "", 
+        updated_at: "",
+        published_at: null
     });
-    const { reset } = useForm();
-    const debouncedSetValueRef = useRef(
-        debounce((
-            name: keyof BrandFormProps,
-            value: string,
-            setValue: UseFormSetValue<BrandFormProps>,
-            trigger: UseFormTrigger<BrandFormProps>
-        ) => {
-            setValue(name, value, { shouldValidate: true });
-            trigger(name);
-        }, 500)
-    );
-
-    const handleChange = (
-        event: React.ChangeEvent<HTMLInputElement>,
-        setValue: UseFormSetValue<BrandFormProps>,
-        trigger: UseFormTrigger<BrandFormProps>
-    ) => {
-        const { name, value } = event.target;
-        setItemState((prev) => ({ ...prev, [name]: value }));
-        debouncedSetValueRef.current(name as keyof BrandFormProps, value, setValue, trigger)
-    };
-
-    const handleSubmit = async (data: any) => {
-        console.log(data);
-        await updateData(id, data, router);
-    };
-
-    const fetchData = React.useCallback(async () => {
-        await fetchDataById(id);
-    }, [fetchDataById, id]);
-
+    const handleSubmit = async (data: BrandFormProps) => await updateData(id, data);
+    const fetchData = async () => await fetchDataById(id);
     useEffect(() => {
+        if (didFetchData.current) return;
+        didFetchData.current = true;
         fetchData();
-    }, [fetchData]);
+    });
     
     useEffect(() => {
-        if (items.length > 0) {
+        if (items) {
             setItemState({
                 id: items[0].id ?? "",
                 image: items[0].image ?? "",
@@ -86,10 +57,11 @@ const Page = ({ params }:{ params: Promise<{id:string}> }) => {
                 detail_ja: items[0].detail_ja ?? "",
                 website: items[0].website ?? "",
                 apiName: items[0].apiName ?? "",
-                updated_at: items[0].updated_at ?? "",
                 categories: items[0].categories ?? [],
-                status: Boolean(items[0]?.status) || false,
-                created_at: items[0].created_at ?? ""
+                status: Boolean(items[0]?.status) ?? false,
+                updated_at: items[0].updated_at ?? null,
+                created_at: items[0].created_at ?? null,
+                published_at: items[0].published_at ?? null
             });
         }
         // @ts-expect-error: items may have a status property from API response
@@ -98,7 +70,7 @@ const Page = ({ params }:{ params: Promise<{id:string}> }) => {
             toast.success(items.message);
         }
         
-    }, [items, reset]);
+    }, [items]);
 
     return (
     <DefaultLayout>
@@ -114,12 +86,7 @@ const Page = ({ params }:{ params: Promise<{id:string}> }) => {
                     <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Edit Brand</h3>
                 </div>
                 <hr />
-                <BrandForm 
-                    itemState={itemState}
-                    setItemState={handleChange}
-                    onSubmit={handleSubmit}
-                    type="edit"
-                />
+                <BrandForm itemState={itemState} onSubmit={handleSubmit} type="edit" />
             </div>
         </div>
     </DefaultLayout>
