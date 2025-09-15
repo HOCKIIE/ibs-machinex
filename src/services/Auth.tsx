@@ -2,7 +2,6 @@ import AxiosInstance from "@/utils/AxiosInstance";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { getCookie, setCookie, removeCookie } from 'typescript-cookie';
-import { useAuth } from "@/contexts/AdminContext";
 
 export const getToken = () => getCookie('accessToken');
 export const setToken = (token: string) =>  setCookie('accessToken', token, { expires: 1 });

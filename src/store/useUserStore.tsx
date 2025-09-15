@@ -1,7 +1,6 @@
 "use client";
 import Api from "@/services/Api";
 import { create } from "zustand";
-import toast from "react-hot-toast";
 import { UserType, UserState, ApiResponse } from "@/types/UserType";
 import { ProcessToast } from "@/utils/ProcessToast";
 
@@ -86,7 +85,7 @@ const useUserStore = create<UserState>((set) => ({
         }
     },
     
-    updateUser: async (id, data, router) => {
+    updateUser: async (id, data) => {
         ProcessToast.show('Saving data...')
         set({ isLoading: true, error: null });
         try {

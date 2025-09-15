@@ -7,7 +7,7 @@ import { IoSearchSharp } from "react-icons/io5";
 import { CategoryType } from '@/types/CategoryType';
 import { BrandType } from '@/types/BrandType';
 import { useLocale, useTranslations } from 'next-intl';
-
+import Image from 'next/image';
 
 const ProductSection = () => {
     const locale = useLocale();
@@ -15,8 +15,6 @@ const ProductSection = () => {
     const [allCategory, setAllCategory] = useState<CategoryType | []>([]);    
     const [category, setCategory] = useState<CategoryType | []>([]);    
     const [keyword, setKeyword] = useState<string>("");
-    const [loading, setLoading] = useState<boolean>(true);
-    
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
@@ -37,24 +35,22 @@ const ProductSection = () => {
     }, [searchParams]);
 
     const fetchAndSetProducts = useCallback(async () => {
-        setLoading(true);
+        
         const params = getQueryParam();
         const path = `/category/brand?${params}`;
         const request = await Api.get(path);
         return request;
     }, [getQueryParam]);
 
-    const fetchCategory = useCallback(async () => {
+    const fetchCategory = async () => {
         try {
             const response = await fetchAndSetProducts();
             setCategory(response.data);
             ScrollToSearchEl()
         } catch (error) {
             console.error("Error fetching category:", error);
-        } finally {
-            setLoading(false);
         }
-    }, [fetchAndSetProducts]);
+    };
 
     const fetchAllCategory = useCallback(async() => {
         try {
@@ -63,9 +59,6 @@ const ProductSection = () => {
         }
         catch (error) {
             console.error("Error fetching category:", error);
-        }
-        finally {
-            setLoading(false);
         }
     }, []);
 
@@ -92,11 +85,9 @@ const ProductSection = () => {
 
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        setLoading(true);
         setKeyword(e.currentTarget.search.value);
         setMultipleParams({"keyword":e.currentTarget.search.value});
         fetchCategory();
-        setLoading(false);
     }
 
     type ScrollTarget = string | HTMLElement | null;
@@ -122,7 +113,7 @@ const ProductSection = () => {
         if(didfetchCategory.current === queryString) return;
         didfetchCategory.current = queryString;
         fetchCategory();
-    },[fetchCategory, queryString]);
+    });
 
     return (
     <div>
@@ -155,7 +146,7 @@ const ProductSection = () => {
         <div className="container space-y-7">
             <h5 className="flex justify-center items-center text-black text-xl">{t('CategoryCaption')}</h5>
             <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-7 gap-4">
-                {Array.isArray(allCategory) && allCategory.map((item: any) => (
+                {Array.isArray(allCategory) && allCategory.map((item: CategoryType) => (
                     <div 
                         key={item.id}
                         onClick={()=>scrollToTarget(`#category-${item.id}`,80)}
@@ -163,7 +154,7 @@ const ProductSection = () => {
                     >
                         <div className="flex flex-col items-center transition-transform duration-300 ease-in-out group-hover:scale-110">
                             <div className="overflow-hidden w-[120px] h-[120px] flex justify-center items-center">
-                                <img src={item.image} alt={item[`title_${locale}`]} width={120} height={120} className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] pb-2"/>
+                                <Image src={item.image} alt={item[`title_${locale}`]} width={120} height={120} className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] pb-2"/>
                             </div>
                             <h2 className="text-center line-clamp-3 mt-5 group-hover:text-red-600">{item[`title_${locale}`]}</h2>
                         </div>
@@ -180,7 +171,7 @@ const ProductSection = () => {
                 <h3 className="text-black text-xl">{t('subtitle')}</h3>
             </div>
             <div className="mt-20" ref={searchRef}>
-                {Array.isArray(category) && category.map((item: any) => (
+                {Array.isArray(category) && category.map((item: CategoryType) => (
                     <div key={item.id} id={`category-${item.id}`} className="grid grid-cols-12 gap-5 mt-5 group">
                         <div className="col-span-12 xl:col-span-4 p-5 rounded-3xl border border-blue-800 bg-white group-hover:bg-blue-800/90 transition-all duration-300 ease-in-out">
                             <div className="text-blue-800 text-3xl font-bold relative group-hover:text-white">
@@ -198,7 +189,7 @@ const ProductSection = () => {
                                                 href={`/brand/${brand.apiName}`}
                                                 className="rounded-full overflow-hidden w-[107px] h-[107px] flex justify-center items-center mb-2 border shadow-md hover:outline hover:outline-offset-[-4px] outline-red-700 hover:outline-[5px] transition-all duration-300 ease-in-out"
                                             >
-                                                <img src={brand.image} alt={brand.title_en} className="w-full h-full object-contain"/>
+                                                <Image src={brand.image} alt={brand.title_en} className="w-full h-full object-contain"/>
                                             </Link>
                                         </div>)
                                     )}

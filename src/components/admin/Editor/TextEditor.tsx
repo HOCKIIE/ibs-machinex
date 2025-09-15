@@ -1,6 +1,6 @@
 "use client";
 import "./TextEditor.scss"
-import React, { useCallback, useMemo, useState, useEffect, useRef, Children } from 'react';
+import React, { useCallback, useMemo, useState, useEffect, useRef } from 'react';
 import { 
     createEditor, 
     BaseElement, 
@@ -14,7 +14,7 @@ import {
     Node,
     Path
 } from 'slate';
-import { Slate, Editable, withReact, useSlate, RenderElementProps  } from 'slate-react';
+import { Slate, Editable, withReact, useSlate, RenderElementProps, RenderLeafProps  } from 'slate-react';
 import { withHistory } from 'slate-history';
 import { serialize, deserialize  } from '@/utils/slateHtmlConverter';
 import { 
@@ -27,7 +27,10 @@ import { LuLayoutTemplate, LuTable, LuAlignJustify, LuChevronDown } from "react-
 import { PiTextIndentBold, PiTextOutdentBold } from "react-icons/pi";
 import { IoRefresh, IoClose, IoTrashBinOutline } from "react-icons/io5";
 import Api from "@/services/Api";
+import HTMLCodeModal from "./HTMLCodeModal";
+import Image from "next/image";
 
+type MyElement = Element & { type: string, className?: string; };
 
 const isMarkActive = (editor: Editor, format: string) => {
     const marks = Editor.marks(editor);
@@ -46,7 +49,7 @@ const toggleMark = (editor: Editor, format: string) => {
 
 const isBlockActive = (editor: Editor, format: string) => {
     const [match] = Array.from(
-        editor.children.map((n: any) => n).filter((n: any) => n.type === format)
+        editor.children.filter((n): n is MyElement => Element.isElement(n) && n.type === format)
     );
     return !!match;
 };
@@ -93,22 +96,38 @@ const toggleBlock = (editor: Editor, format: string) => {
         }
     }
 };
-const toggleAlign = (editor: Editor, align: 'left' | 'center' | 'right'| 'justify') => {
-    const className =
-        align === 'justify' ? 'text-justify' :
-        align === 'center' ? 'text-center' :
-        align === 'right' ? 'text-right' :
-        'text-left';
-        Transforms.setNodes(
+const toggleAlign = (editor: Editor, align: 'left' | 'center' | 'right' | 'justify') => {
+    const newClass =
+        align === 'justify'
+        ? 'text-justify'
+        : align === 'center'
+        ? 'text-center'
+        : align === 'right'
+        ? 'text-right'
+        : 'text-left';
+
+    // หาว่า block ปัจจุบันมี className เดิมอะไรอยู่
+    const [match] = Editor.nodes(editor, {
+        match: n => !Editor.isEditor(n) && Element.isElement(n) && Editor.isBlock(editor, n),
+        mode: 'lowest', // ✅ บังคับให้เจอบล็อกระดับล่างสุด
+    });
+
+    if (match) {
+        const [node, path] : [MyElement, Path] = match;
+        const existing = node.className || '';
+        const cleaned = existing
+            .split(' ')
+            .filter((c: string) => !['text-left', 'text-center', 'text-right', 'text-justify'].includes(c))
+            .join(' ');
+
+        const merged = [cleaned, newClass].filter(Boolean).join(' ');
+
+        Transforms.setNodes<MyElement>(
             editor,
-            { type: 'paragraph', className },
-            { match: n =>
-                !Editor.isEditor(n) &&
-                Element.isElement(n) &&
-                Editor.isBlock(editor, n),
-                split: true,
-            }
+            { className: merged },
+            { at: path }
         );
+    }
 };
 
 const Button: React.FC<{ 
@@ -137,7 +156,7 @@ const Button: React.FC<{
     );
 };
 
-const DropdownButton: React.FC<{ format: string; action?: 'mark' | 'block'; label: any; title?:string }> = ({format, label, title}) => {
+const DropdownButton: React.FC<{ action?: 'mark' | 'block'; label: React.ReactNode; title?:string }> = ({label, title}) => {
 
     const [open, setOpen] = useState(false);
     const menuRef = useRef(null);
@@ -176,7 +195,7 @@ const DropdownButton: React.FC<{ format: string; action?: 'mark' | 'block'; labe
         const innerText = node.children[0].children[0].text;
         const parentEntry = Editor.parent(editor, path);
         const [, parentPath] = parentEntry;
-        const newChild = Array.from({ length: select }, (_, i) => ({
+        const newChild = Array.from({ length: select }, () => ({
             type: 'grid-column',
             className: className?.className,
             children: [{
@@ -200,7 +219,6 @@ const DropdownButton: React.FC<{ format: string; action?: 'mark' | 'block'; labe
             const [match] = Editor.nodes(editor, {
                 match: (n) => n.type === "grid-column",
             });
-            console.log('match', match);
             if (match) {
                 const [, path] = match;
                 const insertPath: Path = Path.next(path);
@@ -211,9 +229,8 @@ const DropdownButton: React.FC<{ format: string; action?: 'mark' | 'block'; labe
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-            if (menuRef.current && !(menuRef.current as HTMLElement).contains(event.target as Node)) {
-            setOpen(false);
-            }
+            if (menuRef.current && !(menuRef.current as HTMLElement).contains(event.target as Node)) 
+                setOpen(false);
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -344,9 +361,8 @@ const ImageModal = ({
     const [uploading, setUploading] = useState(false);
     const [selected, setSelected] = useState<string[] | null>([]);
     const [message, setMessage] = useState<{status: string; message: string} | null>(null);
-    const [thisId, setId] = useState<string | null>(id || "");
-    const [thisType, setType] = useState<string | null>(type || "");
-    const [deleteConfirm, setDelete] = useState(false);
+    const [thisId] = useState<string | null>(id || "");
+    const [thisType] = useState<string | null>(type || "");
     const didFetchGallery = useRef(false);
     
     const getGallery = async () => {
@@ -406,10 +422,7 @@ const ImageModal = ({
         }
     }
     const deleteImage = async () => {
-        if(!selected || selected.length === 0) {
-            setDelete(true);
-            return;
-        }
+        if(!selected || selected.length === 0) return;
         if(!confirm("Are you sure to delete selected image?")) return;
         try {
             const request = await Api.post("/gallery/delete", {
@@ -441,7 +454,7 @@ const ImageModal = ({
         if(didFetchGallery.current) return;
         didFetchGallery.current = true;
         getGallery();
-    },[]);
+    });
 
     return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-99">
@@ -492,13 +505,13 @@ const ImageModal = ({
                         {message && <div className="my-4">
                             <div className={`${message.status=='success'?`bg-green-100 text-green-600 border-green-400`:`bg-red-100 text-red-500 border-red-400`} p-2 border rounded-lg flex items-center justify-between`}>
                                 {message.message}
-                                <button type="button" className={`bg-transparent ${message.status==='success'?`text-green-600`:`text-red-500 p-2`}`} onClick={()=>setError(null)}><IoClose/></button>
+                                <button type="button" className={`bg-transparent ${message.status==='success'?`text-green-600`:`text-red-500 p-2`}`}><IoClose/></button>
                             </div>
                         </div>}
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 h-[77%] overflow-y-auto p-1">
                             {preview && preview.map((img,k)=>(
                             <div key={k} className="border rounded-md overflow-hidden cursor-pointer h-32 w-37 flex justify-center items-center">
-                                <img src={img} alt="preview" className="object-cover h-full" />
+                                <Image src={img} alt="preview" className="object-cover h-full" />
                             </div>
                             ))}
                         </div>
@@ -513,7 +526,7 @@ const ImageModal = ({
                             className={`border rounded-md overflow-hidden cursor-pointer h-32 w-37 flex item-center justify-center ${selected && selected.includes(img.url) ? "ring-2 ring-blue-500" : ""}`}
                             onClick={() => setSelected([img.url])}
                         >
-                            <img src={img.url} alt="gallery" className="object-cover h-full" />
+                            <Image src={img.url} alt="gallery" className="object-cover h-full" />
                         </div>
                         ))}
                     </div>
@@ -568,12 +581,10 @@ const getCurrentElementType = (editor: Editor): string | null => {
         match: n => !Editor.isEditor(n) && Element.isElement(n) && !!n.type,
         mode: 'lowest', // ตรวจสอบ block ต่ำสุดใน path
     });
-
     if (match) {
         const [node] = match;
         return (node as Element).type as string;
     }
-
     return null;
 };
 interface EditorProps {
@@ -587,18 +598,11 @@ interface EditorProps {
 const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) => {
 
     const editor = useMemo(() => withHistory(withReact(createEditor())), []);
-    const [status, setStatus] = useState<string>('p');
     const [showModal, setShowModal] = useState<boolean>(false);
     const didLoadRef = useRef(false);
     const [editorKey, setEditorKey] = useState(0);
+    const [isOpen, setIsOpen] = useState(false);
     const defaultEditorValue: Descendant[] = [
-        {
-            type: 'grid',
-            children: [{
-                type: 'grid-column',
-                children: [{ type: 'paragraph', children: [{ text: 'Image', align: "center" }] }],
-            }],
-        },
         {
             type: 'grid',
             children: [{
@@ -609,28 +613,43 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
     ];
     const [editorValue, setEditorValue] = useState<Descendant[]>(defaultEditorValue);
 
-    
+    const handleOpen = () => setIsOpen(true);
+    // const handleSaveHTML = (html: string) => {
+    //     // แปลง HTML กลับเป็น Slate JSON
+    //     const parser = new DOMParser();
+    //     const doc = parser.parseFromString(html, "text/html");
+    //     const slateValue = Array.from(doc.body.childNodes).map(serialize(html));
+    //     editor.children = slateValue; // update editor
+    // };
+
+    const handleSaveHTML = (html: string) => {
+        // 🟢 HTML → Slate JSON
+        const slateNodes = deserialize(html);
+        setEditorValue(slateNodes);
+    };
+
     const renderElement = useCallback((props: RenderElementProps) => {
+
         const { attributes, children, element } = props;
         switch (element.type) {
             case 'paragraph':
-                return <p {...attributes} className={`text-black ${element.className}`}>{children}</p>;
+                return <p {...attributes} className={element.className || 'text-black mb-b'}>{children}</p>;
             case 'heading-one':
-                return <h1 {...attributes} className={`text-black text-4xl ${element.className}`}>{children}</h1>;
+                return <h1 {...attributes} className={element.className || 'text-black mb-b'}>{children}</h1>;
             case 'heading-two':
-                return <h2 {...attributes} className={`text-black text-3xl ${element.className}`}>{children}</h2>;
+                return <h2 {...attributes} className={element.className || 'text-black mb-b'}>{children}</h2>;
             case 'heading-three':
-                return <h3 {...attributes} className={`text-black text-2xl ${element.className}`}>{children}</h3>;
+                return <h3 {...attributes} className={element.className || 'text-black mb-b'}>{children}</h3>;
             case 'heading-four':
-                return <h4 {...attributes} className={`text-black text-xl ${element.className}`}>{children}</h4>;
+                return <h4 {...attributes} className={element.className || 'text-black mb-b'}>{children}</h4>;
             case 'heading-five':
-                return <h5 {...attributes} className={`text-black text-lg ${element.className}`}>{children}</h5>;
+                return <h5 {...attributes} className={element.className || 'text-black mb-b'}>{children}</h5>;
             case 'heading-six':
-                return <h6 {...attributes} className={`text-black text-md ${element.className}`}>{children}</h6>;
+                return <h6 {...attributes} className={element.className || 'text-black mb-b'}>{children}</h6>;
             case 'bulleted-list':
-                return <ul {...attributes} className="marker:text-gray-700 list-disc pl-5 space-y-1 text-gray-800 text-md">{children}</ul>;
+                return <ul {...attributes} className={element.className ?? 'marker:text-gray-700 list-disc pl-5 space-y-1 text-gray-800 text-md'}>{children}</ul>;
             case 'numbered-list':
-                return <ol {...attributes} className="marker:text-gray-700 list-decimal pl-5 space-y-1 text-gray-800 text-md">{children}</ol>;
+                return <ol {...attributes} className={element.className ?? 'marker:text-gray-700 list-decimal pl-5 space-y-1 text-gray-800 text-md'}>{children}</ol>;
             case 'list-item':
                 return <li {...attributes}>{children}</li>;
             case 'link':
@@ -642,7 +661,7 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
             case 'image':
                 return (
                     <div {...attributes} className={element.className}>
-                        <img src={element.src} alt="image" style={{ maxWidth: '100%', height: '100%' }} />
+                        <Image src={element.src} alt="image" style={{ maxWidth: '100%', height: '100%' }} />
                         {children}
                     </div>
                 );
@@ -671,15 +690,24 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                 return <div {...attributes} className={element.className}>{children}</div>;
         }
     }, []);
-    
-    const renderLeaf = (props: any) => {
-        const { attributes, children, leaf } = props;
+    type CustomLeaf = {
+        bold?: boolean;
+        italic?: boolean;
+        underline?: boolean;
+        strikethrough?: boolean;
+        fontSize?: number;
+        color?: string;
+        // [key: string]: string|number|boolean|undefined;
+    };
+    const renderLeaf = ({ attributes, children, leaf }: RenderLeafProps) => {
+        const customLeaf = leaf as CustomLeaf;
         let el = children;
-        if (leaf.bold) el = <strong>{el}</strong>;
-        if (leaf.italic) el = <em>{el}</em>;
-        if (leaf.underline) el = <u>{el}</u>; 
-        if (leaf.strikethrough) el = <s>{el}</s>;
-        if (leaf.fontSize) el = <span style={{ fontSize: `${leaf.fontSize}px` }}>{el}</span>;
+        if (customLeaf.bold) el = <strong>{el}</strong>;
+        if (customLeaf.italic) el = <em>{el}</em>;
+        if (customLeaf.underline) el = <u>{el}</u>; 
+        if (customLeaf.strikethrough) el = <s>{el}</s>;
+        if (customLeaf.fontSize) el = <span style={{ fontSize: `${customLeaf.fontSize}px` }}>{el}</span>;
+        if (customLeaf.color) el = <span style={{ color: customLeaf.color }}>{el}</span>;
         return <span {...attributes}>{el}</span>;
     };
     
@@ -700,6 +728,17 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                     });
                     Transforms.setNodes(editor, { type: 'paragraph' });
                     return;
+                }
+            }
+            const [p] = Editor.nodes(editor,{ match:n => !Editor.isEditor(n) && Element.isElement(n) && n.type === 'paragraph' });
+            if(p){
+                const [node] = p;
+                const text = Node.string(node as Node);
+                if(text.trim() === ''){
+                    event.preventDefault(); // ป้องกัน line break ปกติ
+                    const newNode: Element = { type: "division", children: [{ text: "" }] }
+                    Transforms.insertNodes(editor, newNode);
+                    Transforms.move(editor); // เลื่อน cursor ไป node ใหม่
                 }
             }
         }
@@ -739,12 +778,15 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
         
     }
 
+    
     const handleChange = (newValue: Descendant[]) => {
         setEditorValue(newValue);
         const html = serialize(newValue);
-        console.log('Handler Change => ',html);
+        console.log('change event >>>')
+        // handleSaveHTML(html);
         onChange(html); // 🔁 ส่งกลับให้ react-hook-form
     };
+
     useEffect(() => {
         if (value && !didLoadRef.current) {
             setEditorKey(prev => prev + 1);
@@ -756,6 +798,8 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
             didLoadRef.current = true;
         }
     }, [value, editorValue, editorKey]);
+
+    const currentHTML = value ?? "";
     
 
     return (
@@ -804,18 +848,17 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                                     <div className="flex px-1">
                                         <Button format="image" setModal={setShowModal} title="Image" label={<RiImageFill />} />
                                         {/* <button title="Image" className="hover:bg-gray-200 text-black dark:text-gray-300 dark:hover:bg-gray-700 p-2 rounded-md"><RiImageFill /></button> */}
-                                        <DropdownButton format="grid-template" action="block" title="Add Grid Template" label={<LuLayoutTemplate/>}/>
+                                        <DropdownButton action="block" title="Add Grid Template" label={<LuLayoutTemplate/>}/>
                                         {/* <Button format="grid-template" action="block" title="Grid template" label={<LuLayoutTemplate/>} /> */}
                                         
                                     </div>
                                 </div>
                                 <div className="flex items-center">
-                                    <button type="button" title="Source code" className="hover:bg-gray-200 text-black dark:text-gray-300 dark:hover:bg-gray-700 p-2 rounded-md"><RiCodeSSlashFill /></button>
+                                    <button type="button" onClick={handleOpen} title="Source code" className="hover:bg-gray-200 text-black dark:text-gray-300 dark:hover:bg-gray-700 p-2 rounded-md"><RiCodeSSlashFill /></button>
                                 </div>
                             </div>
                         </div>
                         <div className="editor-body p-2 resize-y">
-                            
                             <Editable 
                                 renderElement={renderElement}
                                 renderLeaf={renderLeaf}
@@ -827,7 +870,6 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                         </div>
                         <div className="editor-footer border-t">
                             <div className="flex justify-between">
-                                <div className="status text-xs ps-2">{status}</div>
                                 <div className="develop flex items-center">
                                     <div className="text-xs text-gray-500">Develope By: HOƆKY</div>
                                     <div className="px-1">
@@ -860,6 +902,12 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                     }} 
                 />
             )}
+            <HTMLCodeModal 
+                open={isOpen}
+                initialHTML={currentHTML}
+                onClose={() => setIsOpen(false)}
+                onSave={handleSaveHTML}
+            />
         </div>
     )
 }

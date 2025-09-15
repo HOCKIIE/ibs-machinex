@@ -35,7 +35,7 @@ const Header = () => {
         return () => {
             document.removeEventListener('mousedown', handleOutsideClick);
         };
-    },[])
+    })
     return (
         <header className="sticky top-0 flex w-full border-gray-200 bg-white dark:border-gray-800 dark:bg-gray-900 lg:border-b z-99">
             <div className="flex grow flex-col items-center justify-between lg:flex-row lg:px-6">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useCallback, useRef } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
 import { useForm  } from "react-hook-form";
 import { BrandFormProps } from '@/types/BrandType';
@@ -9,19 +9,21 @@ import CoverImageUpload from '../Dropzon/CoverImageUpload';
 import { useRouter } from 'next/navigation';
 import Api from '@/services/Api';
 import { Controller } from 'react-hook-form';
-
-import { IoChevronForwardSharp } from "react-icons/io5";
-import { FaCheck, FaMapPin } from 'react-icons/fa6';
-import { BiSolidCategoryAlt } from "react-icons/bi";
+import { FaMapPin } from 'react-icons/fa6';
 import { LiaLanguageSolid } from "react-icons/lia";
 import { HiExclamation } from "react-icons/hi";
 import TextEditor from '../Editor/TextEditor';
+import { CategoryType } from '@/types/CategoryType';
 
 const BrandForm = ({
     itemState,
     onSubmit,
     type
-} : any) => {
+} : {
+    itemState: BrandFormProps;
+    onSubmit: (data: BrandFormProps) => Promise<void>;
+    type: string;
+}) => {
     const didFetch = useRef(false);
     const [category, setCategory] = useState([]);
     const router = useRouter();
@@ -44,7 +46,6 @@ const BrandForm = ({
         mode: 'onChange',
         criteriaMode: 'all'
     });
-    
     const Required = () => <span className="text-rose-500">*</span>;
     const BadgeLang = ({lng}:{lng:string}) => <div className="bg-blue-200 text-indigo-500 rounded-md text-xs flex items-center px-1">{lng}</div>
     const Exclamation = () => <HiExclamation className="text-rose-500" fontSize={18}/>;
@@ -52,29 +53,20 @@ const BrandForm = ({
     const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
     const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
 
-    const onCreate = async (data: any) => {
-        // console.log(typeof errors)
-        onSubmit(data);
-    };
-
-    const onEdit = async (formData: any) => {
-        console.log(errors)
-        const modifiedData = { ...formData };
-        onSubmit(modifiedData);
-    }
+    const onCreate = async (data: BrandFormProps) =>  onSubmit(data);
+    const onEdit = async (formData: BrandFormProps) => onSubmit({ ...formData });
     const cancelAction = () => router.back();
 
-    // Fetch categories from an API or define them statically
-    const fetchCategory = useCallback(async()=>{
+    const fetchCategory = async()=>{
         const res = await Api.get('/category');
         setCategory(res.data);
-    }, [setCategory]);
+    };
 
     useEffect(()=>{
         if (didFetch.current) return;
         didFetch.current = true;
         fetchCategory();
-    }, [fetchCategory]);
+    });
 
     useEffect(() => {
         if (itemState) {
@@ -94,11 +86,11 @@ const BrandForm = ({
                 apiName: itemState.apiName,
                 categories: itemState.categories,
                 status: itemState.status ?? false,
-                published_at: itemState.published_at,
+                published_at: itemState.published_at ?? null
             });
             if (itemState?.categories) {
-                const categoryIds = itemState.categories.map((c: any) => String(c.id));
-                setValue("category", categoryIds); // set react-hook-form field
+                const categoryIds = itemState.categories.map((c) => c.id);
+                setValue("category", categoryIds);
             }
         }
     }, [itemState, reset, setValue]);
@@ -172,7 +164,7 @@ return (
                                             className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.category ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
                                         >
                                             <option value="" hidden>Select Category</option>
-                                            {category.map((cat: any) => (
+                                            {category.map((cat: CategoryType) => (
                                                 <option key={cat.id} value={cat.id}>{cat.title_en}</option>
                                             ))}
                                         </select>

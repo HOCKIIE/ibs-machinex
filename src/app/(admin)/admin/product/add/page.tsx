@@ -1,21 +1,20 @@
 "use client"
 
-import React ,{ useState, useRef } from "react";
+import React from "react";
 import DefaultLayout from "@/components/admin/layout/DefaultLayout";
 import Breadcrumb from "@/components/admin/Breadcrumb/Breadcrumb";
 import ProductForm from "@/components/admin/Form/ProductForm";
 import { useRouter } from "next/navigation";
 import useProductStore from "@/store/useProductStore";
-import { propductFormProps, ProductType } from "@/types/ProductType";
-import { UseFormSetValue, UseFormTrigger, useForm } from 'react-hook-form';
-import { debounce } from 'lodash';
+import { ProductFormProps } from "@/types/ProductType";
 
 export default function Page(){
 
     const router = useRouter();
     const { createData } = useProductStore();
-    const [itemState, setItemState] = useState<Omit<ProductType,"id"|"created_at"|"deleted_at">>({
-        image:"",
+    const itemState: ProductFormProps = {
+        id: "",
+        image: null,
         image_alt:"",
         thumbnail: "",
         title_th:"",
@@ -29,42 +28,17 @@ export default function Page(){
         detail_ja:"",
         isActive:false,
         color:"",
+        quantity: 0,
         brand:[],
         category:[],
         categories:[],
         published_at:"",
         price: 0,
-        updated_at: ""
-    });
-    const { formState: { errors } } = useForm();
-    const debouncedSetValueRef = useRef(
-        debounce((
-            name: keyof propductFormProps,
-            value: string,
-            setValue: UseFormSetValue<propductFormProps>,
-            trigger: UseFormTrigger<propductFormProps>
-        ) => {
-            setValue(name, value, { shouldValidate: true });
-            trigger(name);
-        }, 500)
-    );
-    const handleChange = (
-        event: React.ChangeEvent<HTMLInputElement>,
-        setValue: UseFormSetValue<propductFormProps>,
-        trigger: UseFormTrigger<propductFormProps>
-    ) => {
-        const { name, value } = event.target;
-
-        setItemState((prev) => ({ ...prev, [name]: value }));
-        debouncedSetValueRef.current(name as keyof propductFormProps, value, setValue, trigger)
-        
+        created_at: "",
+        updated_at: null
     };
 
-    const handleSubmit = async (data: any) => {
-        console.log("errors", errors);
-        
-        await createData(data,router);
-    };
+    const handleSubmit = async (data: ProductFormProps) => await createData(data,router);
 
     return <DefaultLayout>
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -82,7 +56,6 @@ export default function Page(){
                 <hr />
                 <ProductForm 
                     itemState={itemState}
-                    setItemState={handleChange}
                     onSubmit={handleSubmit}
                     type="create"
                 />

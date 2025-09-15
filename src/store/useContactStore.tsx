@@ -2,7 +2,7 @@
 import Api from "@/services/Api";
 import { create } from "zustand";
 import toast from "react-hot-toast";
-import { ContactState, ContactType, ApiResponse } from "@/types/ContactType";
+import { ContactState, ApiResponse } from "@/types/ContactType";
 
 const prefix = '/admin/contact';
 

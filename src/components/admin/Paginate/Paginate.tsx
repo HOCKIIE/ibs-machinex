@@ -97,7 +97,7 @@ export const SearchBar:React.FC<SearchBarProps> = ({keyword,handleSearch}) => {
 }
 
 interface OrderByProps {
-    handlerOrderBy?: <HTMLSelectElement>(e: React.ChangeEvent<HTMLSelectElement>) => void;
+    handlerOrderBy?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }
 export const OrderBy:React.FC<OrderByProps> = ({handlerOrderBy}) => {
     const searchParams = useSearchParams();
@@ -114,7 +114,7 @@ export const OrderBy:React.FC<OrderByProps> = ({handlerOrderBy}) => {
                 name="orderBy" 
                 title="Order By"
                 defaultValue={getOrderBy||""}
-                onChange={(e) => handlerOrderBy && handlerOrderBy(e)}
+                onChange={(e:React.ChangeEvent<HTMLSelectElement>) => handlerOrderBy && handlerOrderBy(e)}
                 className="dark:bg-dark-900 h-9 w-34 z-0 appearance-none rounded-lg border border-gray-300 bg-transparent bg-none py-2 pl-3 pr-8 text-sm text-gray-800 focus:ring-blue-500 focus:border-blue-500 dark:focus:ring-blue-500 dark:focus:border-blue-500 shadow-theme-xs placeholder:text-gray-400 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 focus:outline-none"
             >
                 {orderByOptions.map((v,k)=><option key={k} value={v.key}>{v.value}</option>)}

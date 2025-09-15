@@ -1,5 +1,3 @@
-import { useRouter } from "next/navigation";
-
 export interface ContactType {
     id: string;
     title_th: string;
@@ -41,10 +39,10 @@ export interface ApiResponse {
     total: number;
     lastPage: number;
     currentPage: number;
-    rows: contactUsType[];
+    rows: ContactType[];
 }
 export interface ContactState {
-    items: contactUsType[];
+    items: ContactType[];
     isLoading: boolean;
     error: string | null;
     token: string | null;
@@ -55,7 +53,7 @@ export interface ContactState {
     currentPage: number;
     response: { status: boolean | null; message: string | null };
 
-    fetchData: (page: number) => Promise<void>;
-    updateData: (id: string, data: ContactUsProps, router: ReturnType<typeof useRouter>) => Promise<void>;
+    fetchData: (page?: number) => Promise<void>;
+    updateData: (data: ContactType) => Promise<void>;
     deleteData: (id: string) => Promise<void>;
 }

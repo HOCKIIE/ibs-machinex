@@ -1,22 +1,25 @@
 import createNextIntlPlugin from "next-intl/plugin";
+import type { RemotePattern } from "next/dist/shared/lib/image-config";
 
 const withNextIntl = createNextIntlPlugin();
 
-/** @type {import('next').NextConfig} */
+const remotePatterns: RemotePattern[] = [
+  {
+    protocol: "https",
+    hostname: "api-ibs.test",
+    port: "", // จำเป็น
+    pathname: "/storage/uploads/**",
+  },
+];
+
 const nextConfig = {
-    // reactStrictMode: false, // Disable Strict Mode
-    images: {
-        remotePatterns: [
-          {
-            protocol: "https" as const,
-            hostname: "127.0.0.1",
-            port: "3000",
-          }
-        ]
-    },
-    sassOptions: {
-        additionalData: `$var: red;`,
-    }
+  images: {
+    remotePatterns,
+    minimumCacheTTL: 60,
+  },
+  sassOptions: {
+    additionalData: `$var: red;`,
+  },
 };
 
 export default withNextIntl(nextConfig);

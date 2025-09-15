@@ -2,7 +2,6 @@
 
 import Api from "@/services/Api";
 import { create } from "zustand";
-import toast from "react-hot-toast";
 import { BlogType, BlogState, ApiResponse } from "@/types/BlogType";
 import { ProcessToast } from "@/utils/ProcessToast";
 
@@ -55,7 +54,7 @@ const useBlogStore = create<BlogState>((set) => ({
     },
     
 
-    createData: async (newData, router) => {
+    createData: async (newData) => {
         try {
             ProcessToast.show('Saving data...');
             const formData = new FormData();
@@ -76,9 +75,6 @@ const useBlogStore = create<BlogState>((set) => ({
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
                 ProcessToast.success(message);
-                setTimeout(() => { 
-                    router.push(`${prefix}`); 
-                }, 1000);
             } else {
                 ProcessToast.error(message);
             }
@@ -114,9 +110,9 @@ const useBlogStore = create<BlogState>((set) => ({
             }));
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
-                ProcessToast.success(message,2000);
+                ProcessToast.success(message);
             } else { 
-                ProcessToast.error(message,2000);
+                ProcessToast.error(message);
             }
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
@@ -133,6 +129,7 @@ const useBlogStore = create<BlogState>((set) => ({
                 items: state.items.map((item) => String(item.id) === String(id) ? response.data : item ),
                 isLoading: false,
             }));
+            ProcessToast.success('Status has been changed.')
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({ 
@@ -143,10 +140,12 @@ const useBlogStore = create<BlogState>((set) => ({
                     message: errorMessage
                 }
             });
+            ProcessToast.error(errorMessage)
         }
     },
     
     deleteData: async (id) => {
+        ProcessToast.show('Deleting data...');
         set({ isLoading: true, error: null });
         try {
             await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
@@ -158,7 +157,7 @@ const useBlogStore = create<BlogState>((set) => ({
                     message: "The user was deleted successfully!"
                 }
             }));
-            ProcessToast.success('The user was deleted successfully!',2000);
+            ProcessToast.success('The user was deleted successfully!');
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({
@@ -169,7 +168,7 @@ const useBlogStore = create<BlogState>((set) => ({
                     message: errorMessage
                 }
             });
-            ProcessToast.error(errorMessage,2000);
+            ProcessToast.error(errorMessage);
         }
     }
 

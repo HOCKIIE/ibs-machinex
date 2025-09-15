@@ -1,18 +1,8 @@
-import { StringNullableChain } from "lodash";
 import { Descendant, Text, BaseText } from "slate";
-import { htmlToSlate, slateToHtml } from "slate-serializers";
+// import { htmlToSlate, slateToHtml } from "slate-serializers";
 
 export const deserialize = (html: string): Descendant[] => {
     try {
-        // // return htmlToSlate(html, { 
-        // //     elementTags: { div: () => ({ type: "division" }) },
-        // //     textTags: { span: () => ({ type: "text" }) },
-        // //     filterWhitespaceNodes: true 
-        // // });
-        // const parser = new DOMParser();
-        // const doc = parser.parseFromString(html, 'text/html');
-        // const nodes = Array.from(doc.body.childNodes).map(deserializeElement);
-        // return nodes;
         const parser = new DOMParser();
         const doc = parser.parseFromString(html, "text/html");
         const body = doc.body;
@@ -21,19 +11,10 @@ export const deserialize = (html: string): Descendant[] => {
             .map((node) => innerDeserialize(node))
             .flat()
             .filter(Boolean);
-        console.log('Nodes >>> ',nodes)
         return nodes.length ? nodes : [{ type: "paragraph", children: [{ text: "" }] }];
-    } catch (e) {
+    } catch {
         return [{ type: "paragraph", children: [{ text: "" }] }];
     }
-};
-
-export const serialize = (nodes: any[]): string => {
-    if (!Array.isArray(nodes)) {
-        console.error("❌ nodes ไม่ใช่ array:", nodes);
-        return "";
-    }
-    return nodes.map(serializeNode).join('');
 };
 interface CustomText extends BaseText{
     text: string;
@@ -52,7 +33,26 @@ interface CustomText extends BaseText{
     span:string
 }
 
-function serializeNode(node: CustomText): string {
+export const serialize = (nodes: CustomText[]): string => {
+    if (!Array.isArray(nodes)) {
+        console.error("❌ nodes ไม่ใช่ array:", nodes);
+        return "";
+    }
+    return nodes.map(serializeNode).join('');
+};
+const DEFAULT_CLASSES = {
+    p: "text-black mb-4",
+    ul: 'marker:text-gray-700 list-disc pl-5 space-y-1 text-gray-800 text-md',
+    ol: 'marker:text-gray-700 list-decimal pl-5 space-y-1 text-gray-800 text-md',
+    h1: 'text-black text-4xl',
+    h2: 'text-black text-3xl',
+    h3: 'text-black text-2xl',
+    h4: 'text-black text-xl',
+    h5: 'text-black text-lg',
+    h6: 'text-black text-md',
+    img: "object-cover w-full"
+};
+export function serializeNode(node: CustomText): string {
 
     if (Text.isText(node)) {
         let text = node.text;
@@ -65,11 +65,11 @@ function serializeNode(node: CustomText): string {
     const children = node.children.map(serializeNode).join('');
     switch (node.type) {
         case 'paragraph':
-            return `<p class="mb-4" style="text-align: ${node.align || 'left'};">${children}</p>`;
+            return `<p class="${node.className}">${children}</p>`;
         case 'bulleted-list':
-            return `<ul class="${node.className || ''}">${children}</ul>`;
+            return `<ul class="${node.className || DEFAULT_CLASSES.ul}">${children}</ul>`;
         case 'numbered-list': 
-            return `<ol class="${node.className || ''}">${children}</ol>`;
+            return `<ol class="${node.className || DEFAULT_CLASSES.ol}">${children}</ol>`;
         case 'list-item':
             return `<li>${children}</li>`;
         case 'bold': 
@@ -85,7 +85,7 @@ function serializeNode(node: CustomText): string {
         case 'grid-column':
             return `<div class="col-span-${node.span || 12} p-2">${children}</div>`;
         default:
-            return `<div>${children}</div>`;
+            return `<div class="${node.className || ''}">${children}</div>`;
     }
 }
 function innerDeserialize(node: ChildNode): Descendant | Descendant[]
@@ -109,6 +109,8 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[]
     const styleObj = parseStyle(el.getAttribute("style") || "");
     const className = el.className || "";
 
+    
+
     // if (["span", "strong", "em", "u"].includes(nodeName)) {
     //     return children.map((child) => {
     //         if (!("text" in child)) return child;
@@ -130,37 +132,45 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[]
             return {
                 type: "paragraph",
                 style: styleObj,
-                className,
+                className: [DEFAULT_CLASSES.p, className].filter(Boolean).join(" "),
                 children: children.length ? children : [{ text: "" }],
             };
         case "span":
-            return {
-                type: "span",
-                style: styleObj,
-                className,
-                children: children.length ? children : [{ text: "" }],
-            }
+            return children.map(child => {
+                if ("text" in child) {
+                    return {
+                        ...child,
+                        ...("fontSize" in styleObj ? { fontSize: parseInt(styleObj.fontSize) } : {}),
+                        color: styleObj.color || child.color,
+                        style: { ...child.style, ...styleObj },
+                        className,
+                    };
+                }
+                return child;
+            });
         case "img":
             return {
                 type: "image",
                 src: el.getAttribute("src") || "",
                 alt: el.getAttribute("alt") || "",
                 style: styleObj,
-                className,
+                className: [DEFAULT_CLASSES.img, className].filter(Boolean).join(" "),
                 children: [{ text: "" }],
             };
         case "ul":
+            // console.log("UL deserialize:", "class=", className);
             return {
                 type: "bulleted-list",
                 style: styleObj,
-                className,
+                className: [DEFAULT_CLASSES.ul, className].filter(Boolean).join(" "),
                 children: children.length ? children : [{ text: "" }],
             };
         case "ol":
+            // console.log("OL deserialize:", "class=", className);
             return {
                 type: "numbered-list",
                 style: styleObj,
-                className,
+                className: [DEFAULT_CLASSES.ol, className].filter(Boolean).join(" "),
                 children: children.length ? children : [{ text: "" }],
             };
         case "li":
@@ -173,21 +183,14 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[]
         case "strong":
         case "b":
             return children.map(child => ({ ...child, bold: true }));
-            // return children.map((child) => applyMark(child, "bold"));
-
         case "em":
         case "i":
             return children.map(child => ({ ...child, italic: true }));
-            // return children.map((child) => applyMark(child, "italic"));
-
         case "u":
             return children.map(child => ({ ...child, underline: true }));
-            // return children.map((child) => applyMark(child, "underline"));
-
         case "div":
             if (classList.includes("grid")) {
-                const cols = parseInt(
-                    classList.find((c) => c.startsWith("grid-cols-"))?.split("-")[2] || "12", 10);
+                const cols = parseInt(classList.find((c) => c.startsWith("grid-cols-"))?.split("-")[2] || "12", 10);
                 return {
                     type: "grid",
                     columns: cols,
@@ -196,7 +199,6 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[]
                     children: children.length ? children : [{ text: "" }],
                 };
             }
-
             const colSpanClass = classList.find((c) => c.startsWith("col-span-"));
             if (colSpanClass) {
                 const span = parseInt(colSpanClass.split("-")[2] || "12", 10);
@@ -208,14 +210,12 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[]
                     children: children.length ? children : [{ text: "" }],
                 };
             }
-
             return {
                 type: "division",
                 style: styleObj,
                 className,
                 children: children.length ? children : [{ text: "" }],
             };
-
         default:
             return {
                 type: "division",
@@ -225,23 +225,17 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[]
             };
     }
 }
-function applyMark(child: Descendant, mark: "bold" | "italic" | "underline"): Descendant {
-    if (!("text" in child)) return child;
-    return {
-        ...child,
-        [mark]: true,
-    };
-}
+
 function parseStyle(styleString: string): Record<string, string> {
     return styleString
-        .split(";")
-        .filter(Boolean)
-        .reduce((acc, rule) => {
-            const [prop, value] = rule.split(":");
-            if (prop && value) {
-                const key = prop.trim().replace(/-([a-z])/g, (_, char) => char.toUpperCase()); // kebab-case to camelCase
-                acc[key] = value.trim();
-            }
-            return acc;
-        }, {} as Record<string, string>);
+    .split(";")
+    .filter(Boolean)
+    .reduce((acc, rule) => {
+        const [prop, value] = rule.split(":");
+        if (prop && value) {
+            const key = prop.trim().replace(/-([a-z])/g, (_, char) => char.toUpperCase()); // kebab-case to camelCase
+            acc[key] = value.trim();
+        }
+        return acc;
+    }, {} as Record<string, string>);
 }

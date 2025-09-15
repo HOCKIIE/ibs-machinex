@@ -1,13 +1,13 @@
 "use client";
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect } from 'react';
 import { useForm, Controller  } from "react-hook-form";
-// import { InputPassword } from './Inputs';
 import { FaCheck } from "react-icons/fa6";
 import CancelButton from '@/components/admin/Button/CancelBotton';
 import CreateButton from '@/components/admin/Button/CreateButton';
 import UpdateButton from '@/components/admin/Button/UpdateButton';
-import { useRouter, useSearchParams, useParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@/contexts/AdminContext';
+import { UsersFormProps } from '@/types/UserType';
 
 
 const UserForm = ({
@@ -15,13 +15,17 @@ const UserForm = ({
     setItemState: setData,
     handleSubmit,
     type
-} : any) => {
+} : {
+    itemState: UsersFormProps;
+    setItemState: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    handleSubmit: (data: UsersFormProps) => Promise<void>
+    type: string;
+}) => {
 
     const { user } = useAuth();
     const password = useRef({});
     const router = useRouter();
     const params = useSearchParams();
-    const [redirect, setRedirect] = useState(null)
     const {
         register,
         handleSubmit: handleSubmitForm,
@@ -32,12 +36,12 @@ const UserForm = ({
     } = useForm({
         defaultValues: {
             role: itemState.role || "",
-            contact_sale: false,
+            contact_sale: itemState.contact_sale || "0",
             title: itemState.title || "",
             name: itemState.name || "",
             phone: itemState.phone || "",
             email: itemState.email || "",
-            status: false,
+            status: itemState.status || "0",
             password: "",
             password_confirmation: ""
         },
@@ -46,16 +50,16 @@ const UserForm = ({
     const create = type === "create";
     const edit = type === "edit";
 
-    const onCreate = async (data: any) => {
+    const onCreate = async (data: UsersFormProps) => {
         handleSubmit(data);
     };
 
-    const onEdit = async (formData: any) => {
+    const onEdit = async (formData: UsersFormProps) => {
         const modifiedData = { ...formData };
         if (!formData?.password) {
             delete modifiedData?.password;
         }
-        delete modifiedData?.confirmPassword;
+        delete modifiedData?.password_confirmation;
         handleSubmit(modifiedData);
     };
 
@@ -77,10 +81,10 @@ const UserForm = ({
                 name: itemState.name,
                 phone: itemState.phone,
                 email: itemState.email,
-                status: itemState.status,
+                status: itemState.status
             });
         }
-    }, [itemState.role, itemState.title, itemState.name, itemState.phone, itemState.email, itemState.contact_sale, itemState.status, reset]);
+    }, [itemState,reset]);
 
     if(!user) return;
 

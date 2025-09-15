@@ -6,10 +6,7 @@ import { ThemeProvider } from "next-themes"
 import AdminContext from "@/contexts/AdminContext";
 import { Outfit } from "next/font/google";
 import { Toaster } from "react-hot-toast";
-import { useRouter } from "next/navigation";
 import Loader from "@/components/admin/Loader";
-import { getUser } from "@/services/Auth";
-import { usePathname } from "next/navigation";
 
 
 const outfit = Outfit({
@@ -20,9 +17,7 @@ const outfit = Outfit({
 
 export default function RootLayout({children}:{children: React.ReactNode})
 {
-    const router = useRouter();
     const [loading, setLoading] = useState<boolean>(true);
-    const pathname = usePathname();
 
     useEffect(() => {
         const checkAuth = async () => {

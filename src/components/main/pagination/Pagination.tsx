@@ -1,6 +1,6 @@
 import React from 'react';
 import { useSearchParams } from 'next/navigation';
-import { PaginationType,Meta } from '@/types/PaginationType';
+import { PaginationType } from '@/types/PaginationType';
 import { IoChevronBackOutline, IoChevronForwardOutline } from "react-icons/io5";
 
 const Pagination:React.FC<PaginationType> = ({meta,prevPage,nextPage,handlerPageChangeFromBtn}) => {

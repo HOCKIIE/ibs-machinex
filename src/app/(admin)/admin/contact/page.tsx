@@ -11,6 +11,7 @@ import { LuPencil } from "react-icons/lu";
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import useContactStore from '@/store/useContactStore';
 import Link from 'next/link';
+import { CategoryType } from '@/types/CategoryType';
 
 interface SelectDeleteProps { event: React.MouseEvent<HTMLButtonElement>; }
 const show = [10, 25, 50, 100];
@@ -33,8 +34,6 @@ const Contact = () =>
         loading,
         limit,
         updateLimit,
-        setLoading,
-        setPage,
         nextPage,
         prevPage,
         fetchData,
@@ -60,7 +59,7 @@ const Contact = () =>
             setSelectDelete(true)
         }else{
             if(data && data.length>0){
-                setSelectedIds(data.map((item) => item.id));
+                setSelectedIds(data.map((item:CategoryType) => Number(item.id)));
                 setSelectDelete(false)
             }
         }
@@ -80,12 +79,6 @@ const Contact = () =>
 
         return null;
     };
-
-    const setDeleteRecords = async() => {
-        if(selectedIds.length > 0){
-            setId(selectedIds)
-        }
-    }
 
     const deleteRecord = async() => {
         const ids = id?.join(',');
@@ -126,7 +119,7 @@ const Contact = () =>
                                 ><BiTrash fontSize={24}/></button>
                             </div>
                             <div className='flex gap-2'>
-                                <OrderBy handlerOrderBy={(e) => handlerOrderBy(e)}/>
+                                <OrderBy handlerOrderBy={(e) => handlerOrderBy(e)} />
                                 <SearchBar keyword={keyword} handleSearch={(e) => handleSearch(e)} />
                             </div>
                         </div>
@@ -148,7 +141,7 @@ const Contact = () =>
                                     <td className="px-6 py-4">
                                         {loading
                                             ? <div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
-                                            : <AnimatedCheckbox className="select" checked={selectedIds.includes(v.id)} onChange={()=>toggleSelect(v.id)}/>
+                                            : <AnimatedCheckbox className="select" checked={selectedIds.includes(Number(v.id))} onChange={()=>toggleSelect(Number(v.id))}/>
                                         }
                                     </td>
                                     <td className="px-6 py-4">
@@ -186,7 +179,7 @@ const Contact = () =>
                                         <div className="flex gap-2">
                                             <button 
                                                 title="Delete"
-                                                onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([v.id])}}
+                                                onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([Number(v.id)])}}
                                                 className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
                                                 <BiTrash fontSize={24}/>
                                             </button>

@@ -19,11 +19,12 @@ export interface BrandType {
     image: string;
     created_at: string;
     updated_at: string;
+    published_at: string | null;
 }
 
 export interface BrandFormProps {
     id: string;
-    image: File | null;
+    image: File | string| null;
     title_th: string;
     title_en: string;
     title_ja: string;
@@ -36,10 +37,10 @@ export interface BrandFormProps {
     website: string;
     apiName: string;
     status: boolean;
-    brands: BrandType[];
-    category?: Array<string>;
-    categories: Array<{id: string;}>;
-    published_at: string;
+    brands?: BrandType[] | [];
+    category?: Array<string> | [];
+    categories: Array<{id: string;}> | [];
+    published_at: string | null;
     created_at: string;
     updated_at: string;
 }
@@ -67,6 +68,6 @@ export interface BrandState {
         newData: BrandFormProps, 
         router: ReturnType<typeof useRouter>
     ) => Promise<void>;
-    updateData: (id: string, data: BrandFormProps, router: ReturnType<typeof useRouter>) => Promise<void>;
+    updateData: (id: string, data: BrandFormProps) => Promise<void>;
     deleteData: (id: string) => Promise<void>;
 }

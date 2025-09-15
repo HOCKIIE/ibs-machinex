@@ -1,30 +1,25 @@
-"use client";
 
-import Api from '@/services/Api';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, {useEffect } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
-import { useForm, Controller  } from "react-hook-form";
-import { LiaLanguageSolid } from "react-icons/lia";
+import { useForm } from 'react-hook-form';
 import { useRouter } from 'next/navigation';
-import { ApiResponse } from '@/types/CategoryType';
 import { CategoryFormProps } from '@/types/CategoryType';
-import { HiExclamation } from "react-icons/hi";
 import { ErrorMessage } from './Validation';
 import CoverImageUpload from '../Dropzon/CoverImageUpload';
 
 
 const CategoryForm = ({
     itemState,
-    setItemState: setData,
     onSubmit,
     type
-} : any) => {
+} : {
+    itemState: CategoryFormProps;
+    onSubmit: (data:CategoryFormProps) => Promise<void>;
+    type: string
+}) => {
 
     const rounter = useRouter();
-    const [category, setCategory] = useState<ApiResponse[]>([]);
-    const [lng, setLang] = useState<string>('th');
     const BadgeLang = ({lng}:{lng:string}) => <div className="bg-blue-200 text-indigo-500 rounded-md text-xs flex items-center px-1">{lng}</div>
-    const activeLng = `bg-indigo-100 text-indigo-600 dark:bg-indigo-900 dark:text-indigo-300 dark:hover:text-indigo-300 dark:hover:bg-indigo-800`;
     const invalidClass = "border-rose-300 text-rose-600 border-rose-300 focus:border-rose-500 focus:ring-rose-500/40 dark:border-rose dark:border-rose-500";
     const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
     const create = type === "create";
@@ -35,54 +30,19 @@ const CategoryForm = ({
         handleSubmit: handleSubmitForm,
         formState: { errors },
         setValue,
-        control,
-        trigger,
         watch,
         reset
     } = useForm<CategoryFormProps>({
         mode: 'onChange',
         criteriaMode: 'all'
     });
-    const Exclamation = () => <HiExclamation className="text-rose-500" fontSize={18}/>;
-    const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
-    const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
-    const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
 
-    const search = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        console.log(value)
-    }
-
-    const onCreate = async (data: any) => {
-        // console.log(typeof errors)
-        onSubmit(data);
-    };
-
-    const onEdit = async (formData: any) => {
-        console.log(errors)
+    const onCreate = async (data: CategoryFormProps) => onSubmit(data);
+    const onEdit = async (formData: CategoryFormProps) => {
         const modifiedData = { ...formData };
         onSubmit(modifiedData);
     };
-
     const cancelAdd = () => rounter.back();
-
-    const formatDate = (date: Date): string => {
-        const now = new Date();
-        const bangkokTime = new Intl.DateTimeFormat('en-GB', {
-            timeZone: 'Asia/Bangkok',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hourCycle: 'h23',
-        }).format(now);
-
-        const [datePart, timePart] = bangkokTime.split(', ');
-        const [day, month, year] = datePart.split('/');
-        return `${year}-${month}-${day} ${timePart}`;
-    };
 
     useEffect(() => {
             if (itemState) {
@@ -95,9 +55,6 @@ const CategoryForm = ({
                 description_th: itemState.description_th,
                 description_en: itemState.description_en,
                 description_ja: itemState.description_ja,
-                detail_th: itemState.detail_th,
-                detail_en: itemState.detail_en,
-                detail_ja: itemState.detail_ja,
                 status: itemState.status ?? false,
                 published_at: itemState.published_at,
             });

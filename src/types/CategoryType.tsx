@@ -10,16 +10,17 @@ export interface CategoryType {
     description_th: string;
     description_en: string;
     description_ja: string;
-    brand?: [];
+    brands?: [];
     status: boolean;
     created_at: string;
     updated_at: string;
     deleted_at?: string;
+    published_at: string | null;
 }
 
 export interface CategoryFormProps {
     id: string;
-    image: File | null;
+    image: File | string | null;
     title_th: string;
     title_en: string;
     title_ja: string;
@@ -28,9 +29,9 @@ export interface CategoryFormProps {
     description_ja: string;
     status: boolean;
     brands: BrandType[];
-    published_at: string;
     created_at: string;
     updated_at: string;
+    published_at: string | null;
 }
 
 export interface ApiResponse {

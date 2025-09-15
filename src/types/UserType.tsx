@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 export interface UserType {
     id:number;
     role:string;
@@ -27,6 +26,7 @@ export interface UsersFormProps {
     status: string;
     email: string;
     password?: string;
+    password_confirmation?: string;
 }
 
 
@@ -51,10 +51,9 @@ export interface UserState {
     fetchUserById: (id: string) => Promise<void>;
     fetchUsers: () => Promise<void>;
     createUser: (
-        newUser: UsersFormProps, 
-        router: ReturnType<typeof useRouter>
+        newUser: UsersFormProps
     ) => Promise<void>;
-    updateUser: (id: string, data: UsersFormProps, router: ReturnType<typeof useRouter>) => Promise<void>;
+    updateUser: (data: UsersFormProps) => Promise<void>;
     onChangeStatus: (id: string, status: boolean) => Promise<void>;
     deleteUser: (id: string) => Promise<void>;
 

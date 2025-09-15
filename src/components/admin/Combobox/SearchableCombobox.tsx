@@ -15,11 +15,9 @@ type Props = {
     value: Option | null;
     onChange: (value: Option) => void;
     errors: object;
-    inValidClass?: string;
-    validClass?: string;
 };
 
-export default function SearchableCombobox({ options, value, onChange, inValidClass, validClass }: Props) {
+export default function SearchableCombobox({ options, value, onChange }: Props) {
     const [query, setQuery] = useState('');
 
     const filteredOptions =

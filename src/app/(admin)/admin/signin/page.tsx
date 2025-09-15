@@ -9,6 +9,7 @@ import { loginUser } from '@/services/Auth';
 import { useRouter, useSearchParams } from "next/navigation";
 import Alert from '@/utils/Alert';
 import { AlertType } from '@/types/AlertType';
+import Image from 'next/image';
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -146,10 +147,10 @@ const Signin = () =>
                 <div className="relative items-center hidden w-full h-full bg-indigo-950 dark:bg-white/5 lg:grid lg:w-1/2">
                     <div className="flex items-center justify-center z-1">
                         <div className="absolute right-0 top-0 -z-1 w-full max-w-[250px] xl:max-w-[450px]">
-                            <img src="/admin/grid-01.svg" alt="grid" />
+                            <Image src="/admin/grid-01.svg" alt="grid" width={450} height={450}/>
                         </div>
                         <div className="absolute bottom-0 left-0 -z-1 w-full max-w-[250px] rotate-180 xl:max-w-[450px]">
-                            <img src="/admin/grid-01.svg" alt="grid" />
+                            <Image src="/admin/grid-01.svg" alt="grid" width={450} height={450}/>
                         </div>
                         <div className="flex flex-col items-center max-w-xs">
                             <p className="text-center text-gray-400 dark:text-white/60">
