@@ -19,19 +19,24 @@ const FormAdd = () => {
         status: ""
     });
 
-    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => 
+    const handleChange = (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => 
     {
-        const { name, value, files } = event.target;
-        if (name === "image" && files && files[0]) {
-        setUserState((prevState) => ({
-            ...prevState,
-            image: files[0],
-        }));
+        const { name, value } = event.target;
+        if (
+            name === "image" &&
+            event.target instanceof HTMLInputElement &&
+            (event.target as HTMLInputElement).files &&
+            (event.target as HTMLInputElement).files![0]
+        ) {
+            setUserState((prevState) => ({
+                ...prevState,
+                image: (event.target as HTMLInputElement).files![0],
+            }));
         } else {
-        setUserState((prevState) => ({
-            ...prevState,
-            [name]: value,
-        }));
+            setUserState((prevState) => ({
+                ...prevState,
+                [name]: value,
+            }));
         }
     };
     const handleSubmit = async (data: UsersFormProps) => await createUser(data);

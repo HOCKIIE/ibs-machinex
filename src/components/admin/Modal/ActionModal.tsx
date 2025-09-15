@@ -1,17 +1,17 @@
 "use client";
 
 import React from 'react';
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 import { ConfirmModalProps } from '@/types/ConfirmModal';
 import { BsExclamationTriangle } from "react-icons/bs";
 import { IoIosCheckmarkCircleOutline, IoMdClose } from "react-icons/io";
 
-const fadeVariants = {
+const fadeVariants: Variants = {
     hidden: { opacity: 0 },
     visible: { opacity: 1 }
 }
 
-const modalVariants = {
+const modalVariants: Variants = {
     hidden: {
         opacity: 0,
         scale: 0.5
@@ -21,7 +21,7 @@ const modalVariants = {
         scale: 1,
         transition: {
             duration: 0.25,
-            ease: "easeOut",
+            ease: "easeOut", // use a string value compatible with Framer Motion
         }
     },
     exit: {
@@ -29,7 +29,7 @@ const modalVariants = {
         scale: 0.5,
         transition: {
             duration: 0.25,
-            ease: "easeOut"
+            ease: "easeOut" // use a string value compatible with Framer Motion
         }
     },
 };

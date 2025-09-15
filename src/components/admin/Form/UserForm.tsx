@@ -17,13 +17,13 @@ const UserForm = ({
     type
 } : {
     itemState: UsersFormProps;
-    setItemState: (event: React.ChangeEvent<HTMLInputElement>) => void;
+    setItemState: (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
     handleSubmit: (data: UsersFormProps) => Promise<void>
     type: string;
 }) => {
 
     const { user } = useAuth();
-    const password = useRef({});
+    const password = useRef<string | undefined>("");
     const router = useRouter();
     const params = useSearchParams();
     const {
@@ -33,8 +33,9 @@ const UserForm = ({
         control,
         reset,
         watch
-    } = useForm({
+    } = useForm<UsersFormProps>({
         defaultValues: {
+            id: itemState.id || "",
             role: itemState.role || "",
             contact_sale: itemState.contact_sale || "0",
             title: itemState.title || "",
@@ -49,11 +50,11 @@ const UserForm = ({
     password.current = watch("password", "");
     const create = type === "create";
     const edit = type === "edit";
+    const invalidClass = "border-rose-300 text-rose-600 border-rose-300 focus:border-rose-500 focus:ring-rose-500/40 dark:border-rose dark:border-rose-500";
+    const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
+    const roleList = [{value:"super",title:"Super Administrator"},{value:"admin",title:"Administrator"},{value:"user",title:"User"}];
 
-    const onCreate = async (data: UsersFormProps) => {
-        handleSubmit(data);
-    };
-
+    const onCreate = async (data: UsersFormProps) => await handleSubmit(data);
     const onEdit = async (formData: UsersFormProps) => {
         const modifiedData = { ...formData };
         if (!formData?.password) {
@@ -62,11 +63,6 @@ const UserForm = ({
         delete modifiedData?.password_confirmation;
         handleSubmit(modifiedData);
     };
-
-    const invalidClass = "border-rose-300 text-rose-600 border-rose-300 focus:border-rose-500 focus:ring-rose-500/40 dark:border-rose dark:border-rose-500";
-    const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
-    const roleList = [{value:"super",title:"Super Administrator"},{value:"admin",title:"Administrator"},{value:"user",title:"User"}];
-
     const CancelUpdate = () => {
         const redirect = params.get('redirect')
         if (redirect) router.push(redirect);
@@ -75,6 +71,7 @@ const UserForm = ({
     useEffect(() => {
         if (itemState.role) {
             reset({ 
+                id: itemState.id,
                 role: itemState.role,
                 title: itemState.title,
                 contact_sale: itemState.contact_sale,
@@ -85,7 +82,6 @@ const UserForm = ({
             });
         }
     }, [itemState,reset]);
-
     if(!user) return;
 
     return (
@@ -105,7 +101,6 @@ const UserForm = ({
                                 {roleList?.map(({value,title}, k: number) => (
                                     <option key={k} value={value}>{title}</option>
                                 ))}
-                                
                             </select>
                             {errors?.role?.type === "required" && (
                                 <p className="text-xs text-rose-600 dark:text-rose-700">
@@ -125,7 +120,7 @@ const UserForm = ({
                                         <input
                                             type="checkbox"
                                             className="peer absolute opacity-0 w-0 h-0"
-                                            checked={field.value}
+                                            checked={field.value === "1"}
                                             onChange={(e) => field.onChange(e.target.checked)}
                                             ref={field.ref}
                                         />
@@ -144,7 +139,7 @@ const UserForm = ({
                                         <input
                                             type="checkbox"
                                             className="peer absolute opacity-0 w-0 h-0"
-                                            checked={field.value}
+                                            checked={field.value === "1"}
                                             onChange={(e) => field.onChange(e.target.checked)}
                                             ref={field.ref}
                                         />
@@ -248,9 +243,9 @@ const UserForm = ({
                                     <input 
                                         {...register("password_confirmation", { 
                                             required: create,
-                                            validate: (val: string) => {
-                                                if (watch("password") != val) {
-                                                return "Your passwords do no match";
+                                            validate: (val: string | undefined) => {
+                                                if (watch("password") !== val) {
+                                                    return "Your passwords do no match";
                                                 }
                                             },
                                         })}

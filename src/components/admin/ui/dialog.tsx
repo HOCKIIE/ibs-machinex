@@ -27,7 +27,7 @@ export function Dialog({ open, onOpenChange, children }: DialogProps) {
     );
 }
 
-export function DialogContent({ className,children }:{ className?: string; children: React.ReactNode; }) {
+export function DialogContent({ className,children }:{ className: string; children: React.ReactNode; }) {
     return <div className={cn("p-6 space-y-4", className)}>{children}</div>;
 }
 
