@@ -33,18 +33,21 @@ export const ProcessToast = {
         });
     },
     error: (message: string = "เกิดข้อผิดพลาด", delay: number = 1500) => {
-        setTimeout(() => {
-            toast.error(message, {
-                id: "process-toast",
-                position:'top-center',
-                style: {
-                    color: "#991b1b",
-                    borderRadius: "8px",
-                    padding: "10px 16px",
-                    background: "#fecaca",
-                    border:"1px solid #fca5a5"
-                },
-            });
-        },delay);
+        return new Promise<void>((resolve) => {
+            setTimeout(() => {
+                toast.error(message, {
+                    id: "process-toast",
+                    position:'top-center',
+                    style: {
+                        color: "#991b1b",
+                        borderRadius: "8px",
+                        padding: "10px 16px",
+                        background: "#fecaca",
+                        border:"1px solid #fca5a5"
+                    },
+                });
+                resolve();
+            },delay);
+        });
     },
 };

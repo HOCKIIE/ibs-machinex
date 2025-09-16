@@ -4,7 +4,6 @@ import Api from "@/services/Api";
 import { create } from "zustand";
 import { BlogType, BlogState, ApiResponse } from "@/types/BlogType";
 import { ProcessToast } from "@/utils/ProcessToast";
-import { Router } from "next/router";
 
 const prefix = '/admin/blog';
 
@@ -55,7 +54,7 @@ const useBlogStore = create<BlogState>((set) => ({
     },
     
 
-    createData: async (newData,router) => {
+    createData: async (newData, router) => {
         try {
             ProcessToast.show('Saving data...');
             const formData = new FormData();
@@ -75,6 +74,7 @@ const useBlogStore = create<BlogState>((set) => ({
             } else {
                 await ProcessToast.error(message);
             }
+            await router.push(prefix);
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
