@@ -1,5 +1,5 @@
 import Api from '@/services/Api';
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
 import { useForm, Controller  } from "react-hook-form";
 import { CategoryType } from '@/types/CategoryType';
@@ -25,7 +25,7 @@ const BlogForm = ({
     onSubmit: (data: BlogFormProps) => Promise<void>;
     type: string;
 }) => {
-
+    const didFetchData = useRef(false);
     const router = useRouter();
     const [category, setCategory] = useState<CategoryType[]>([]);
     const [lng, setLang] = useState<string>('th');
@@ -75,20 +75,20 @@ const BlogForm = ({
             second: '2-digit',
             hourCycle: 'h23',
         }).format(date);
-
         const [datePart, timePart] = bangkokTime.split(', ');
         const [day, month, year] = datePart.split('/');
         return `${year}-${month}-${day} ${timePart}`;
     };
-    const fetchCategory = useCallback(async()=>{
+    const fetchCategory = async() => {
         const res = await Api.get('/category');
         setCategory(res.data);
-    }, [setCategory]);
+    };
 
     useEffect(()=>{
+        if(didFetchData.current) return;
+        didFetchData.current = true;
         fetchCategory();
-    }, [fetchCategory]);
-
+    },[fetchCategory]);
     useEffect(() => {
         if (itemState) {
             reset({

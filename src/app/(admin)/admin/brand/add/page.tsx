@@ -4,13 +4,11 @@ import React from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import BrandForm from '@/components/admin/Form/BrandForm';
-import { useRouter } from 'next/navigation';
 import useBrandStore from '@/store/useBrandStore';
 import { BrandFormProps } from '@/types/BrandType';
 
 const Page = () => {
 
-    const router = useRouter();
     const { createData } = useBrandStore();
     const categoryState: BrandFormProps = {
         id: "",
@@ -35,7 +33,7 @@ const Page = () => {
         updated_at: ""
     };
 
-    const handleSubmit = async (data: BrandFormProps) => await createData(data,router);
+    const handleSubmit = async (data: BrandFormProps) => await createData(data);
 
     return (
     <DefaultLayout>

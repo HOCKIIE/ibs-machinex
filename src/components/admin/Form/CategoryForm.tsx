@@ -38,10 +38,7 @@ const CategoryForm = ({
     });
 
     const onCreate = async (data: CategoryFormProps) => onSubmit(data);
-    const onEdit = async (formData: CategoryFormProps) => {
-        const modifiedData = { ...formData };
-        onSubmit(modifiedData);
-    };
+    const onEdit = async (formData: CategoryFormProps) => onSubmit({ ...formData });
     const cancelAdd = () => rounter.back();
 
     useEffect(() => {
@@ -59,7 +56,7 @@ const CategoryForm = ({
                 published_at: itemState.published_at,
             });
         }
-    }, [itemState, reset, setValue]);
+    }, [itemState, reset]);
     
 
 return (

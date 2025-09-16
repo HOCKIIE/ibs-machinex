@@ -4,6 +4,7 @@ import Api from "@/services/Api";
 import { create } from "zustand";
 import { BlogType, BlogState, ApiResponse } from "@/types/BlogType";
 import { ProcessToast } from "@/utils/ProcessToast";
+import { Router } from "next/router";
 
 const prefix = '/admin/blog';
 
@@ -54,7 +55,7 @@ const useBlogStore = create<BlogState>((set) => ({
     },
     
 
-    createData: async (newData) => {
+    createData: async (newData,router) => {
         try {
             ProcessToast.show('Saving data...');
             const formData = new FormData();
@@ -68,15 +69,11 @@ const useBlogStore = create<BlogState>((set) => ({
                 }
             });
             const response = await Api.post(`${prefix}/store`, formData);
-            set((state) => ({
-                items: [...state.items, response.data],
-                isLoading: false,
-            }));
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
-                ProcessToast.success(message);
+                await ProcessToast.success(message);
             } else {
-                ProcessToast.error(message);
+                await ProcessToast.error(message);
             }
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
@@ -146,11 +143,10 @@ const useBlogStore = create<BlogState>((set) => ({
     
     deleteData: async (id) => {
         ProcessToast.show('Deleting data...');
-        set({ isLoading: true, error: null });
         try {
             await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set((state) => ({
-                items: state.items.filter((item) => item.id !== Number(id)),
+                items: state.items.filter((item:BlogType) => Number(item.id) !== Number(id)),
                 isLoading: false,
                 response:{
                     status: true,

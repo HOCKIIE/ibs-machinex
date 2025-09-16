@@ -53,7 +53,7 @@ export interface UserState {
     createUser: (
         newUser: UsersFormProps
     ) => Promise<void>;
-    updateUser: (data: UsersFormProps) => Promise<void>;
+    updateUser: (id:string, data: UsersFormProps) => Promise<void>;
     onChangeStatus: (id: string, status: boolean) => Promise<void>;
     deleteUser: (id: string) => Promise<void>;
 

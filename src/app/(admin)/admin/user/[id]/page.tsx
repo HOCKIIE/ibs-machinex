@@ -44,9 +44,7 @@ const EditUser = ({ params }: { params:  Promise<{ id: string }> }) =>
             }));
         }
     };
-    
-    
-    const handleSubmit = async (data: UsersFormProps) => await updateUser(data);
+    const handleSubmit = async (data: UsersFormProps) => await updateUser(id, data);
     const fetchData = async () => await fetchUserById(id);
 
     useEffect(()=>{

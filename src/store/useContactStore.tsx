@@ -18,7 +18,7 @@ const useContactStore = create<ContactState>((set) => ({
     currentPage: 1,
     response: { status: null, message: null },
     
-    fetchData: async (page: number) => {
+    fetchData: async (page?: number) => {
         set({ isLoading: true, error: null });
         try {
             const response = await Api.get<ApiResponse>(`${prefix}?page=${page}`);
