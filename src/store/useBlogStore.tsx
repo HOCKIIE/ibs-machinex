@@ -71,10 +71,10 @@ const useBlogStore = create<BlogState>((set) => ({
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
                 await ProcessToast.success(message);
+                router.push(prefix);
             } else {
                 await ProcessToast.error(message);
             }
-            await router.push(prefix);
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";

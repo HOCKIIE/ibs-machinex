@@ -25,6 +25,7 @@ const BlogForm = ({
     onSubmit: (data: BlogFormProps) => Promise<void>;
     type: string;
 }) => {
+
     const didFetchData = useRef(false);
     const router = useRouter();
     const [category, setCategory] = useState<CategoryType[]>([]);
@@ -35,7 +36,6 @@ const BlogForm = ({
     const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
     const create = type === "create";
     const edit = type === "edit";
-
     const {
         register,
         handleSubmit: handleSubmitForm,
@@ -48,12 +48,10 @@ const BlogForm = ({
         mode: 'onChange',
         criteriaMode: 'all'
     });
-
     const Exclamation = () => <HiExclamation className="text-rose-500" fontSize={18}/>;
     const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
     const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
     const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
-
     const search = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         console.log(value)
@@ -83,12 +81,11 @@ const BlogForm = ({
         const res = await Api.get('/category');
         setCategory(res.data);
     };
-
     useEffect(()=>{
         if(didFetchData.current) return;
         didFetchData.current = true;
         fetchCategory();
-    },[fetchCategory]);
+    });
     useEffect(() => {
         if (itemState) {
             reset({

@@ -1,5 +1,5 @@
 "use client"
-import React,{ useEffect,useState,use } from 'react';
+import React,{ useEffect,useState,useRef,use } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import BlogForm from '@/components/admin/Form/BlogForm';
@@ -9,6 +9,7 @@ import { BlogFormProps } from '@/types/BlogType';
 const Page = ({ params }: { params: Promise<{ id: string }> }) => 
 {
     const { id } = use(params);
+    const didFetchData = useRef(false);
     const { items, fetchDataById, updateData } = useBlogStore();
     const [blogState, setBlogState] = useState<BlogFormProps>({
         id: "",
@@ -29,12 +30,9 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) =>
         published_at: "",
         created_at: "",
     });
-
     const handleSubmit = async (data: BlogFormProps) => await updateData(id, data);
-    const fetchData = React.useCallback(async () => { await fetchDataById(id);}, [fetchDataById, id]); 
-    useEffect(() => { fetchData() }, [fetchData]);
-    
-
+    const fetchData = async () => await fetchDataById(id);
+    useEffect(() => { if(didFetchData.current) return; didFetchData.current = true; fetchData(); });
     useEffect(() => {
         if (items.length > 0) {
             setBlogState({
@@ -52,12 +50,12 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) =>
                 detail_ja: items[0].detail_ja ?? "",
                 updated_at: items[0].updated_at ?? "",
                 status: items[0].status ?? false,
-                pathName: items[0].pathName ?? false,
+                pathName: items[0].pathName ?? "",
                 published_at: items[0].published_at ?? "",
                 created_at: items[0].created_at ?? ""
             });
         }
-    }, [items]);
+    }, [setBlogState,items]);
 
     return (
         <DefaultLayout>
@@ -72,11 +70,7 @@ const Page = ({ params }: { params: Promise<{ id: string }> }) =>
                         <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Add a new blog</h3>
                     </div>
                     <hr />
-                    <BlogForm 
-                        itemState={blogState}
-                        onSubmit={handleSubmit}
-                        type="edit"
-                    />
+                    <BlogForm itemState={blogState} onSubmit={handleSubmit} type="edit" />
                 </div>
             </div>
         </DefaultLayout>
