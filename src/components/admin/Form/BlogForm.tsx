@@ -12,7 +12,7 @@ import CoverImageUpload from '../Dropzon/CoverImageUpload';
 import TextEditor from '../Editor/TextEditor';
 import { ErrorMessage } from './Validation';
 import { useRouter } from 'next/navigation';
-
+import Format from '@/utils/Format';
 import { IoMdPricetag, IoMdClose } from "react-icons/io";
 import { HiExclamation } from "react-icons/hi";
 
@@ -62,21 +62,6 @@ const BlogForm = ({
         onSubmit(modifiedData);
     };
     const cancelAdd = () => router.back();
-    const formatDate = (date: Date): string => {
-        const bangkokTime = new Intl.DateTimeFormat('en-GB', {
-            timeZone: 'Asia/Bangkok',
-            year: 'numeric',
-            month: '2-digit',
-            day: '2-digit',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit',
-            hourCycle: 'h23',
-        }).format(date);
-        const [datePart, timePart] = bangkokTime.split(', ');
-        const [day, month, year] = datePart.split('/');
-        return `${year}-${month}-${day} ${timePart}`;
-    };
     const fetchCategory = async() => {
         const res = await Api.get('/category');
         setCategory(res.data);
@@ -229,20 +214,20 @@ const BlogForm = ({
                                 render={({ field }) => {
                                     const isChecked = !!field.value;
                                     return (
-                                    <label className="inline-flex items-center cursor-pointer">
-                                        <input
-                                        type="checkbox"
-                                        className="sr-only peer"
-                                        checked={isChecked}
-                                        onChange={(e) => {
-                                            const checked = e.target.checked;
-                                            field.onChange(checked ? formatDate(new Date()) : null);
-                                        }}
-                                        disabled={!!itemState?.published_at}
-                                        />
-                                        <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600 dark:peer-checked:bg-indigo-600"></div>
-                                        <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Publish:</span>
-                                    </label>
+                                        <label className="inline-flex items-center cursor-pointer">
+                                            <input
+                                            type="checkbox"
+                                            className="sr-only peer"
+                                            checked={isChecked}
+                                            onChange={(e) => {
+                                                const checked = e.target.checked;
+                                                field.onChange(checked ? Format.date(new Date()) : null);
+                                            }}
+                                            disabled={!!itemState?.published_at}
+                                            />
+                                            <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600 dark:peer-checked:bg-indigo-600"></div>
+                                            <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Publish:</span>
+                                        </label>
                                     );
                                 }}
                             />
