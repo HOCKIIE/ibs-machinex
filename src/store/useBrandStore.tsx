@@ -91,7 +91,7 @@ const useBrandStore = create<BrandState>((set) => ({
             ProcessToast.show('Saving data...');
             const formData = new FormData();
             Object.entries(data).forEach(([key, value]) => {
-                if (key === "image" && value instanceof File) {
+                if (key === "image" && (value as unknown) instanceof File) {
                     formData.append("image", value);
                 } else 
                 if(key === 'status'){
