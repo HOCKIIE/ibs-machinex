@@ -24,7 +24,7 @@ export default function Page(){
         detail_en: "",
         detail_ja: "",
         status: false,
-        pathName:"",
+        pathName: "",
         category: [],
         categories: [],
         published_at:"",
