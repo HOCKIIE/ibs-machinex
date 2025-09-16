@@ -63,7 +63,7 @@ const useUserStore = create<UserState>((set) => ({
         }
     },
     
-    createUser: async (newUser, router) => {
+    createUser: async (newUser) => {
         try {
             ProcessToast.show('Creating data...')
             const response = await Api.post(`${prefix}/store`, newUser);
@@ -74,7 +74,6 @@ const useUserStore = create<UserState>((set) => ({
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
                 ProcessToast.success(message,2000);
-                router.push(`${prefix}`);
             } else { 
                 ProcessToast.error(message,2000);
             }

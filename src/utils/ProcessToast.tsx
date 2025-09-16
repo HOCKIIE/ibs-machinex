@@ -15,19 +15,22 @@ export const ProcessToast = {
         });
     },
     success: (message: string = "สำเร็จ!", delay: number = 1500) => {
-        setTimeout(() => {
-            toast.success(message, {
-                id: "process-toast",
-                position:'top-center',
-                style: {
-                    color: "#047857",// emerald-700
-                    borderRadius: "8px",
-                    padding: "10px 16px",
-                    background: "#d1fae5", // emerald-100
-                    border:"1px solid #6ee7b7" // emerald-300
-                },
-            });
-        },delay)
+        return new Promise<void>((resolve) => {
+            setTimeout(() => {
+                toast.success(message, {
+                    id: "process-toast",
+                    position: 'top-center',
+                    style: {
+                        color: "#047857", // emerald-700
+                        borderRadius: "8px",
+                        padding: "10px 16px",
+                        background: "#d1fae5", // emerald-100
+                        border: "1px solid #6ee7b7" // emerald-300
+                    },
+                });
+                resolve();
+            }, delay);
+        });
     },
     error: (message: string = "เกิดข้อผิดพลาด", delay: number = 1500) => {
         setTimeout(() => {

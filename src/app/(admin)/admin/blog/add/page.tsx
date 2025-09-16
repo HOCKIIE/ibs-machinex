@@ -6,9 +6,10 @@ import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import BlogForm from '@/components/admin/Form/BlogForm';
 import { BlogFormProps } from '@/types/BlogType';
 import useBlogStore from '@/store/useBlogStore';
+import { useRouter } from 'next/navigation'
 
 export default function Page(){
-
+    const router = useRouter();
     const { createData } = useBlogStore();
     const blogState: BlogFormProps = {
         id:"",
@@ -30,7 +31,7 @@ export default function Page(){
         created_at:"",
         updated_at:""
     };
-    const handleSubmit = async (data: BlogFormProps) =>  await createData(data);
+    const handleSubmit = async (data: BlogFormProps) => await createData(data,router);
 
     return (
         <DefaultLayout>

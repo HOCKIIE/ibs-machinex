@@ -147,7 +147,7 @@ const useProductStore = create<ProductState>((set) => ({
         try {
             await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set((state) => ({
-                items: state.items.filter((item) => item.id !== Number(id)),
+                items: state.items.filter((item) => Number(item.id) !== Number(id)),
                 isLoading: false,
                 response:{
                     status: true,

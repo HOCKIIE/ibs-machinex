@@ -45,9 +45,10 @@ export interface BrandFormProps {
 }
 
 export interface ApiResponse {
-    id: string;
-    name: string;
-    image: string;
+    total: number;
+    lastPage: number;
+    currentPage: number;
+    items: BrandType[];
 }
 
 export interface BrandState {
@@ -64,6 +65,6 @@ export interface BrandState {
     fetchData: (page: number) => Promise<void>;
     fetchDataById: (id: string) => Promise<void>;
     createData: (newData: BrandFormProps) => Promise<void>;
-    updateData: (data: BrandFormProps) => Promise<void>;
+    updateData: (id: string, data: BrandFormProps) => Promise<void>;
     deleteData: (id: string) => Promise<void>;
 }

@@ -70,7 +70,7 @@ const useBrandStore = create<BrandState>((set) => ({
             });
             const response = await Api.post(`${prefix}/store`, formData);
             set((state) => ({
-                items: [...state.items, response.data],
+                items: [...(state.items || []), response.data],
                 isLoading: false,
             }));
             const { status, message } = response.data as { status: boolean; message: string };
@@ -106,10 +106,10 @@ const useBrandStore = create<BrandState>((set) => ({
                     "X-Requested-With": "XMLHttpRequest"
                 },
             });
-            set((state) => ({
-                items: state.items.map((item) => String(item.id) === String(id) ? response.data.data : item  ),
+            set({
+                items: response.data.data ?? [],
                 isLoading: false
-            }));
+            });
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
                 ProcessToast.success(message,2000);
@@ -127,14 +127,13 @@ const useBrandStore = create<BrandState>((set) => ({
         set({ isLoading: true, error: null });
         try {
             await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
-            set((state) => ({
-                items: state.items.filter((item) => item.id !== id),
+            set({
                 isLoading: false,
                 response:{
                     status: true,
                     message: "The user was deleted successfully!"
                 }
-            }));
+            });
             ProcessToast.error('The user was deleted successfully!',2000)
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";

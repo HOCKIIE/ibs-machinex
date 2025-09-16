@@ -30,7 +30,8 @@ interface CustomText extends BaseText{
     style:string;
     alt:string;
     columns:string;
-    span:string
+    span:string;
+    src?: string; // Added src property
 }
 
 export const serialize = (nodes: CustomText[]): string => {
