@@ -1,6 +1,6 @@
 "use client"
 
-import React,{ useEffect,useState } from 'react';
+import React,{ useEffect,useState,useRef } from 'react';
 import Link from 'next/link';
 import { BiTrash } from "react-icons/bi";
 import { LuPencil } from 'react-icons/lu';
@@ -26,7 +26,6 @@ const recordStatus = [
 
 const Blog = () => {
 
-    const [mounted, setMounted] = useState(false);
     const [selectDelete, setSelectDelete] = useState<boolean>(true)
     const { 
         keyword,
@@ -46,13 +45,14 @@ const Blog = () => {
         endpoint: '/admin/blog' 
     });
 
-    const {  isLoading, error, deleteData, response } = useBlogStore();
+    const { error, deleteData, response } = useBlogStore();
+    const [progress, setProgress] = useState(false);
     const currentUrl = useCurrentUrl();
     const [redirect, setRedirect] = useState<string|null>(null);
     const [isAction, setAction] = useState<string>("delete");
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
-
+    const didFetchData = useRef(false);
     const [id, setId] = useState<number[] | null>(null);
     const isAllSelected = selectedIds.length > 0;
 
@@ -86,24 +86,34 @@ const Blog = () => {
 
 
     const deleteRecord = async() => {
-        const ids = id?.join(',');
-        if (ids !== null) await deleteData(`${ids}`);
+        setProgress(true);
+        try {
+            console.log('isOpen', isOpen);  
+            const ids = id?.join(',');
+            if (ids !== null) {
+                await deleteData(ids?.split(',') || []);
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setProgress(false);
+        }
     }
-    const successProgress: () => void = () => {
-        response.status = null;
-        response.message = null;
-        fetchData()
-    }
-    const closeModal = () => {
-        setModalOpen(false);
-        successProgress();
-    }
-    useEffect(()=>{ setRedirect(currentUrl) },[currentUrl,setRedirect])
-    useEffect(() => {
-        setMounted(true);
-    }, []);
+    const openModal = () => setModalOpen(true);
+    // const closeModal = () => setModalOpen(false);
 
-    if (!mounted) return null; // Prevent SSR mismatches
+    const successProgress = () => { response.status = null; response.statusCode = null; response.message = null; fetchData(); }
+    const closeModal = () => { setModalOpen(false); successProgress(); }
+    const fetchDataHandler = () => fetchData();
+    useEffect(() => {
+        console.log("Parent isOpen =", isOpen);
+    },[isOpen]);
+    useEffect(()=>{ setRedirect(currentUrl) },[currentUrl,setRedirect]);
+    useEffect(() => {
+        if (didFetchData.current) return;
+        didFetchData.current = true;
+        fetchDataHandler();
+    });
 
     return (
         <DefaultLayout>
@@ -192,7 +202,7 @@ const Blog = () => {
                                             <div className="flex gap-2">
                                                 <button 
                                                     title="Delete"
-                                                    onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([Number(v.id)])}}
+                                                    onClick={()=>{openModal(); setAction("delete"); setId([Number(v.id)])}}
                                                     className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
                                                     <BiTrash fontSize={24}/>
                                                 </button>
@@ -235,15 +245,16 @@ const Blog = () => {
                 isOpen={isOpen} 
                 action={isAction}
                 onClose={() => setModalOpen(false)}
-                onAfterClose={()=>fetchData}
+                onAfterClose={fetchData}
                 closeModal={closeModal}
                 data={{
                     confirm: deleteRecord,
-                    progress: isLoading,
-                    successProgress: successProgress,
-                    response: { 
-                        status: typeof response.status === 'boolean' ? response.status : null, 
-                        message: response.message 
+                    progress: progress,
+                    successProgress: fetchDataHandler,
+                    response: {
+                        status: typeof response.status == 'boolean' ? response.status : null,
+                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null, 
+                        message: typeof response.message == 'string' ? response.message : null 
                     },
                     error: error
                 }}

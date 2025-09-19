@@ -44,12 +44,10 @@ const Signin = () =>
         setMessage(null);
         try {
             const request = await loginUser(data.email, data.password);
-            console.log("✅ Login Success:", request);
             if(request.status == 'success'){
                 setStatus('success')
                 setMessage('Success, The system is redirecting.')
                 const redirectTo = typeof redirect === 'string' ? redirect : '/admin';
-                console.log('redirectTo > ',redirectTo)
                 router.push(redirectTo);
             }else{
                 setStatus('error')

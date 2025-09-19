@@ -43,7 +43,7 @@ export interface UserState {
     total: number;
     lastPage: number;
     currentPage: number;
-    response: { status: boolean | null; message: string | null };
+    response: { status: boolean | null; statusCode:number | null; message: string | null };
 
     // initializeAuth: () => Promise<boolean>;
     // login: (email: string, password: string) => Promise<boolean>;

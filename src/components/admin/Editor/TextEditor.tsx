@@ -28,7 +28,6 @@ import { PiTextIndentBold, PiTextOutdentBold } from "react-icons/pi";
 import { IoRefresh, IoClose, IoTrashBinOutline } from "react-icons/io5";
 import Api from "@/services/Api";
 import HTMLCodeModal from "./HTMLCodeModal";
-import Image from "next/image";
 
 type MyElement = Element & { type: string, className?: string; };
 
@@ -511,7 +510,7 @@ const ImageModal = ({
                         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 h-[77%] overflow-y-auto p-1">
                             {preview && preview.map((img,k)=>(
                             <div key={k} className="border rounded-md overflow-hidden cursor-pointer h-32 w-37 flex justify-center items-center">
-                                <Image src={img} alt="preview" className="object-cover h-full" />
+                                <img src={img} alt="preview" className="object-cover h-full" />
                             </div>
                             ))}
                         </div>
@@ -520,15 +519,17 @@ const ImageModal = ({
                 {tab === "gallery" && (
                 <>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 h-[77%] overflow-y-auto p-1">
-                        {gallery && gallery.map((img,k) => (
+                        {gallery && gallery.map((img,k) => {
+                            console.log(img)
+                            return (
                         <div
                             key={k}
                             className={`border rounded-md overflow-hidden cursor-pointer h-32 w-37 flex item-center justify-center ${selected && selected.includes(img.url) ? "ring-2 ring-blue-500" : ""}`}
                             onClick={() => setSelected([img.url])}
                         >
-                            <Image src={img.url} alt="gallery" className="object-cover h-full" />
+                            <img src={img.url} alt="gallery image" className="object-cover h-full" />
                         </div>
-                        ))}
+                        )})}
                     </div>
                 </>
                 )}
@@ -660,8 +661,8 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                 );
             case 'image':
                 return (
-                    <div {...attributes} className={element.className}>
-                        <Image src={element.src} alt="image" style={{ maxWidth: '100%', height: '100%' }} />
+                    <div {...attributes}>
+                        <img src={element.url} alt="image" className={element.className}/>
                         {children}
                     </div>
                 );
@@ -869,7 +870,7 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                             />
                         </div>
                         <div className="editor-footer border-t">
-                            <div className="flex justify-between">
+                            <div className="flex justify-end">
                                 <div className="develop flex items-center">
                                     <div className="text-xs text-gray-500">Develope By: HOƆKY</div>
                                     <div className="px-1">

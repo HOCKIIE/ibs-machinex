@@ -78,10 +78,10 @@ const Users = () =>
         const ids = id?.join(',');
         if (ids !== null) await deleteUser(`${ids}`);
     }
-    const successProgress: () => void = () => {
+    const successProgress = () => {
         response.status = null;
         response.message = null;
-        fetchData()
+        fetchData();
     }
     const closeModal = () => {
         setModalOpen(false);
@@ -223,10 +223,11 @@ const Users = () =>
                 closeModal={closeModal}
                 data={{
                     confirm: deleteRecord,
+                    successProgress: closeModal,
                     progress: isLoading,
-                    successProgress: successProgress,
                     response: { 
                         status: typeof response.status === 'boolean' ? response.status : null, 
+                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,
                         message: response.message 
                     },
                     error: error

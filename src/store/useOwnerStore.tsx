@@ -36,11 +36,11 @@ const useOwnerStore = create<OwnerState>((set) => ({
             ProcessToast.show('Saving data...')
             const response = await Api.put(`${prefix}/update`,data);
             set({ item: response.data.data });
-            ProcessToast.success(response.data.message,2000);
+            await ProcessToast.success(response.data.message,2000);
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            ProcessToast.error(errorMessage,2000);
+            await ProcessToast.error(errorMessage,2000);
         }
     }
 

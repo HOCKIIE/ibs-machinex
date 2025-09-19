@@ -14,7 +14,6 @@ import usePagination from '@/hooks/usePagination';
 import Format from '@/utils/Format';
 import { Paginate, LimitPerPage, SearchBar } from '@/components/admin/Paginate/Paginate';
 import ActionModal from '@/components/admin/Modal/ActionModal';
-import Image from 'next/image';
 import { ProductType } from '@/types/ProductType';
 
 interface SelectDeleteProps { event: React.MouseEvent<HTMLButtonElement>; }
@@ -173,7 +172,7 @@ const Product = () =>
                                             :
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 w-10 h-10">
-                                                    <Image className="w-10 h-10 rounded-full" 
+                                                    <img className="w-10 h-10 rounded-full" 
                                                         src={`${process.env.NEXT_PUBLIC_API_URL}${v.image}` || '/storage/fallback-image.jpg'} 
                                                         alt={v.title_en}
                                                     />
@@ -309,7 +308,8 @@ const Product = () =>
                     progress: isLoading,
                     successProgress: successProgress,
                     response: { 
-                        status: typeof response.status === 'boolean' ? response.status : null, 
+                        status: typeof response.status == 'boolean' ? response.status : null,
+                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null, 
                         message: response.message 
                     },
                     error: error

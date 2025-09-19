@@ -16,7 +16,6 @@ import { Paginate, LimitPerPage, SearchBar } from '@/components/admin/Paginate/P
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import { BrandType } from '@/types/BrandType';
 import { useCurrentUrl } from '@/utils/useCurrentUrl';
-import Image from 'next/image';
 
 interface SelectDeleteProps { event: React.MouseEvent<HTMLButtonElement>; }
 const show = [10, 25, 50, 100];
@@ -174,7 +173,7 @@ const Brand = () =>
                                         </div>
                                         : <div className="flex items-center">
                                             <div className="flex-shrink-0 w-20 h-20">
-                                                <Image className="w-20 h-20 rounded-full" 
+                                                <img className="w-20 h-20 rounded-full" 
                                                     src={`${v.image}` || '/storage/fallback-image.jpg'} 
                                                     alt={v.title_en}
                                                 />
@@ -252,10 +251,11 @@ const Brand = () =>
                 closeModal={closeModal}
                 data={{
                     confirm: deleteRecord,
+                    successProgress:successProgress,
                     progress: isLoading,
-                    successProgress: successProgress,
                     response: { 
                         status: typeof response.status === 'boolean' ? response.status : null, 
+                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,
                         message: response.message 
                     },
                     error: error

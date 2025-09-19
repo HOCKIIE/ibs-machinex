@@ -17,7 +17,7 @@ const useProductStore = create<ProductState>((set) => ({
     total: 1,
     lastPage: 1,
     currentPage: 1,
-    response: { status: null, message: null },
+    response: { status: null, statusCode: null, message: null },
 
     fetchData: async (page: number) => {
         set({ isLoading: true, error: null });
@@ -136,6 +136,7 @@ const useProductStore = create<ProductState>((set) => ({
                 isLoading: false,
                 response : {
                     status: false,
+                    statusCode: 500,
                     message: errorMessage
                 }
             });
@@ -145,12 +146,13 @@ const useProductStore = create<ProductState>((set) => ({
     deleteData: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
+            const callout = await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set((state) => ({
                 items: state.items.filter((item) => Number(item.id) !== Number(id)),
                 isLoading: false,
                 response:{
                     status: true,
+                    statusCode: callout.data.statusCode,
                     message: "The user was deleted successfully!"
                 }
             }));
@@ -161,6 +163,7 @@ const useProductStore = create<ProductState>((set) => ({
                 isLoading: false,
                 response : {
                     status: false,
+                    statusCode: 500,
                     message: errorMessage
                 }
             });

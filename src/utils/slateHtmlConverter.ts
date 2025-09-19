@@ -32,6 +32,7 @@ interface CustomText extends BaseText{
     columns:string;
     span:string;
     src?: string; // Added src property
+    url?: string;
 }
 
 export const serialize = (nodes: CustomText[]): string => {
@@ -80,7 +81,7 @@ export function serializeNode(node: CustomText): string {
         case 'underline':
             return `<u>${children}</u>`;
         case 'image':
-            return `<img src="${node.src || ""}" alt="${node.alt || ""}" class="${node.className || "max-w-full h-auto"}" style="${node.style ? Object.entries(node.style).map(([k,v]) => `${k}:${v}`).join(";") : ""}" />`;
+            return `<img src="${node?.url || ""}" alt="${node.alt || ""}" class="${node.className || "max-w-full h-auto"}" style="${node.style ? Object.entries(node.style).map(([k,v]) => `${k}:${v}`).join(";") : ""}" />`;
         case 'grid':
             return `<div class="grid grid-cols-${node.columns || 12} gap-4 mb-4">${children}</div>`;
         case 'grid-column':
@@ -152,14 +153,13 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[]
         case "img":
             return {
                 type: "image",
-                src: el.getAttribute("src") || "",
+                url: el.getAttribute("src") || "",
                 alt: el.getAttribute("alt") || "",
                 style: styleObj,
                 className: [DEFAULT_CLASSES.img, className].filter(Boolean).join(" "),
-                children: [{ text: "" }],
+                children: children.length ? children : [{ text: "" }],
             };
         case "ul":
-            // console.log("UL deserialize:", "class=", className);
             return {
                 type: "bulleted-list",
                 style: styleObj,
@@ -167,7 +167,6 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[]
                 children: children.length ? children : [{ text: "" }],
             };
         case "ol":
-            // console.log("OL deserialize:", "class=", className);
             return {
                 type: "numbered-list",
                 style: styleObj,

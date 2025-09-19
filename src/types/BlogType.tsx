@@ -68,13 +68,13 @@ export interface BlogState {
     total: number;
     lastPage: number;
     currentPage: number;
-    response: { status: boolean | null; message: string | null };
+    response: { status?: boolean | null; statusCode?: number | null; message?: string | null };
 
     fetchData: (page: number) => Promise<void>;
     fetchDataById: (id: string) => Promise<void>;
     createData: (newUser: BlogFormProps, router: ReturnType<typeof useRouter>) => Promise<void>;
     updateData: (id: string, data: BlogFormProps) => Promise<void>;
     onChangeStatus: (id: string, status: boolean) => Promise<void>;
-    deleteData: (id: string) => Promise<void>;
+    deleteData: (id: string[]) => Promise<void>;
 
 }

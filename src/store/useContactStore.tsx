@@ -16,7 +16,7 @@ const useContactStore = create<ContactState>((set) => ({
     total: 1,
     lastPage: 1,
     currentPage: 1,
-    response: { status: null, message: null },
+    response: { status: null, statusCode: null, message: null },
     
     fetchData: async (page?: number) => {
         set({ isLoading: true, error: null });
@@ -43,6 +43,7 @@ const useContactStore = create<ContactState>((set) => ({
             set({
                 response: {
                     status : response.data.status,
+                    statusCode : response.data.statusCode,
                     message : response.data.message,
                 }
             });
@@ -62,6 +63,7 @@ const useContactStore = create<ContactState>((set) => ({
                 isLoading: false,
                 response: {
                     status : response.data.status,
+                    statusCode : response.data.statusCode,
                     message : response.data.message,
                 }
             });
