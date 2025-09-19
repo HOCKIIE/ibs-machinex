@@ -224,6 +224,7 @@ const Contact = () =>
                     successProgress: successProgress,
                     response: { 
                         status: typeof response.status === 'boolean' ? response.status : null, 
+                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,
                         message: response.message 
                     },
                     error: error

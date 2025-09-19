@@ -24,15 +24,16 @@ export const loginUser = async (email: string, password: string) => {
         }
     }
 };
-export const logout = () => {
+export const logout = (pathName?:string) => {
     toast.success("Logged out successfully!", { duration: 1000 });
+    const queryString = pathName ? `?redirect=${encodeURIComponent(pathName)}` : '';
     setTimeout(async () => {
         try {
-            await AxiosInstance.put("/logout");
+            await AxiosInstance.put(`/logout${queryString}`);
         } catch (error) {
             console.error("Logout error", error);
         } finally {
-            window.location.href = "/admin/signin";
+            window.location.href = `/admin/signin${queryString}`;
         }
     }, 1000);
 };
@@ -52,7 +53,6 @@ export const refreshToken = async (): Promise<string | null> =>
 }
 
 export const getUser = async () => {
-    // const router = useRouter();
     try {
         const res = await AxiosInstance.get('/me');
         return res.data;

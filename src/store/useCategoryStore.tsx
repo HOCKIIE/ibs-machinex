@@ -2,7 +2,7 @@
 
 import Api from "@/services/Api";
 import { create } from "zustand";
-import toast from "react-hot-toast";
+import { ProcessToast } from "@/utils/ProcessToast";
 import { CategoryState, CategoryType, ApiResponse } from "@/types/CategoryType";
 
 const prefix = '/admin/category';
@@ -17,7 +17,7 @@ const useCategoryStore = create<CategoryState>((set) => ({
     total: 1,
     lastPage: 1,
     currentPage: 1,
-    response: { status: null, message: null },
+    response: { status: null, statusCode: null, message: null },
 
     fetchData: async (page: number) => {
         set({ isLoading: true, error: null });
@@ -55,6 +55,7 @@ const useCategoryStore = create<CategoryState>((set) => ({
 
     createData: async (newData, router) => {
         try {
+            ProcessToast.show('Creating category...');
             const formData = new FormData();
             Object.entries(newData).forEach(([key, value]) => {
                 if (key === "category" && Array.isArray(value)) {
@@ -72,22 +73,21 @@ const useCategoryStore = create<CategoryState>((set) => ({
             }));
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
-                toast.success(message);
-                setTimeout(() => { 
-                    router.push(`${prefix}`); 
-                }, 1000);
+                await ProcessToast.success(message);
+                router.push(`${prefix}`); 
             } else { 
-                toast.error(message);
+                await ProcessToast.error(message);
             }
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage);
+            ProcessToast.error(errorMessage);
         }
     },
 
     updateData: async (id, data) => {
         try {
+            ProcessToast.show('Updating category...');
             const formData = new FormData();
             Object.entries(data).forEach(([key, value]) => {
                 if (key === "image" && value instanceof File) {
@@ -97,37 +97,34 @@ const useCategoryStore = create<CategoryState>((set) => ({
                 }
             });
             formData.append("_method", "PUT");
-            const response = await Api.post(`${prefix}/update/${id}`,formData, {
-                headers: {
-                    "X-Requested-With": "XMLHttpRequest"
-                },
-            });
+            const response = await Api.post(`${prefix}/update/${id}`, formData, { headers: {"X-Requested-With": "XMLHttpRequest"} });
             set((state) => ({
                 items: state.items.map((item) => String(item.id) === String(id) ? response.data.data : item  ),
                 isLoading: false
             }));
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
-                toast.success(message);
+                await ProcessToast.success(message);
             } else { 
-                toast.error(message);
+                await ProcessToast.error(message);
             }
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage);
+            await ProcessToast.error(errorMessage);
         }
     },
 
     deleteData: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
+            const callout = await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set((state) => ({
-                items: state.items.filter((item) => item.id !== id),
+                items: state.items.filter((item) => item.id !== String(id)),
                 isLoading: false,
                 response:{
                     status: true,
+                    statusCode: callout.data.statusCode,
                     message: "The user was deleted successfully!"
                 }
             }));
@@ -138,6 +135,7 @@ const useCategoryStore = create<CategoryState>((set) => ({
                 isLoading: false,
                 response : {
                     status: false,
+                    statusCode: 500,
                     message: errorMessage
                 }
             });

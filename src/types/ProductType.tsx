@@ -69,7 +69,7 @@ export interface ProductState {
     total: number;
     lastPage: number;
     currentPage: number;
-    response: { status: boolean | null; message: string | null };
+    response: { status: boolean | null; statusCode: number | null; message: string | null };
 
     fetchData: (page: number) => Promise<void>;
     fetchDataById: (id: string) => Promise<void>;

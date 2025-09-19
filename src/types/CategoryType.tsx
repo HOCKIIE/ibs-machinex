@@ -55,7 +55,7 @@ export interface CategoryState {
     total: number;
     lastPage: number;
     currentPage: number;
-    response: { status: boolean | null; message: string | null };
+    response: { status: boolean | null; statusCode: number | null; message: string | null };
 
     fetchData: (page: number) => Promise<void>;
     fetchDataById: (id: string) => Promise<void>;
@@ -64,6 +64,6 @@ export interface CategoryState {
         router: ReturnType<typeof useRouter>
     ) => Promise<void>;
     updateData: (id: string, data: CategoryFormProps, router: ReturnType<typeof useRouter>) => Promise<void>;
-    deleteData: (id: string) => Promise<void>;
+    deleteData: (id: Array<number>) => Promise<void>;
 
 }

@@ -17,7 +17,7 @@ const useBrandStore = create<BrandState>((set) => ({
     total: 1,
     lastPage: 1,
     currentPage: 1,
-    response: { status: null, message: null },
+    response: { status: null, statusCode: null,  message: null },
 
     fetchData: async (page: number) => {
         set({ isLoading: true, error: null });
@@ -75,14 +75,14 @@ const useBrandStore = create<BrandState>((set) => ({
             }));
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
-                ProcessToast.success(message,2000);
+                await ProcessToast.success(message,2000);
             } else { 
-                ProcessToast.error(message,2000);
+                await ProcessToast.error(message,2000);
             }
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            ProcessToast.error(errorMessage,2000);
+            await ProcessToast.error(errorMessage,2000);
         }
     },
 
@@ -112,29 +112,29 @@ const useBrandStore = create<BrandState>((set) => ({
             });
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
-                ProcessToast.success(message,2000);
+                await ProcessToast.success(message,2000);
             } else { 
-                ProcessToast.error(message,2000);
+                await ProcessToast.error(message,2000);
             }
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            ProcessToast.error(errorMessage,2000);
+            await ProcessToast.error(errorMessage,2000);
         }
     },
 
     deleteData: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
+            const callout = await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set({
                 isLoading: false,
                 response:{
                     status: true,
+                    statusCode: callout.data.statusCode,
                     message: "The user was deleted successfully!"
                 }
             });
-            ProcessToast.error('The user was deleted successfully!',2000)
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({
@@ -142,10 +142,10 @@ const useBrandStore = create<BrandState>((set) => ({
                 isLoading: false,
                 response : {
                     status: false,
+                    statusCode: 500,
                     message: errorMessage
                 }
             });
-            ProcessToast.error(errorMessage,2000)
         }
     }
 

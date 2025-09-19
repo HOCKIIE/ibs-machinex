@@ -17,7 +17,7 @@ const useBlogStore = create<BlogState>((set) => ({
     total: 1,
     lastPage: 1,
     currentPage: 1,
-    response: { status: null, message: null },
+    response: { status: null, statusCode: null, message: null },
 
     fetchData: async (page: number) => {
         set({ isLoading: true, error: null });
@@ -142,18 +142,16 @@ const useBlogStore = create<BlogState>((set) => ({
     },
     
     deleteData: async (id) => {
-        ProcessToast.show('Deleting data...');
         try {
-            await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
-            set((state) => ({
-                items: state.items.filter((item:BlogType) => Number(item.id) !== Number(id)),
+            const request = await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
+            set({
                 isLoading: false,
                 response:{
-                    status: true,
-                    message: "The user was deleted successfully!"
+                    status: request.data.status,
+                    statusCode: request.data.statusCode,
+                    message: request.data.message
                 }
-            }));
-            ProcessToast.success('The user was deleted successfully!');
+            });
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({
@@ -161,10 +159,10 @@ const useBlogStore = create<BlogState>((set) => ({
                 isLoading: false,
                 response : {
                     status: false,
+                    statusCode: 500,
                     message: errorMessage
                 }
             });
-            ProcessToast.error(errorMessage);
         }
     }
 

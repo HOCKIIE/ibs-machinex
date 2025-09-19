@@ -9,7 +9,7 @@ const prefix = '/admin/user';
 const useUserStore = create<UserState>((set) => ({
     users: [],
     isLoading: false,
-    response:{ status:null,message:null},
+    response:{ status:null, statusCode: null, message:null},
     error: null,
     token: null,
     role: "",
@@ -35,11 +35,11 @@ const useUserStore = create<UserState>((set) => ({
                     filteredRows = [];
             }
             set({
-                    users: filteredRows,
-                    total,
-                    lastPage,
-                    currentPage,
-                    isLoading: false,
+                users: filteredRows,
+                total,
+                lastPage,
+                currentPage,
+                isLoading: false,
             });
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
@@ -102,13 +102,13 @@ const useUserStore = create<UserState>((set) => ({
     },
 
     onChangeStatus: async (id, status) => {
+        ProcessToast.show('Saving data...');
         set({ isLoading: true, error: null });
         try {
-            ProcessToast.show('Saving data...');
-            const response = await Api.put<UserType>(`${prefix}/status/${id}`,{ status });
+            const response = await Api.put(`${prefix}/status/${id}`,{ status });
             set((state) => ({
                 banners: state.users.map((item) => item.id === Number(id) ? response.data : item ),
-                isLoading: false,
+                isLoading: false
             }));
             ProcessToast.success("The User status change successfully!",2000);
         } catch (error: unknown) {
@@ -118,6 +118,7 @@ const useUserStore = create<UserState>((set) => ({
                 isLoading: false,
                 response : {
                     status: false,
+                    statusCode: 500,
                     message: errorMessage
                 }
             });
@@ -125,19 +126,18 @@ const useUserStore = create<UserState>((set) => ({
     },
     
     deleteUser: async (id) => {
-        ProcessToast.show('Deleting data...')
         set({ isLoading: true, error: null });
         try {
-            await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
+            const callout = await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set((state) => ({
                 users: state.users.filter((item) => item.id !== Number(id)),
                 isLoading: false,
                 response:{
                     status: true,
+                    statusCode: callout.data.statusCode,
                     message: "The user was deleted successfully!"
                 }
             }));
-            ProcessToast.success("The user was deleted successfully!",2000);
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({
@@ -145,10 +145,10 @@ const useUserStore = create<UserState>((set) => ({
                 isLoading: false,
                 response : {
                     status: false,
+                    statusCode: 500,
                     message: errorMessage
                 }
             });
-            ProcessToast.error(errorMessage,2000)
         }
     }
 
