@@ -6,7 +6,6 @@ import BrandForm from '@/components/admin/Form/BrandForm';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import { BrandFormProps } from '@/types/BrandType';
 import useBrandStore from '@/store/useBrandStore';
-import toast from 'react-hot-toast';
 
 const Page = ({ params }:{ params: Promise<{id:string}> }) => {
     const { id } = use(params);
@@ -64,12 +63,6 @@ const Page = ({ params }:{ params: Promise<{id:string}> }) => {
                 published_at: items[0].published_at ?? null
             });
         }
-        // @ts-expect-error: items may have a status property from API response
-        if(items.status === true) {
-        // @ts-expect-error: items may have a message property from API response
-            toast.success(items.message);
-        }
-        
     }, [items]);
 
     return (

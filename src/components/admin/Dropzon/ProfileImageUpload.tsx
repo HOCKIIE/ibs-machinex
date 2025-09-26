@@ -43,7 +43,7 @@ const ProfileImageUpload: React.FC<ProfileImageUploadProps> = ({currentImage}) =
         <input {...getInputProps()} />
         {image ? (
           <>
-            <Image src={image} alt="Profile" width={128} height={128} className="w-full h-full object-cover" />
+            <img src={image} alt="Profile" width={128} height={128} className="w-full h-full object-cover" />
             <button
               title="Reset"
               type="button"

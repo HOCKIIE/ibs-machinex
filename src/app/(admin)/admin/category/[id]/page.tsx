@@ -46,18 +46,18 @@ const EditCategory = ({ params }: { params: Promise<{ id: string }> }) => {
         if (items) {
             setItemState({
                 id: id,
-                image: items[0].image ?? "",
-                title_th: items[0].title_th ?? "",
-                title_en: items[0].title_en ?? "",
-                title_ja: items[0].title_ja ?? "",
-                description_th: items[0].description_th ?? "",
-                description_en: items[0].description_en ?? "",
-                description_ja: items[0].description_ja ?? "",
+                image: items[0]?.image ?? "",
+                title_th: items[0]?.title_th ?? "",
+                title_en: items[0]?.title_en ?? "",
+                title_ja: items[0]?.title_ja ?? "",
+                description_th: items[0]?.description_th ?? "",
+                description_en: items[0]?.description_en ?? "",
+                description_ja: items[0]?.description_ja ?? "",
                 status: Boolean(items[0]?.status) || false,
-                brands: items[0].brands ?? [],
-                created_at: items[0].created_at ?? "",
-                updated_at: items[0].updated_at ?? "",
-                published_at: items[0].published_at ?? ""
+                brands: items[0]?.brands ?? [],
+                created_at: items[0]?.created_at ?? "",
+                updated_at: items[0]?.updated_at ?? "",
+                published_at: items[0]?.published_at ?? ""
             });
         }
         // @ts-expect-error: items may have a status property from API response

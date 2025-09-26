@@ -98,6 +98,9 @@ const Brand = () =>
         setModalOpen(false);
         successProgress();
     }
+    useEffect(() => {
+        console.log('response', response);
+    });
     useEffect(()=>{
         setRedirect(currentUrl)
     },[currentUrl, setRedirect])

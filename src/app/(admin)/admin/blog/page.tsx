@@ -108,7 +108,7 @@ const Blog = () => {
     useEffect(() => {
         console.log("Parent isOpen =", isOpen);
     },[isOpen]);
-    useEffect(()=>{ setRedirect(currentUrl) },[currentUrl,setRedirect]);
+    useEffect(() => { setRedirect(currentUrl) },[currentUrl,setRedirect]);
     useEffect(() => {
         if (didFetchData.current) return;
         didFetchData.current = true;

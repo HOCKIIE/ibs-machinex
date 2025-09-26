@@ -28,24 +28,37 @@ const ContactSection = () => {
     };
 
     useEffect(() => {
-        const updateIframeWidth = () => {
-            if (iframeRef.current) {
-                setIframeWidth(iframeRef.current.clientWidth);
-            }
-        };
         const iframe = iframeRef.current;
-        if (iframe) {
-            iframe.onload = () => {
-                updateIframeWidth();
-                iframe.contentWindow?.addEventListener("resize", updateIframeWidth);
-                iframe.contentWindow?.addEventListener("orientationchange", updateIframeWidth);
-            };
-        }
+
+        const updateIframeWidth = () => {
+            if (iframe) setIframeWidth(iframe.clientWidth);
+        };
+
+        const handleLoad = () => {
+            updateIframeWidth();
+            iframe?.contentWindow?.addEventListener("resize", updateIframeWidth);
+            iframe?.contentWindow?.addEventListener("orientationchange", updateIframeWidth);
+        };
+
+        iframe?.addEventListener("load", handleLoad);
+
         return () => {
+            iframe?.removeEventListener("load", handleLoad);
             iframe?.contentWindow?.removeEventListener("resize", updateIframeWidth);
             iframe?.contentWindow?.removeEventListener("orientationchange", updateIframeWidth);
         };
-    });
+    }, []);
+    useEffect(() => {
+        const handleMessage = (event: MessageEvent) => {
+            if (event.data?.type === "iframe-resize") {
+            setIframeWidth(event.data.width);
+            }
+        };
+
+        window.addEventListener("message", handleMessage);
+        return () => window.removeEventListener("message", handleMessage);
+    }, []);
+
     useEffect(() => {
         if (didFetchData.current) return;
         didFetchData.current = true;
@@ -62,7 +75,7 @@ const ContactSection = () => {
             </div>
             <div className="col-span-12 xl:col-span-6">
                 <div className="relative bg-contain h-[488px] overflow-hidden">
-                    <Image src="/images/about/central-business-district-singapore 1.png" fill objectFit="fit" className="h-full object-contain" alt="Contact"/>
+                    <img src="/images/about/central-business-district-singapore 1.png" className="h-full object-contain" alt="Contact"/>
                 </div>
             </div>
 
