@@ -154,7 +154,7 @@ const ProductSection = () => {
                     >
                         <div className="flex flex-col items-center transition-transform duration-300 ease-in-out group-hover:scale-110">
                             <div className="overflow-hidden w-[120px] h-[120px] flex justify-center items-center">
-                                <Image src={item.image} alt={item[`title_${locale}`]} width={120} height={120} className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] pb-2"/>
+                                <img src={item.image} alt={item[`title_${locale}`]} width={120} height={120} className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.4)] pb-2"/>
                             </div>
                             <h2 className="text-center line-clamp-3 mt-5 group-hover:text-red-600">{item[`title_${locale}`]}</h2>
                         </div>
@@ -188,7 +188,7 @@ const ProductSection = () => {
                                                 href={`/brand/${brand.apiName}`}
                                                 className="rounded-full overflow-hidden w-[107px] h-[107px] flex justify-center items-center mb-2 border shadow-md hover:outline hover:outline-offset-[-4px] outline-red-700 hover:outline-[5px] transition-all duration-300 ease-in-out"
                                             >
-                                                <Image src={brand.image} alt={brand.title_en} className="w-full h-full object-contain"/>
+                                                <img src={brand.image} alt={brand.title_en} className="w-full h-full object-contain"/>
                                             </Link>
                                         </div>)
                                     )}

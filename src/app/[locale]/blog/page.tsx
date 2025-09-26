@@ -86,7 +86,7 @@ const Blog = () =>
                             <div className="grid gap-5 overflow-hidden bg-white rounded-2xl">
                                 <Link href={'/blog/' + recentBlog[0].pathName} className="group">
                                     <div className="overflow-hidden rounded-t-2xl max-h-[200px] xl:max-h-[300px]">
-                                            <Image src={recentBlog[0].image} title={data[0][`title_${locale}`]} alt="" className="w-full object-cover"/>
+                                        <img src={recentBlog[0].image} title={data[0][`title_${locale}`]} alt="" className="w-full object-cover"/>
                                     </div>
                                     <div className="p-4">
                                         <p className="text-black">{data[0]['updated_at']}</p>
@@ -104,7 +104,7 @@ const Blog = () =>
                                             <div key={index} className="grid xl:flex bg-white rounded-2xl group">
                                                 <div className="xl:w-1/2">
                                                     <Link href={'/blog/' + item.pathName} className="block rounded-l-2xl max-h-[200px] overflow-hidden group">
-                                                        <Image src={item.image} title={item[`title_${locale}`]} alt="" className="h-full object-cover"/>
+                                                        <img src={item.image} title={item[`title_${locale}`]} alt="" className="h-full object-cover"/>
                                                     </Link>
                                                 </div>
                                                 <div className="xl:w-1/2 p-4 overflow-hidden">
@@ -124,7 +124,7 @@ const Blog = () =>
                                     <div className="grid gap-5 overflow-hidden">
                                         <Link href={'/blog/' + item.pathName} className="group">
                                             <div className="overflow-hidden rounded-t-2xl max-h-[200px] xl:max-h-[300px]">
-                                                <Image src={item.image} title={item[`title_${locale}`]} alt={item[`title_${locale}`]} className="w-full object-cover"/>
+                                                <img src={item.image} title={item[`title_${locale}`]} alt={item[`title_${locale}`]} className="w-full object-cover"/>
                                             </div>
                                             <div className="">
                                                 <p className="text-black">{item.updated_at}</p>
@@ -146,7 +146,7 @@ const Blog = () =>
                                     <Link href={'/blog/' + item.pathName} className="group block">
                                         <div className="grid overflow-hidden ">
                                             <div className="ow-full aspect-video overflow-hidden rounded-t-2xl max-h-[300px]">
-                                                <Image src={item.image} title={item[`title_${locale}`]} alt={item[`title_${locale}`]} className="w-full h-full object-cover"/>
+                                                <img src={item.image} title={item[`title_${locale}`]} alt={item[`title_${locale}`]} className="w-full h-full object-cover"/>
                                             </div>
                                             <div className="p-4">
                                                 <p className="text-black mb-2">{item.updated_at}</p>

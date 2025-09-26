@@ -13,7 +13,7 @@ type Option = {
 type Props = {
     options: Option[];
     value: Option | null;
-    onChange: (value: Option) => void;
+    onChange: (value: Option | null) => void;
     errors: object;
 };
 

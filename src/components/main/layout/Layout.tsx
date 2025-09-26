@@ -34,7 +34,7 @@ export const Header = () => {
         <div className="fixed w-full bg-white z-20 shadow-sm">
             <div className="container md:px-0 flex justify-between">
                 <div className="flex gap-1 items-center text-blue-900 text-sm h-12 lg:h-auto md:text-md xl:text-title-md md:font-semibold">
-                    <Image src="/images/logo.png" alt="IBS Machinex (Thailand) Company Limited" width={77} height={48}/>
+                    <img src="/images/logo.png" alt="IBS Machinex (Thailand) Company Limited" width={77} height={48}/>
                     <div>IBS Machinex (Thailand) Company Limited</div>
                 </div>
                 <div className="hidden lg:flex items-center gap-20">

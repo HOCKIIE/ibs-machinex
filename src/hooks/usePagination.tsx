@@ -39,19 +39,16 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
     const DEBOUNCE_DELAY = 800;
 
     const fetchData = useCallback(async () => {
-        setLoading(true);
         try {
-            const queryString = await searchParams.toString();
+            const queryString = searchParams.toString();
             const res = await Api.get(`${endpoint}?${queryString}`);
             setData(res.data.data);
             setMeta(res.data.meta);
         } catch {
-            toast.error("Failed to load data.")
-        } finally {
-            setLoading(false);
+            console.log('Failed to fetch data.');
         }
 
-    },[endpoint, searchParams]);
+    },[endpoint, queryString]);
 
     const handleClickPage = useCallback((action:string) => 
     {
@@ -154,6 +151,13 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
 
         },DEBOUNCE_DELAY);
     }
+    useEffect(() => {
+        return () => {
+            if (debounceTimeout.current) {
+            clearTimeout(debounceTimeout.current);
+            }
+        };
+    }, []);
 
     useEffect(() => {
         if (didFetchData.current === queryString) return;

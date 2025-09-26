@@ -48,7 +48,7 @@ const Brand = ({ params }:{ params: Promise<{slug:string}> }) => {
             <div className="grid grid-cols-12 gap-4">
                 <div className="col-span-12 xl:col-span-6">
                     <div className="relative bg-contain h-[488px] overflow-hidden">
-                        <Image src="/images/about/central-business-district-singapore 1.png" fill objectFit="fit" className="h-full object-contain" alt="Contact"/>
+                        <img src="/images/about/central-business-district-singapore 1.png" className="h-full object-contain" alt="Contact"/>
                     </div>
                 </div>
 

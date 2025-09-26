@@ -3,7 +3,7 @@
 import Api from "@/services/Api";
 import { create } from "zustand";
 import { ProcessToast } from "@/utils/ProcessToast";
-import { CategoryState, CategoryType, ApiResponse } from "@/types/CategoryType";
+import { CategoryState, ApiResponse } from "@/types/CategoryType";
 
 const prefix = '/admin/category';
 
@@ -40,10 +40,10 @@ const useCategoryStore = create<CategoryState>((set) => ({
     fetchDataById: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.get<CategoryType>(`${prefix}/show/${id}`);
+            const response = await Api.get(`${prefix}/show/${id}`);
             set((state) => ({
                 ...state,
-                items: [response.data],
+                items: response.data,
                 isLoading: false,
             }));
         } catch (error: unknown) {

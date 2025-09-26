@@ -103,7 +103,7 @@ const ActionModal: React.FC<ConfirmModalProps> = ({isOpen, onAfterClose, closeMo
         // console.log('response', response);
         if(response.statusCode != 200 && response.statusCode != null) ErrorHandler();
         if(response.status == true && response.statusCode == 200 ) SuccessHandler();
-    },[response.statusCode, ErrorHandler, SuccessHandler]);
+    },[response.statusCode,response.status, ErrorHandler, SuccessHandler]);
     return (
         <AnimatePresence onExitComplete={onAfterClose}>
             {isOpen && (
