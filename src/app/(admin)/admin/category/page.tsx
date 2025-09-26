@@ -15,9 +15,7 @@ import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
 import { CategoryType } from '@/types/CategoryType';
 import { useCurrentUrl } from '@/utils/useCurrentUrl';
-// import Image from 'next/image';
 
-interface SelectDeleteProps { event: React.MouseEvent<HTMLButtonElement>; }
 const show = [10, 25, 50, 100];
 const recordStatus = [
     {value:"all", label:"All"},
@@ -27,7 +25,7 @@ const recordStatus = [
 
 const Category = () =>
 {
-    const [mounted, setMounted] = useState(false);
+
     const { 
         keyword,
         data,
@@ -73,15 +71,6 @@ const Category = () =>
         if(selectedIds.length> 0) setSelectDelete(false);
     };
 
-    const SelectDelete: React.FC<SelectDeleteProps> = ({ event }) => {
-        useEffect(() => {
-            console.log(event.target);
-            console.log(selectedIds);
-        }, [event]);
-
-        return null;
-    };
-
     const deleteRecord = async() => {
         if (id && id.length > 0) {
             await deleteData(id);
@@ -100,10 +89,6 @@ const Category = () =>
     }
     
     useEffect(()=> setRedirect(currentUrl), [currentUrl,setRedirect])
-    useEffect(() => {
-        setMounted(true);
-    }, []);
-    if (!mounted) return null; // Prevent SSR mismatches
 
     return (
         <DefaultLayout>
@@ -125,7 +110,6 @@ const Category = () =>
                                 <LimitPerPage show={show} limit={limit} updateLimit={updateLimit}/>
                                 <button 
                                     disabled={selectDelete}
-                                    onClick={(e) => <SelectDelete event={e} />}
                                     title="Remove from select"
                                     type="button"
                                     className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-error-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"

@@ -6,8 +6,8 @@ import CancelButton from '@/components/admin/Button/CancelBotton';
 import CreateButton from '@/components/admin/Button/CreateButton';
 import UpdateButton from '@/components/admin/Button/UpdateButton';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useAuth } from '@/contexts/AdminContext';
 import { UsersFormProps } from '@/types/UserType';
+import { getUser } from '@/services/Auth';
 
 
 const UserForm = ({
@@ -22,7 +22,8 @@ const UserForm = ({
     type: string;
 }) => {
 
-    const { user } = useAuth();
+    const didFetchCurrentData = useRef(false);
+    const [currentUser, setCurrentUser] = React.useState<UsersFormProps | null>(null);
     const password = useRef<string | undefined>("");
     const router = useRouter();
     const params = useSearchParams();
@@ -67,6 +68,10 @@ const UserForm = ({
         const redirect = params.get('redirect')
         if (redirect) router.push(redirect);
     }
+    const fetchUser = async() => {
+        const request = await getUser();
+        setCurrentUser(request.user);
+    }
 
     useEffect(() => {
         if (itemState.role) {
@@ -82,7 +87,11 @@ const UserForm = ({
             });
         }
     }, [itemState,reset]);
-    if(!user) return;
+    useEffect(() => {
+        if (didFetchCurrentData.current) return;
+        didFetchCurrentData.current = true;
+        fetchUser();
+    },[]);
 
     return (
         <div>
@@ -221,7 +230,7 @@ const UserForm = ({
                             )}
                         </div>
                     </div>
-                    {user?.role == 'super' &&
+                    {currentUser?.role == 'super' &&
                         <>
                             <div className="col-span-12">
                                 <div className="space-y-3">

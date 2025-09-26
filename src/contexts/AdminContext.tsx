@@ -2,10 +2,17 @@
 
 import { ReactNode, createContext, useContext, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { UserType } from "@/types/UserType";
+// import { UserType } from "@/types/UserType";
 import { setAccessToken } from "@/services/Api";
 import { getUser } from "@/services/Auth";
 
+interface UserType {
+    id: number;
+    role: string;
+    name: string;
+    email: string;
+    status: number;
+}
 interface AuthContextType {
     user: UserType | null;
     loading: boolean;
@@ -34,7 +41,7 @@ export default function AdminContextProvider({ children }: { children: ReactNode
 {
     const router = useRouter();
     const [isSidebarOpen, setSidebarOpen] = useState(true);
-    const [user, setUser] = useState<UserType | null>(null);
+    const [user, setUser] = useState<UserType|null>(null);
     const [menuActive, setMenuActive] = useState<string>('');
     const [userMenu, setUserMenu] = useState<boolean>(false);
     const [loading, setLoading] = useState(true);
@@ -45,7 +52,13 @@ export default function AdminContextProvider({ children }: { children: ReactNode
     const fetchUser = async () => {
         try {
             const res = await getUser();
-            setUser(res.user);
+            setUser({
+                id: res.user.id,
+                role: res.user.role,
+                name: res.user.name,
+                email: res.user.email,
+                status: res.user.status,
+            });
             setAccessToken(res.accessToken);
         } catch (error) {
             console.log(error);

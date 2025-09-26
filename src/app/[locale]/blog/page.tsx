@@ -50,8 +50,7 @@ const Blog = () =>
     },[setScreenWidth])
 
     return (
-        <div 
-        className="relative bg-fixed bg-center bg-cover" 
+        <div className="relative bg-fixed bg-center bg-cover" 
         style={{ 
             backgroundImage: "url('/images/bg-2.svg')",
             backgroundRepeat:"no-repeat",
