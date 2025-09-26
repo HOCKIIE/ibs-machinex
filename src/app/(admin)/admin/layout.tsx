@@ -18,21 +18,9 @@ const outfit = Outfit({
 export default function RootLayout({children}:{children: React.ReactNode})
 {
     const [loading, setLoading] = useState<boolean>(true);
-
     useEffect(() => {
-        const checkAuth = async () => {
-            // setLoading(true);
-            // const user = await getUser();
-
-            // if (!user) {
-            //     if(pathname.includes('/signin')) router.push('/admin/signin')
-            //     else router.push(`/admin/signin?redirect=${encodeURIComponent(pathname)}`);
-            //     setLoading(false);
-            //     return;
-            // }
-            setLoading(false);
-        };
-        checkAuth();
+        const timer = setTimeout(() => setLoading(false), 2000);
+        return () => clearTimeout(timer);
     }, []);
 
     return (

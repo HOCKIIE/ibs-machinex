@@ -87,10 +87,8 @@ const Users = () =>
         setModalOpen(false);
         successProgress();
     }
-    
 
     useEffect(() => {
-        console.log("🔄 URL changed:", currentUrl);
         setRedirect(currentUrl)
     }, [currentUrl,setRedirect]);
     return (

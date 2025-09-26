@@ -7,7 +7,6 @@ import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import useCategoryStore from '@/store/useCategoryStore';
 import { useRouter } from 'next/navigation';
 import { CategoryFormProps } from '@/types/CategoryType';
-import toast from 'react-hot-toast';
 
 const EditCategory = ({ params }: { params: Promise<{ id: string }> }) => {
 
@@ -31,7 +30,6 @@ const EditCategory = ({ params }: { params: Promise<{ id: string }> }) => {
         published_at:""
     });
     const handleSubmit = async (data: CategoryFormProps) => {
-        console.log(data);
         await updateData(id, data, router);
     };
 
@@ -59,13 +57,7 @@ const EditCategory = ({ params }: { params: Promise<{ id: string }> }) => {
                 updated_at: items[0]?.updated_at ?? "",
                 published_at: items[0]?.published_at ?? ""
             });
-        }
-        // @ts-expect-error: items may have a status property from API response
-        if(items.status === true) {
-        // @ts-expect-error: items may have a message property from API response
-            toast.success(items.message);
-        }
-        
+        }        
     }, [items,id]);
 
     return (

@@ -40,7 +40,6 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
 
     const fetchData = useCallback(async () => {
         try {
-            const queryString = searchParams.toString();
             const res = await Api.get(`${endpoint}?${queryString}`);
             setData(res.data.data);
             setMeta(res.data.meta);
@@ -48,7 +47,7 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
             console.log('Failed to fetch data.');
         }
 
-    },[endpoint, queryString]);
+    },[queryString]);
 
     const handleClickPage = useCallback((action:string) => 
     {

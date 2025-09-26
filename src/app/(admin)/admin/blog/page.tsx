@@ -70,11 +70,10 @@ const Blog = () => {
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
         );
         if(selectedIds.length> 0) setSelectDelete(false);
-    };
+    }
     interface SelectDeleteProps {
-            event: React.MouseEvent<HTMLButtonElement>;
-        }
-    
+        event: React.MouseEvent<HTMLButtonElement>;
+    }
     const SelectDelete: React.FC<SelectDeleteProps> = ({ event }) => {
         useEffect(() => {
             console.log(event.target);
@@ -82,13 +81,10 @@ const Blog = () => {
         }, [event]);
 
         return null;
-    };
-
-
+    }
     const deleteRecord = async() => {
         setProgress(true);
         try {
-            console.log('isOpen', isOpen);  
             const ids = id?.join(',');
             if (ids !== null) {
                 await deleteData(ids?.split(',') || []);
@@ -100,14 +96,9 @@ const Blog = () => {
         }
     }
     const openModal = () => setModalOpen(true);
-    // const closeModal = () => setModalOpen(false);
-
     const successProgress = () => { response.status = null; response.statusCode = null; response.message = null; fetchData(); }
     const closeModal = () => { setModalOpen(false); successProgress(); }
     const fetchDataHandler = () => fetchData();
-    useEffect(() => {
-        console.log("Parent isOpen =", isOpen);
-    },[isOpen]);
     useEffect(() => { setRedirect(currentUrl) },[currentUrl,setRedirect]);
     useEffect(() => {
         if (didFetchData.current) return;

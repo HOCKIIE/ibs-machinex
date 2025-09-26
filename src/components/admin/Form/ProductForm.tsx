@@ -78,7 +78,6 @@ const ProductForm = ({
             second: '2-digit',
             hourCycle: 'h23',
         }).format(now);
-
         const [datePart, timePart] = bangkokTime.split(', ');
         const [day, month, year] = datePart.split('/');
         return `${year}-${month}-${day} ${timePart}`;
