@@ -45,7 +45,7 @@ const Blog = () => {
         endpoint: '/admin/blog' 
     });
 
-    const { error, deleteData, response } = useBlogStore();
+    const { deleteData, response } = useBlogStore();
     const [progress, setProgress] = useState(false);
     const currentUrl = useCurrentUrl();
     const [redirect, setRedirect] = useState<string|null>(null);
@@ -246,8 +246,7 @@ const Blog = () => {
                         status: typeof response.status == 'boolean' ? response.status : null,
                         statusCode: typeof response.statusCode == 'number' ? response.statusCode : null, 
                         message: typeof response.message == 'string' ? response.message : null 
-                    },
-                    error: error
+                    }
                 }}
             />
         </DefaultLayout>

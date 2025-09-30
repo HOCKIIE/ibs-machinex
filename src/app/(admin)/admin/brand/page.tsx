@@ -43,9 +43,10 @@ const Brand = () =>
         initialLimit: show[0],
         endpoint: '/admin/brand'
     });
-    const { isLoading, error, deleteData, response } = useProductStore();
+    const { deleteData, response } = useProductStore();
     const [id, setId] = useState<number[] | null>(null);
     const [isOpen, setModalOpen] = useState<boolean>(false);
+    const [progress, setProgress] = useState(false);
     const [isAction, setAction] = useState<string>("delete");
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const [selectDelete, setSelectDelete] = useState<boolean>(true)
@@ -72,10 +73,17 @@ const Brand = () =>
     };
 
     const deleteRecord = async() => {
-        const ids = id?.join(',');
-        if (ids !== null) {
-            await deleteData(`${ids}`);
-            successProgress();
+        setProgress(true);
+        try{
+            const ids = id?.join(',');
+            if (ids !== null) {
+                await deleteData(`${ids}`);
+                successProgress();
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setProgress(false);
         }
     }
     const successProgress = () => {
@@ -241,13 +249,12 @@ const Brand = () =>
                 data={{
                     confirm: deleteRecord,
                     successProgress:successProgress,
-                    progress: isLoading,
+                    progress: progress,
                     response: { 
                         status: typeof response.status === 'boolean' ? response.status : null, 
                         statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,
                         message: response.message 
-                    },
-                    error: error
+                    }
                 }}
             />
         </DefaultLayout>

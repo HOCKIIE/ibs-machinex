@@ -44,8 +44,8 @@ const Contact = () =>
         initialLimit: show[0],
         endpoint: '/admin/contact-us'
     });
-    const { isLoading, error, deleteData, response } = useContactStore();
-
+    const { deleteData, response } = useContactStore();
+    const [progress, setProgress] = useState(false);
     const [id, setId] = useState<number[] | null>(null);
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [isAction, setAction] = useState<string>("delete");
@@ -81,10 +81,16 @@ const Contact = () =>
     };
 
     const deleteRecord = async() => {
-        const ids = id?.join(',');
-        if (ids !== null) {
-            await deleteData(`${ids}`);
-            successProgress();
+        try {
+            const ids = id?.join(',');
+            if (ids !== null) {
+                await deleteData(`${ids}`);
+                successProgress();
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setProgress(false);
         }
     }
     const successProgress = () => {
@@ -220,14 +226,13 @@ const Contact = () =>
                 closeModal={closeModal}
                 data={{
                     confirm: deleteRecord,
-                    progress: isLoading,
+                    progress: progress,
                     successProgress: successProgress,
                     response: { 
                         status: typeof response.status === 'boolean' ? response.status : null, 
                         statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,
                         message: response.message 
-                    },
-                    error: error
+                    }
                 }}
             />
         </DefaultLayout>

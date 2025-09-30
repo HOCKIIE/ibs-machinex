@@ -43,7 +43,8 @@ const Users = () =>
         endpoint: '/admin/user'
     });
 
-    const { isLoading, error, deleteUser, response } = useUserStore();
+    const { deleteUser, response } = useUserStore();
+    const [progress, setProgress] = useState(false);
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [isAction, setAction] = useState<string>("delete");
     const [id, setId] = useState<number[] | null>(null);
@@ -75,8 +76,14 @@ const Users = () =>
     }
 
     const deleteRecord = async() => {
-        const ids = id?.join(',');
-        if (ids !== null) await deleteUser(`${ids}`);
+        try {
+            const ids = id?.join(',');
+            if (ids !== null) await deleteUser(`${ids}`);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setProgress(false);
+        }
     }
     const successProgress = () => {
         response.status = null;
@@ -222,13 +229,12 @@ const Users = () =>
                 data={{
                     confirm: deleteRecord,
                     successProgress: closeModal,
-                    progress: isLoading,
+                    progress: progress,
                     response: { 
                         status: typeof response.status === 'boolean' ? response.status : null, 
                         statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,
                         message: response.message 
-                    },
-                    error: error
+                    }
                 }}
             />
         </DefaultLayout>
