@@ -60,9 +60,6 @@ export interface BlogFormProps {
 
 export interface BlogState {
     items: BlogType[];
-    isLoading: boolean;
-    error: string | null;
-    token: string | null;
 
     id: string;
     total: number;

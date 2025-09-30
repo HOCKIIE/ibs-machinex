@@ -69,7 +69,7 @@ export default function AdminContextProvider({ children }: { children: ReactNode
         if (didFetchUserData.current) return;
         didFetchUserData.current = true;
         fetchUser()
-    }, [router]);
+    }, []);
 
 
     return (

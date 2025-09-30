@@ -66,7 +66,7 @@ const BrandForm = ({
         if (didFetch.current) return;
         didFetch.current = true;
         fetchCategory();
-    });
+    },[]);
 
     useEffect(() => {
         if (itemState) {

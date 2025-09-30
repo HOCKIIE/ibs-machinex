@@ -9,15 +9,13 @@ const apiPrefix = '/admin/about';
 
 const useAboutStore = create<AboutState>((set) => ({
     about: null,
-    error: null,
     response:{ status:null,message:null, action:null},
-    token: null,
     role: "",
     user: "",
     id: "",
     
     getData: async () => {
-        set({ error: null });
+        set({about: null });
         try {
             const response = await Api.get<AboutType>(apiPrefix);
             set({about: response.data});
@@ -28,8 +26,8 @@ const useAboutStore = create<AboutState>((set) => ({
         }
     },
     updateData: async (data) => {
-        ProcessToast.show('Saving data...')
-        set({ error: null });
+        set({ response: { action: null, status : null, message : null } });
+        ProcessToast.show('Saving data...');
         try {
             const response = await Api.put(`${apiPrefix}/update`,data);
             set({

@@ -11,8 +11,6 @@ interface Props {
 }
 
 export default function AnimatedCheckbox({ checked, onChange, className, label }: Props) {
-    // const [checked, setChecked] = useState(false);
-
     return (
         <label className={`flex items-center cursor-pointer${className?` ${className}$`:''}`}>
             <input type="checkbox" checked={checked} onChange={onChange} className="hidden" />

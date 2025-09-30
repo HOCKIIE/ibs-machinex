@@ -61,10 +61,6 @@ export interface ProductFormProps {
 }
 export interface ProductState {
     items: ProductType[];
-    isLoading: boolean;
-    error: string | null;
-    token: string | null;
-
     id: string;
     total: number;
     lastPage: number;

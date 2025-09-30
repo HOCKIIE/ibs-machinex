@@ -1,8 +1,8 @@
 import React from 'react'
 
 interface CancelButtonProps {
-  onClick: () => void,
-  children: React.ReactNode
+    onClick: () => void,
+    children: React.ReactNode
 }
 
 const CancelButton: React.FC<CancelButtonProps> = ({ onClick,children }) => {

@@ -369,6 +369,11 @@ const ImageModal = ({
         console.log('Gallery response:', response.data.gallery);
         setGallery(response?.data.gallery);
     }
+    useEffect(() => {
+        return () => {
+            preview?.forEach(url => URL.revokeObjectURL(url));
+        };
+    }, [preview]);
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFile([]);
         setPreview([]);
@@ -450,10 +455,11 @@ const ImageModal = ({
         setTab('gallery');
     }
     useEffect(() => {
-        if(didFetchGallery.current) return;
-        didFetchGallery.current = true;
-        getGallery();
-    });
+        if (!didFetchGallery.current) {
+            didFetchGallery.current = true;
+            getGallery();
+        }
+    },[]);
 
     return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-99">
@@ -519,17 +525,15 @@ const ImageModal = ({
                 {tab === "gallery" && (
                 <>
                     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 h-[77%] overflow-y-auto p-1">
-                        {gallery && gallery.map((img,k) => {
-                            console.log(img)
-                            return (
-                        <div
-                            key={k}
-                            className={`border rounded-md overflow-hidden cursor-pointer h-32 w-37 flex item-center justify-center ${selected && selected.includes(img.url) ? "ring-2 ring-blue-500" : ""}`}
-                            onClick={() => setSelected([img.url])}
-                        >
-                            <img src={img.url} alt="gallery image" className="object-cover h-full" />
-                        </div>
-                        )})}
+                        {gallery && gallery.map((img,k) => 
+                            <div
+                                key={k}
+                                className={`border rounded-md overflow-hidden cursor-pointer h-32 w-37 flex item-center justify-center ${selected && selected.includes(img.url) ? "ring-2 ring-blue-500" : ""}`}
+                                onClick={() => setSelected([img.url])}
+                            >
+                                <img src={img.url} alt="gallery image" className="object-cover h-full" />
+                            </div>
+                        )}
                     </div>
                 </>
                 )}
@@ -603,17 +607,17 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
     const didLoadRef = useRef(false);
     const [editorKey, setEditorKey] = useState(0);
     const [isOpen, setIsOpen] = useState(false);
-    const defaultEditorValue: Descendant[] = [
-        {
-            type: 'grid',
-            children: [{
-                type: 'grid-column',
-                children: [{ type: 'paragraph', children: [{ text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum." }] }],
-            }]
-        }
-    ];
-    const [editorValue, setEditorValue] = useState<Descendant[]>(defaultEditorValue);
-
+    const defaultEditorValue: Descendant[] = [];
+    // [
+    //     {
+    //         type: 'grid',
+    //         children: [{
+    //             type: 'grid-column',
+    //             children: [{ type: 'paragraph', children: [{ text: "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum." }] }],
+    //         }]
+    //     }
+    // ];
+    const [editorValue, setEditorValue] = useState<Descendant[]>(()=>defaultEditorValue);
     const handleOpen = () => setIsOpen(true);
     // const handleSaveHTML = (html: string) => {
     //     // แปลง HTML กลับเป็น Slate JSON
@@ -783,7 +787,6 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
     const handleChange = (newValue: Descendant[]) => {
         setEditorValue(newValue);
         const html = serialize(newValue);
-        console.log('change event >>>')
         // handleSaveHTML(html);
         onChange(html); // 🔁 ส่งกลับให้ react-hook-form
     };
@@ -793,7 +796,6 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
             setEditorKey(prev => prev + 1);
             const newValue = deserialize(value);
             if (JSON.stringify(newValue) !== JSON.stringify(editorValue)) {
-                console.log("Updating editor value from props:", newValue);
                 setEditorValue(newValue);
             }
             didLoadRef.current = true;

@@ -1,16 +1,13 @@
 "use client";
 import Api from "@/services/Api";
 import { create } from "zustand";
-import toast from "react-hot-toast";
+import { ProcessToast } from "@/utils/ProcessToast";
 import { ContactState, ApiResponse } from "@/types/ContactType";
 
 const prefix = '/admin/contact';
 
 const useContactStore = create<ContactState>((set) => ({
     items: [],
-    isLoading: false,
-    error: null,
-    token: null,
     
     id: "",
     total: 1,
@@ -19,7 +16,7 @@ const useContactStore = create<ContactState>((set) => ({
     response: { status: null, statusCode: null, message: null },
     
     fetchData: async (page?: number) => {
-        set({ isLoading: true, error: null });
+        set({ items:[], total:1, lastPage: 1, currentPage: 1 })
         try {
             const response = await Api.get<ApiResponse>(`${prefix}?page=${page}`);
             const { total, lastPage, currentPage, rows } = response.data;
@@ -28,16 +25,16 @@ const useContactStore = create<ContactState>((set) => ({
                 total,
                 lastPage,
                 currentPage,
-                isLoading: false,
             });
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-            set({ error: errorMessage, isLoading: false });
+            const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
+            const errorMessage = response?.data?.message || "An unknown error occurred";
+            ProcessToast.error(errorMessage);
         }
     },
 
     updateData: async (data) => {
-        set({ error: null });
+        set({ response: { status: null, statusCode: null, message: null } })
         try {
             const response = await Api.put(`${prefix}/update`,data);
             set({
@@ -51,16 +48,15 @@ const useContactStore = create<ContactState>((set) => ({
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage);
+            ProcessToast.error(errorMessage);
         }
     },
 
     deleteData: async (id) => {
-        set({ isLoading: true, error: null });
+        set({ response: { status: null, statusCode: null, message: null } })
         try {
             const response = await Api.delete(`${prefix}/delete/${id}`);
             set({
-                isLoading: false,
                 response: {
                     status : response.data.status,
                     statusCode : response.data.statusCode,
@@ -70,7 +66,7 @@ const useContactStore = create<ContactState>((set) => ({
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage);
+            ProcessToast.error(errorMessage);
         }
     }
 

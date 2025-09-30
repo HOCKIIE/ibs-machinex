@@ -47,10 +47,6 @@ export interface ApiResponse {
 
 export interface CategoryState {
     items: CategoryType[];
-    isLoading: boolean;
-    error: string | null;
-    token: string | null;
-
     id: string;
     total: number;
     lastPage: number;

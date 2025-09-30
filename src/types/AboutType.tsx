@@ -6,10 +6,7 @@ export interface AboutType {
 }
 
 export interface AboutState {
-    
     about: AboutType | null;
-    error: string | null;
-    token: string | null;
     id: string;
     role: string;
 
