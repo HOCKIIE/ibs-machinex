@@ -1,7 +1,6 @@
 "use client"
 
 import React, { useEffect, useState, useRef } from 'react';
-import Image from 'next/image';
 import ContactUsForm from '@/components/admin/Form/ContactUsForm';
 import { ContactType } from '@/types/ContactType';
 import { UserType } from '@/types/UserType';
@@ -36,18 +35,17 @@ const ContactSection = () => {
 
         const handleLoad = () => {
             updateIframeWidth();
-            iframe?.contentWindow?.addEventListener("resize", updateIframeWidth);
-            iframe?.contentWindow?.addEventListener("orientationchange", updateIframeWidth);
         };
 
         iframe?.addEventListener("load", handleLoad);
+        window.addEventListener("resize", updateIframeWidth);
 
         return () => {
             iframe?.removeEventListener("load", handleLoad);
-            iframe?.contentWindow?.removeEventListener("resize", updateIframeWidth);
-            iframe?.contentWindow?.removeEventListener("orientationchange", updateIframeWidth);
+            window.removeEventListener("resize", updateIframeWidth);
         };
     }, []);
+
     useEffect(() => {
         const handleMessage = (event: MessageEvent) => {
             if (event.data?.type === "iframe-resize") {

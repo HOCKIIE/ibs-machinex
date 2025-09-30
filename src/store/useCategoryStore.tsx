@@ -9,10 +9,6 @@ const prefix = '/admin/category';
 
 const useCategoryStore = create<CategoryState>((set) => ({
     items: [],
-    isLoading: false,
-    error: null,
-    token: null,
-    
     id: "",
     total: 1,
     lastPage: 1,
@@ -20,41 +16,34 @@ const useCategoryStore = create<CategoryState>((set) => ({
     response: { status: null, statusCode: null, message: null },
 
     fetchData: async (page: number) => {
-        set({ isLoading: true, error: null });
+        set({ items:[], total:1, lastPage: 1, currentPage: 1 })
         try {
             const response = await Api.get<ApiResponse>(`${prefix}?page=${page}`);
             const { total, lastPage, currentPage, rows } = response.data;
-            set({
-                items: rows,
-                total,
-                lastPage,
-                currentPage,
-                isLoading: false,
-            });
+            set({items: rows, total:total, lastPage: lastPage, currentPage: currentPage,});
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-            set({ error: errorMessage, isLoading: false });
+            const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
+            const errorMessage = response?.data?.message || "An unknown error occurred";
+            ProcessToast.error(errorMessage);
         }
     },
 
     fetchDataById: async (id) => {
-        set({ isLoading: true, error: null });
+        set({ response: { status: null, statusCode: null, message: null} })
         try {
             const response = await Api.get(`${prefix}/show/${id}`);
-            set((state) => ({
-                ...state,
-                items: response.data,
-                isLoading: false,
-            }));
+            set({items: response.data});
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-            set({ error: errorMessage, isLoading: false });
+            const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
+            const errorMessage = response?.data?.message || "An unknown error occurred";
+            ProcessToast.error(errorMessage);
         }
     },
     
 
     createData: async (newData, router) => {
         try {
+            set({ response: { status: null, statusCode: null, message: null } })
             ProcessToast.show('Creating category...');
             const formData = new FormData();
             Object.entries(newData).forEach(([key, value]) => {
@@ -67,10 +56,7 @@ const useCategoryStore = create<CategoryState>((set) => ({
                 }
             });
             const response = await Api.post(`${prefix}/store`, formData);
-            set((state) => ({
-                items: [...state.items, response.data],
-                isLoading: false,
-            }));
+            set({ items: [response.data] });
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
                 await ProcessToast.success(message);
@@ -87,6 +73,7 @@ const useCategoryStore = create<CategoryState>((set) => ({
 
     updateData: async (id, data) => {
         try {
+            set({ response: { status: null, statusCode: null, message: null } })
             ProcessToast.show('Updating category...');
             const formData = new FormData();
             Object.entries(data).forEach(([key, value]) => {
@@ -99,8 +86,7 @@ const useCategoryStore = create<CategoryState>((set) => ({
             formData.append("_method", "PUT");
             const response = await Api.post(`${prefix}/update/${id}`, formData, { headers: {"X-Requested-With": "XMLHttpRequest"} });
             set((state) => ({
-                items: state.items.map((item) => String(item.id) === String(id) ? response.data.data : item  ),
-                isLoading: false
+                items: state.items.map((item) => String(item.id) === String(id) ? response.data.data : item  )
             }));
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
@@ -116,12 +102,11 @@ const useCategoryStore = create<CategoryState>((set) => ({
     },
 
     deleteData: async (id) => {
-        set({ isLoading: true, error: null });
+        set({ items:[], response: { status: null, statusCode: null, message: null }, error: null });
         try {
             const callout = await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set((state) => ({
                 items: state.items.filter((item) => item.id !== String(id)),
-                isLoading: false,
                 response:{
                     status: true,
                     statusCode: callout.data.statusCode,
@@ -131,8 +116,6 @@ const useCategoryStore = create<CategoryState>((set) => ({
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({
-                error: errorMessage,
-                isLoading: false,
                 response : {
                     status: false,
                     statusCode: 500,

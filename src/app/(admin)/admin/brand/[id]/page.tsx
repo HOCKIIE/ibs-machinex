@@ -1,14 +1,14 @@
 "use client";
 
-import React,{ useEffect, useState, useRef, use } from 'react';
+import React,{ useEffect, useState, useRef } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import BrandForm from '@/components/admin/Form/BrandForm';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import { BrandFormProps } from '@/types/BrandType';
 import useBrandStore from '@/store/useBrandStore';
 
-const Page = ({ params }:{ params: Promise<{id:string}> }) => {
-    const { id } = use(params);
+const Page = ({ params }:{ params: {id:string} }) => {
+    const { id } = params;
     const { items, fetchDataById, updateData } = useBrandStore();
     const didFetchData = useRef(false);
     const [ itemState, setItemState ] = useState<BrandFormProps>({
@@ -41,7 +41,7 @@ const Page = ({ params }:{ params: Promise<{id:string}> }) => {
     });
     
     useEffect(() => {
-        if (items) {
+        if (items && items.length > 0) {
             setItemState({
                 id: items[0].id ?? "",
                 image: items[0].image ?? "",
@@ -63,7 +63,7 @@ const Page = ({ params }:{ params: Promise<{id:string}> }) => {
                 published_at: items[0].published_at ?? null
             });
         }
-    }, [items]);
+    }, [setItemState,items]);
 
     return (
     <DefaultLayout>

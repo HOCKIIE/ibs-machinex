@@ -1,14 +1,14 @@
 "use client"
-import React,{ useEffect,useState,useRef,use } from 'react';
+import React,{ useEffect,useState,useRef } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import BlogForm from '@/components/admin/Form/BlogForm';
 import useBlogStore from '@/store/useBlogStore';
 import { BlogFormProps } from '@/types/BlogType';
 
-const Page = ({ params }: { params: Promise<{ id: string }> }) => 
+const Page = ({ params }: { params: { id: string } }) => 
 {
-    const { id } = use(params);
+    const { id } = params;
     const didFetchData = useRef(false);
     const { items, fetchDataById, updateData } = useBlogStore();
     const [blogState, setBlogState] = useState<BlogFormProps>({

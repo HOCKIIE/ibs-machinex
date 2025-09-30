@@ -17,7 +17,6 @@ import ActionModal from '@/components/admin/Modal/ActionModal';
 import { BrandType } from '@/types/BrandType';
 import { useCurrentUrl } from '@/utils/useCurrentUrl';
 
-interface SelectDeleteProps { event: React.MouseEvent<HTMLButtonElement>; }
 const show = [10, 25, 50, 100];
 const recordStatus = [
     {value:"all", label:"All"},
@@ -72,15 +71,6 @@ const Brand = () =>
         if(selectedIds.length> 0) setSelectDelete(false);
     };
 
-    const SelectDelete: React.FC<SelectDeleteProps> = ({ event }) => {
-        useEffect(() => {
-            console.log(event.target);
-            console.log(selectedIds);
-        }, [event]);
-
-        return null;
-    };
-
     const deleteRecord = async() => {
         const ids = id?.join(',');
         if (ids !== null) {
@@ -99,7 +89,7 @@ const Brand = () =>
         successProgress();
     }
     useEffect(()=>{
-        setRedirect(currentUrl)
+        setRedirect(currentUrl);
     },[currentUrl, setRedirect])
 
     return (
@@ -122,7 +112,6 @@ const Brand = () =>
                                 <LimitPerPage show={show} limit={limit} updateLimit={updateLimit}/>
                                 <button 
                                     disabled={selectDelete}
-                                    onClick={(e) => <SelectDelete event={e} />}
                                     title="Remove from select"
                                     type="button"
                                     className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-error-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"

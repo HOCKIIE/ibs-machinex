@@ -2,7 +2,7 @@
 
 import Api from "@/services/Api";
 import { create } from "zustand";
-import toast from "react-hot-toast";
+import { ProcessToast } from "@/utils/ProcessToast";
 import { ContactUsState, ResponseType, ContactUsType } from "@/types/ContactUsType";
 
 const prefix = '/contact-us';
@@ -18,7 +18,7 @@ const useContactUsStore = create<ContactUsState>(() =>  ({
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
-            toast.error(errorMessage,{position: "top-center"});
+            ProcessToast.error(errorMessage);
         }
     }
 }));

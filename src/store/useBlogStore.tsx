@@ -9,9 +9,6 @@ const prefix = '/admin/blog';
 
 const useBlogStore = create<BlogState>((set) => ({
     items: [],
-    isLoading: false,
-    error: null,
-    token: null,
     
     id: "",
     total: 1,
@@ -20,36 +17,27 @@ const useBlogStore = create<BlogState>((set) => ({
     response: { status: null, statusCode: null, message: null },
 
     fetchData: async (page: number) => {
-        set({ isLoading: true, error: null });
+        set({ items:[], total:1, lastPage: 1, currentPage: 1, error: null });
         try {
             const response = await Api.get<ApiResponse>(`${prefix}?page=${page}`);
             const { total, lastPage, currentPage, rows } = response.data;
-        
-            set({
-                items: rows,
-                total,
-                lastPage,
-                currentPage,
-                isLoading: false,
-            });
+            set({items: rows,total: total,lastPage: lastPage,currentPage: currentPage});
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-            set({ error: errorMessage, isLoading: false });
+            const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
+            const errorMessage = response?.data?.message || "An unknown error occurred";
+            ProcessToast.error(errorMessage);
         }
     },
 
     fetchDataById: async (id) => {
-        set({ isLoading: true, error: null });
+        set({ items:[] });
         try {
             const response = await Api.get<BlogType>(`${prefix}/show/${id}`);
-            set((state) => ({
-                ...state,
-                items: [response.data],
-                isLoading: false,
-            }));
+            set({ items: [response.data]});
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-            set({ error: errorMessage, isLoading: false });
+            const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
+            const errorMessage = response?.data?.message || "An unknown error occurred";
+            ProcessToast.error(errorMessage);
         }
     },
     
@@ -83,6 +71,7 @@ const useBlogStore = create<BlogState>((set) => ({
     },
 
     updateData: async (id, data) => {
+        set({ items:[] })
         try {
             ProcessToast.show('Saving data...')
             const formData = new FormData();
@@ -101,10 +90,7 @@ const useBlogStore = create<BlogState>((set) => ({
                     "X-Requested-With": "XMLHttpRequest"
                 },
             });
-            set((state) => ({
-                items: state.items.map((item) => String(item.id) === String(id) ? response.data.data : item  ),
-                isLoading: false
-            }));
+            set((state) => ({ items: state.items.map((item) => String(item.id) === String(id) ? response.data.data : item  ) }));
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
                 ProcessToast.success(message);
@@ -119,33 +105,25 @@ const useBlogStore = create<BlogState>((set) => ({
     },
 
     onChangeStatus: async (id, status) => {
-        set({ isLoading: true, error: null });
+        set({  items: [] });
         try {
             const response = await Api.put<BlogType>(`${prefix}/status/${id}`,{ status });
             set((state) => ({
-                items: state.items.map((item) => String(item.id) === String(id) ? response.data : item ),
-                isLoading: false,
+                items: state.items.map((item) => String(item.id) === String(id) ? response.data : item )
             }));
             ProcessToast.success('Status has been changed.')
         } catch (error: unknown) {
-            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-            set({ 
-                error: errorMessage, 
-                isLoading: false,
-                response : {
-                    status: false,
-                    message: errorMessage
-                }
-            });
-            ProcessToast.error(errorMessage)
+            const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
+            const errorMessage = response?.data?.message || "An unknown error occurred";
+            ProcessToast.error(errorMessage);
         }
     },
     
     deleteData: async (id) => {
+        set({ response : { status: null, statusCode: null, message: null} });
         try {
             const request = await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set({
-                isLoading: false,
                 response:{
                     status: request.data.status,
                     statusCode: request.data.statusCode,
@@ -155,8 +133,6 @@ const useBlogStore = create<BlogState>((set) => ({
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
             set({
-                error: errorMessage,
-                isLoading: false,
                 response : {
                     status: false,
                     statusCode: 500,

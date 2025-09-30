@@ -52,16 +52,26 @@ const CoverImageUpload =  <T extends FieldValues>({ register, setValue, defaultV
         setPreviewUrl(null);
     };
     useEffect(() => {
+        let objectUrl: string | null = null;
+
         if (defaultValue) {
             if (typeof defaultValue === "string") {
                 setPreviewUrl(defaultValue);
             } else if (defaultValue instanceof File) {
-                setPreviewUrl(URL.createObjectURL(defaultValue));
+                objectUrl = URL.createObjectURL(defaultValue);
+                setPreviewUrl(objectUrl);
             }
         } else {
             setPreviewUrl(null);
         }
+
+        return () => {
+            if (objectUrl) {
+                URL.revokeObjectURL(objectUrl);
+            }
+        };
     }, [defaultValue]);
+
 
     return (
         <div className="col-span-full">

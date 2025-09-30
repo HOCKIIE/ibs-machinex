@@ -7,9 +7,9 @@ import UserForm from '@/components/admin/Form/UserForm';
 import { UsersFormProps } from '@/types/UserType';
 import useUserStore from '@/store/useUserStore';
 
-const EditUser = ({ params }: { params:  Promise<{ id: string }> }) => 
+const EditUser = ({ params }: { params:  { id: string } }) => 
     {
-    const {id} = use(params);
+    const {id} = params;
     const didFetchData = useRef(false);
     const { fetchUserById, updateUser, users } = useUserStore();
     const [userState, setUserState] = useState<UsersFormProps>({
@@ -51,7 +51,7 @@ const EditUser = ({ params }: { params:  Promise<{ id: string }> }) =>
         if (didFetchData.current) return;
         didFetchData.current = true;
         fetchData();
-    });
+    },[]);
 
     useEffect(() => {
         if (users?.length > 0) {

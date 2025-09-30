@@ -40,10 +40,10 @@ const useBrandStore = create<BrandState>((set) => ({
     fetchDataById: async (id) => {
         set({ isLoading: true, error: null });
         try {
-            const response = await Api.get<BrandType>(`${prefix}/show/${id}`);
+            const response = await Api.get<BrandType[]>(`${prefix}/show/${id}`);
             set((state) => ({
                 ...state,
-                items: [response.data],
+                items: response.data ? response.data : [],
                 isLoading: false,
             }));
         } catch (error: unknown) {

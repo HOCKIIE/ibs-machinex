@@ -1,15 +1,15 @@
 "use client";
 
-import React, { useState, useEffect, useRef, use } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { H1, H2, H3 } from '@/utils/Title';
 import Api from '@/services/Api';
 import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { BlogType, BlogFormProps } from '@/types/BlogType';
 
-const BlogDetail = ({ params }:{ params: Promise<{slug:string}> }) => {
+const BlogDetail = ({ params }:{ params: {slug:string} }) => {
     const locale = useLocale();
-    const { slug } = use(params);
+    const { slug } = params;
     const [itemState, setData] = useState<BlogFormProps>();
     const [recommend, setRecommend] = useState<BlogType[]>();
     const didFetchData = useRef(false);

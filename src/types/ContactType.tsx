@@ -43,10 +43,6 @@ export interface ApiResponse {
 }
 export interface ContactState {
     items: ContactType[];
-    isLoading: boolean;
-    error: string | null;
-    token: string | null;
-
     id: string;
     total: number;
     lastPage: number;

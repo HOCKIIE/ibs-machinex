@@ -321,7 +321,7 @@ const BlogForm = ({
                                             )}
                                         </div>
                                     </div>
-                                    <div className="col-span-12">
+                                    {/* <div className="col-span-12">
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-2">
                                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Detail </label> <BadgeLang lng="TH"/>
@@ -336,7 +336,7 @@ const BlogForm = ({
                                         {errors?.detail_th?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )} 
-                                    </div>
+                                    </div> */}
                                     
                                 </div>
                             </div>
@@ -373,7 +373,7 @@ const BlogForm = ({
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )}
                                     </div>
-                                    <div className="col-span-12">
+                                    {/* <div className="col-span-12">
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-2">
                                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Detail </label> <BadgeLang lng="EN"/>
@@ -388,7 +388,7 @@ const BlogForm = ({
                                         {errors?.detail_en?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )} 
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                             <div className={`tab ease-in-out duration-300 ${lng=='ja'?``:` hidden`}`} data-tab="ja">
@@ -424,7 +424,7 @@ const BlogForm = ({
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )}
                                     </div>
-                                    <div className="col-span-12">
+                                    {/* <div className="col-span-12">
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-2">
                                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Detail </label> <BadgeLang lng="JA"/>
@@ -439,7 +439,7 @@ const BlogForm = ({
                                         {errors?.detail_ja?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )} 
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </div>

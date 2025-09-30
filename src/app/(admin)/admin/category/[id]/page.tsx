@@ -1,6 +1,6 @@
 "use client";
 
-import React,{ useEffect,useState,useRef,use } from 'react';
+import React,{ useEffect,useState,useRef } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import CategoryForm from '@/components/admin/Form/CategoryForm';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
@@ -8,9 +8,9 @@ import useCategoryStore from '@/store/useCategoryStore';
 import { useRouter } from 'next/navigation';
 import { CategoryFormProps } from '@/types/CategoryType';
 
-const EditCategory = ({ params }: { params: Promise<{ id: string }> }) => {
+const EditCategory = ({ params }: { params: { id: string } }) => {
 
-    const  { id } = use(params);
+    const  { id } = params;
     const router = useRouter();
     const didFetchData = useRef(false);
     const { items, fetchDataById, updateData } = useCategoryStore();

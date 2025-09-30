@@ -1,6 +1,6 @@
 "use client";
 
-import React,{ useEffect, useRef, useState, use } from 'react';
+import React,{ useEffect, useRef, useState } from 'react';
 import ContactUsForm from '@/components/admin/Form/ContactUsForm';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
@@ -8,8 +8,8 @@ import { BrandType } from '@/types/BrandType';
 import Image from 'next/image';
 import Api from '@/services/Api';
 
-const Brand = ({ params }:{ params: Promise<{slug:string}> }) => {
-    const { slug } = use(params);
+const Brand = ({ params }:{ params: {slug:string} }) => {
+    const { slug } = params;
     const pathname = usePathname();
     const locale = useLocale();
     const t = useTranslations("alert");

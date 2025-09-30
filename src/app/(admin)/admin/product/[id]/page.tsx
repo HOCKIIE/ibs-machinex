@@ -1,5 +1,5 @@
 "use client"
-import React,{ useEffect,useState,useRef,use } from 'react';
+import React,{ useEffect,useState,useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
@@ -9,7 +9,7 @@ import { ProductFormProps } from '@/types/ProductType';
 import toast from 'react-hot-toast';
 
 export default function Page({ params }: { params: Promise<{ id: string }> }){
-    const  { id } = use(params);
+    const  { id } = params;
     const router = useRouter();
     const { items, fetchDataById, updateData } = useProductStore();
     const didFetchData = useRef(false);
