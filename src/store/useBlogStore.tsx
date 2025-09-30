@@ -17,7 +17,7 @@ const useBlogStore = create<BlogState>((set) => ({
     response: { status: null, statusCode: null, message: null },
 
     fetchData: async (page: number) => {
-        set({ items:[], total:1, lastPage: 1, currentPage: 1, error: null });
+        set({ items:[], total:1, lastPage: 1, currentPage: 1});
         try {
             const response = await Api.get<ApiResponse>(`${prefix}?page=${page}`);
             const { total, lastPage, currentPage, rows } = response.data;

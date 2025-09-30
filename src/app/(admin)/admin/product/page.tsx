@@ -44,8 +44,8 @@ const Product = () =>
         endpoint: '/admin/product'
     });
 
-    const { isLoading, error, deleteData, response } = useProductStore();
-
+    const { deleteData, response } = useProductStore();
+    const [progress, setProgress] = useState(false);
     const [id, setId] = useState<number[] | null>(null);
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [isAction, setAction] = useState<string>("delete");
@@ -81,10 +81,17 @@ const Product = () =>
     };
 
     const deleteRecord = async() => {
-        const ids = id?.join(',');
-        if (ids !== null) {
-            await deleteData(`${ids}`);
-            successProgress();
+        setProgress(true);
+        try {
+            const ids = id?.join(',');
+            if (ids !== null) {
+                await deleteData(`${ids}`);
+                successProgress();
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setProgress(false);
         }
     }
     const successProgress = () => {
@@ -305,14 +312,13 @@ const Product = () =>
                 closeModal={closeModal}
                 data={{
                     confirm: deleteRecord,
-                    progress: isLoading,
+                    progress: progress,
                     successProgress: successProgress,
                     response: { 
                         status: typeof response.status == 'boolean' ? response.status : null,
                         statusCode: typeof response.statusCode == 'number' ? response.statusCode : null, 
                         message: response.message 
-                    },
-                    error: error
+                    }
                 }}
             />
         </DefaultLayout>

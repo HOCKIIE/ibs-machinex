@@ -44,8 +44,9 @@ const Category = () =>
         endpoint: '/admin/category'
     });
     const currentUrl = useCurrentUrl();
-    const { isLoading, error, deleteData, response } = useCategoryStore();
+    const { deleteData, response } = useCategoryStore();
     const [id, setId] = useState<number[] | null>(null);
+    const [progress, setProgress] = useState(false);
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [isAction, setAction] = useState<string>("delete");
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
@@ -72,9 +73,16 @@ const Category = () =>
     };
 
     const deleteRecord = async() => {
-        if (id && id.length > 0) {
-            await deleteData(id);
-            successProgress();
+        setProgress(true);
+        try{
+            if (id && id.length > 0) {
+                await deleteData(id);
+                successProgress();
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setProgress(false);
         }
     }
     const successProgress = () => {
@@ -226,14 +234,13 @@ const Category = () =>
                 closeModal={closeModal}
                 data={{
                     confirm: deleteRecord,
-                    progress: isLoading,
+                    progress: progress,
                     successProgress: successProgress,
                     response: { 
                         status: typeof response.status === 'boolean' ? response.status : null, 
                         statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,
                         message: response.message 
-                    },
-                    error: error
+                    }
                 }}
             />
         </DefaultLayout>

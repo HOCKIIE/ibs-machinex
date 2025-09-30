@@ -102,7 +102,7 @@ const useCategoryStore = create<CategoryState>((set) => ({
     },
 
     deleteData: async (id) => {
-        set({ items:[], response: { status: null, statusCode: null, message: null }, error: null });
+        set({ items:[], response: { status: null, statusCode: null, message: null } });
         try {
             const callout = await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             set((state) => ({

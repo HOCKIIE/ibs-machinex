@@ -8,7 +8,7 @@ import useProductStore from '@/store/useProductStore';
 import { ProductFormProps } from '@/types/ProductType';
 import toast from 'react-hot-toast';
 
-export default function Page({ params }: { params: Promise<{ id: string }> }){
+export default function Page({ params }: { params: { id: string } }){
     const  { id } = params;
     const router = useRouter();
     const { items, fetchDataById, updateData } = useProductStore();
