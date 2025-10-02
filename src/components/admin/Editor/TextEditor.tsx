@@ -32,8 +32,8 @@ import HTMLCodeModal from "./HTMLCodeModal";
 type MyElement = Element & { type: string, className?: string; };
 
 const isMarkActive = (editor: Editor, format: string) => {
-    const marks = Editor.marks(editor);
-    // @ts-expect-error: Marks may not exist on the editor object
+    const marks = Editor.marks(editor) ?? {};
+    // @ts-ignore
     return marks ? marks[format] === true : false;
 };
 
@@ -700,7 +700,7 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
         italic?: boolean;
         underline?: boolean;
         strikethrough?: boolean;
-        fontSize?: number;
+        fontSize?: string;
         color?: string;
         // [key: string]: string|number|boolean|undefined;
     };

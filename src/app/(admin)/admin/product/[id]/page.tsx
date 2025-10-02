@@ -73,9 +73,9 @@ export default function Page({ params }: { params: { id: string } }){
                 created_at: items[0].created_at ?? ""
             });
         }
-        // @ts-expect-error: items may have a status property from API response
+        // @ts-ignore
         if(items.status === true) {
-        // @ts-expect-error: items may have a message property from API response
+        // @ts-ignore
             toast.success(items.message);
         }
         

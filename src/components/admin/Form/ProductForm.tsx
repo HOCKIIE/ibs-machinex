@@ -116,7 +116,7 @@ const ProductForm = ({
                 setValue("category", categoryIds);
             }
             if(itemState?.brand) {
-                // @ts-expect-error: skip v.id
+                // @ts-ignore
                 const brandId = itemState.brand.map((v) => Number(v.id));
                 setValue('brand',brandId);
             }

@@ -25,7 +25,12 @@ const Blog = () =>
         endpoint: '/blog' 
     });
     const [screenWidth, setScreenWidth] = useState(0);
-    const windowResized = () => setScreenWidth(window.innerWidth);
+    const windowResized = () => {
+        setScreenWidth(prev => {
+            const current = window.innerWidth;
+            return prev !== current ? current : prev;
+        });
+    };
     const didFetchRecent = useRef(false);
 
     const fetchRecent = async () => {
@@ -41,12 +46,11 @@ const Blog = () =>
 
     useEffect(() => {
         window.addEventListener('resize', windowResized);
-    });
+        return () => window.removeEventListener('resize', windowResized);
+    },[]);
 
     useEffect(()=>{
-        if(window?.innerWidth){
-            setScreenWidth(window.innerWidth)
-        }
+        setScreenWidth(window.innerWidth);
     },[setScreenWidth])
 
     return (

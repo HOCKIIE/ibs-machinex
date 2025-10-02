@@ -66,10 +66,13 @@ const Brand = () =>
         }
     };
     const toggleSelect = (id: number) => {
-        setSelectedIds((prev) =>
-            prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-        );
-        if(selectedIds.length> 0) setSelectDelete(false);
+        setSelectedIds((prev) => {
+            const updated = prev.includes(id)
+                ? prev.filter((item) => item !== id)
+                : [...prev, id];
+            setSelectDelete(updated.length === 0);
+            return updated;
+        });
     };
 
     const deleteRecord = async() => {
@@ -87,18 +90,22 @@ const Brand = () =>
         }
     }
     const successProgress = () => {
-        response.status = null;
-        response.message = null;
+        useProductStore.setState({ 
+            response: { status: null, message: null, statusCode: null }
+        });
         setModalOpen(!isOpen);
     }
 
     const closeModal = () => {
         setModalOpen(false);
+        useProductStore.setState({ 
+            response: { status: null, message: null, statusCode: null }
+        });
         successProgress();
     }
     useEffect(()=>{
         setRedirect(currentUrl);
-    },[currentUrl, setRedirect])
+    },[currentUrl])
 
     return (
         <DefaultLayout>
@@ -244,7 +251,7 @@ const Brand = () =>
                 isOpen={isOpen} 
                 action={isAction}
                 onClose={() => setModalOpen(false)}
-                onAfterClose={()=>fetchData}
+                onAfterClose={fetchData}
                 closeModal={closeModal}
                 data={{
                     confirm: deleteRecord,
