@@ -99,9 +99,16 @@ const ActionModal: React.FC<ConfirmModalProps> = ({isOpen, onAfterClose, closeMo
         closeModal();
     }
     useEffect(() => {
-        if(response.statusCode != 200 && response.statusCode != null) ErrorHandler();
-        if(response.status == true && response.statusCode == 200 ) SuccessHandler();
-    },[response.statusCode,response.status, ErrorHandler, SuccessHandler]);
+        if (response.statusCode != null && response.statusCode !== 200) {
+            ErrorHandler();
+        }
+    }, [response.statusCode]);
+
+    useEffect(() => {
+        if (response.status === true && response.statusCode === 200) {
+            SuccessHandler();
+        }
+    }, [response.status, response.statusCode]);
     return (
         <AnimatePresence onExitComplete={onAfterClose}>
             {isOpen && (
