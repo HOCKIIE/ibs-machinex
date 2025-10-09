@@ -1,6 +1,6 @@
 "use client"
 
-import React,{ useEffect,useState,useRef } from 'react';
+import React,{ useEffect, useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import { BiTrash } from "react-icons/bi";
 import { LuPencil } from 'react-icons/lu';
@@ -15,7 +15,6 @@ import useBlogStore from '@/store/useBlogStore';
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import { BlogType } from '@/types/BlogType';
 import { useCurrentUrl } from '@/utils/useCurrentUrl';
-// import Image from 'next/image';
 
 const show = [10, 25, 50, 100];
 const recordStatus = [
@@ -26,7 +25,6 @@ const recordStatus = [
 
 const Blog = () => {
 
-    const [selectDelete, setSelectDelete] = useState<boolean>(true)
     const { 
         keyword,
         data,
@@ -55,34 +53,30 @@ const Blog = () => {
     const didFetchData = useRef(false);
     const [id, setId] = useState<number[] | null>(null);
     const isAllSelected = selectedIds.length > 0;
+    
+    useEffect(() => { setRedirect(currentUrl) },[currentUrl]);
+    useEffect(() => {
+        if (didFetchData.current) return;
+        didFetchData.current = true;
+        fetchData();
+    },[]);
 
-    const toggleSelectAll = () => {
+    const toggleSelectAll = useCallback(() => {
         if (isAllSelected) {
             setSelectedIds([]);
-            setSelectDelete(true)
         }else{
             setSelectedIds(data.map((item:BlogType) => Number(item.id)));
-            setSelectDelete(false)
         }
-    };
-    const toggleSelect = (id: number) => {
+    }, [data, isAllSelected]);
+
+    const toggleSelect = useCallback((id: number) => {
         setSelectedIds((prev) =>
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
         );
-        if(selectedIds.length> 0) setSelectDelete(false);
-    }
-    interface SelectDeleteProps {
-        event: React.MouseEvent<HTMLButtonElement>;
-    }
-    const SelectDelete: React.FC<SelectDeleteProps> = ({ event }) => {
-        useEffect(() => {
-            console.log(event.target);
-            console.log(selectedIds);
-        }, [event]);
-
-        return null;
-    }
-    const deleteRecord = async() => {
+    },[]);
+    
+    const deleteRecord = useCallback(async() => {
+        if (!id) return;
         setProgress(true);
         try {
             const ids = id?.join(',');
@@ -94,17 +88,25 @@ const Blog = () => {
         } finally {
             setProgress(false);
         }
-    }
-    const openModal = () => setModalOpen(true);
-    const successProgress = () => { response.status = null; response.statusCode = null; response.message = null; fetchData(); }
-    const closeModal = () => { setModalOpen(false); successProgress(); }
-    const fetchDataHandler = () => fetchData();
-    useEffect(() => { setRedirect(currentUrl) },[currentUrl,setRedirect]);
-    useEffect(() => {
-        if (didFetchData.current) return;
-        didFetchData.current = true;
-        fetchDataHandler();
-    });
+    },[id, deleteData]);
+    
+    const openModal = () => useCallback((ids: number[]) => {
+        setId(ids);
+        setAction("delete");
+        setModalOpen(true);
+    }, []);
+    
+    const closeModal = () => useCallback(() => {
+        setModalOpen(false);
+        fetchData();
+    }, [fetchData]);
+    
+    const handleBulkDelete = useCallback(() => {
+        if (!selectedIds.length) return;
+        //@ts-ignore
+        openModal(selectedIds);
+    }, [selectedIds, openModal]);
+
 
     return (
         <DefaultLayout>
@@ -119,15 +121,14 @@ const Blog = () => {
                         
                     </div>
                 </div>
-                {/* <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"> */}
                 <div className="relative overflow-x-auto shadow-md sm:rounded-lg border border-gray-200/60">
                     <div className="p-5 text-md font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800">
                             <div className="flex justify-between w-full">
                                 <div className='flex gap-3'>
                                     <LimitPerPage show={show} limit={limit} updateLimit={updateLimit}/>
                                     <button 
-                                        disabled={selectDelete}
-                                        onClick={(e) => <SelectDelete event={e} />}
+                                        disabled={!isAllSelected}
+                                        onClick={handleBulkDelete}
                                         title="Remove from select"
                                         type="button"
                                         className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-error-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"
@@ -193,7 +194,8 @@ const Blog = () => {
                                             <div className="flex gap-2">
                                                 <button 
                                                     title="Delete"
-                                                    onClick={()=>{openModal(); setAction("delete"); setId([Number(v.id)])}}
+                                                    //@ts-ignore
+                                                    onClick={() => openModal([Number(v.id)])}
                                                     className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
                                                     <BiTrash fontSize={24}/>
                                                 </button>
@@ -241,7 +243,7 @@ const Blog = () => {
                 data={{
                     confirm: deleteRecord,
                     progress: progress,
-                    successProgress: fetchDataHandler,
+                    successProgress: fetchData,
                     response: {
                         status: typeof response.status == 'boolean' ? response.status : null,
                         statusCode: typeof response.statusCode == 'number' ? response.statusCode : null, 

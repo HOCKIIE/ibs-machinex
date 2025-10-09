@@ -1,6 +1,6 @@
 "use client"
 
-import React,{ useState, useEffect } from 'react';
+import React,{ useState, useEffect, useCallback } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import usePagination from '@/hooks/usePagination';
@@ -53,29 +53,28 @@ const Users = () =>
     const isAllSelected = selectedIds.length > 0;
     const currentUrl = useCurrentUrl();
 
-    const toggleSelectAll = () => {
+    useEffect(() => {
+        setRedirect(currentUrl)
+    }, [currentUrl,setRedirect]);
+
+    const toggleSelectAll = useCallback(() => {
         if (isAllSelected) {
             setSelectedIds([]);
         }else{
             setSelectedIds(data.map((item:UserType) => Number(item.id)));
         }
-    };
-    const toggleSelect = (id: number) => {
+    },[data, isAllSelected]);
+    
+    const toggleSelect = useCallback((id: number) => {
         setSelectedIds((prev) => {
             const newSelected = prev.includes(id)
                 ? prev.filter((item) => item !== id)
                 : [...prev, id];
             return newSelected;
         });
-    };
-    
-    const setDeleteRecords = async() => {
-        if(selectedIds.length > 0){
-            setId(selectedIds)
-        }
-    }
+    },[]);
 
-    const deleteRecord = async() => {
+    const deleteRecord = useCallback(async() => {
         try {
             const ids = id?.join(',');
             if (ids !== null) await deleteUser(`${ids}`);
@@ -84,20 +83,25 @@ const Users = () =>
         } finally {
             setProgress(false);
         }
-    }
-    const successProgress = () => {
-        response.status = null;
-        response.message = null;
-        fetchData();
-    }
-    const closeModal = () => {
-        setModalOpen(false);
-        successProgress();
-    }
+    },[id, deleteUser]);
 
-    useEffect(() => {
-        setRedirect(currentUrl)
-    }, [currentUrl,setRedirect]);
+    const openModal = () => useCallback((ids: number[]) => {
+        setId(ids);
+        setAction("delete");
+        setModalOpen(true);
+    }, []);
+    
+    const closeModal = () => useCallback(() => {
+        setModalOpen(false);
+        fetchData();
+    }, [fetchData]);
+    
+    const handleBulkDelete = useCallback(() => {
+        if (!selectedIds.length) return;
+        //@ts-ignore
+        openModal(selectedIds);
+    }, [selectedIds, openModal]);
+
     return (
         <DefaultLayout>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
@@ -118,8 +122,8 @@ const Users = () =>
                             <div className='flex gap-3'>
                                 <LimitPerPage show={show} limit={limit} updateLimit={updateLimit}/>
                                 <button 
-                                    disabled={selectedIds.length > 0 ? false : true}
-                                    onClick={()=>{setAction("delete"); setDeleteRecords(); setModalOpen(!isOpen)}}
+                                    disabled={!isAllSelected}
+                                    onClick={handleBulkDelete}
                                     title="Remove from select"
                                     type="button"
                                     className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-error-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"

@@ -38,7 +38,7 @@ const AboutMeSection = () => {
         if(didFetchData.current === true) return;
         didFetchData.current = true;
         fetchData();
-    })
+    },[])
     useEffect(() => {
         const timer = setTimeout(() => {
             handleResise()
