@@ -17,14 +17,10 @@ export const setAccessToken = (token: string | null) => {
     accessToken = token;
 };
 
-const API_URL =   process.env.NODE_ENV === "development"
-    ? process.env.NEXT_PUBLIC_API_URL
-    : (() => {
-        console.warn("⚠️ NEXT_PUBLIC_API_URL is missing in production!");
-        return "";
-    })()
+console.log('NODE_ENV: ',process.env.NODE_ENV)
 
-console.log("🔍 Using API_URL =", API_URL);
+const API_URL = process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_API_URL_DEV : process.env.NEXT_PUBLIC_API_URL_PROD;
+
 const Api = axios.create({baseURL:`${API_URL}/api`});
 
 const publicRoutes = [
