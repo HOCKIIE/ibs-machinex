@@ -11,8 +11,4 @@ async function start(req, res) {
     await handle(req, res, parsedUrl);
 }
 
-app.prepare().then(() => {
-    console.log("✅ server.js handler prepared for Passenger");
-});
-
 export default start;

@@ -7,7 +7,7 @@ import { IoSearchSharp } from "react-icons/io5";
 import { CategoryType } from '@/types/CategoryType';
 import { BrandType } from '@/types/BrandType';
 import { useLocale, useTranslations } from 'next-intl';
-import Image from 'next/image';
+import RecommendBlog from './RecommendBlog';
 
 const ProductSection = () => {
     const locale = useLocale();
@@ -113,7 +113,7 @@ const ProductSection = () => {
         if(didfetchCategory.current === queryString) return;
         didfetchCategory.current = queryString;
         fetchCategory();
-    });
+    },[]);
 
     return (
     <div>
@@ -163,6 +163,7 @@ const ProductSection = () => {
             </div>
             <hr />
         </div>
+        <RecommendBlog />
         <div className="container md:px-0 mt-20">
             <div className="flex justify-center">
                 <h2 className="bg-gradient-to-r from-[#0055d3] from-2% via-[#007ecf] via-55% to-[#00a5cb] to-1% text-4xl md:text-5xl font-bold text-transparent bg-clip-text">{t('searchBoxTitle')}</h2>

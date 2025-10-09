@@ -9,7 +9,6 @@ import { loginUser } from '@/services/Auth';
 import { useRouter, useSearchParams } from "next/navigation";
 import Alert from '@/utils/Alert';
 import { AlertType } from '@/types/AlertType';
-import Image from 'next/image';
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),

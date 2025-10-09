@@ -26,6 +26,7 @@ const Page = ({ params }: { params: { id: string } }) =>
         detail_ja: ``,
         updated_at: "",
         pathName: "",
+        recommend: "",
         status: false,
         published_at: "",
         created_at: "",
@@ -51,6 +52,7 @@ const Page = ({ params }: { params: { id: string } }) =>
                 updated_at: items[0].updated_at ?? "",
                 status: items[0].status ?? false,
                 pathName: items[0].pathName ?? "",
+                recommend: items[0].recommend ?? "",
                 published_at: items[0].published_at ?? "",
                 created_at: items[0].created_at ?? ""
             });

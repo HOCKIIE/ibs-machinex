@@ -17,6 +17,7 @@ export interface BlogType {
     category?: [];
     categories: Array<CategoryType>;
     pathName: string;
+    recommend: string;
     published_at: string | null;
     created_at: string;
     updated_at: string | null;
@@ -49,6 +50,7 @@ export interface BlogFormProps {
     category?: Array<string>;
     categories: Array<{id: string;}>;
     pathName: string;
+    recommend: string;
     published_at: string | null;
     created_at: string;
     updated_at: string | null;

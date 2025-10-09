@@ -27,7 +27,9 @@
   },
   "blog":{
     "title":"Blog",
-    "subTitle":"Find the best solutions here!"
+    "subTitle":"Find the best solutions here!",
+    "recommend": "Recommend",
+    "recommendSubtitle":"Find the best solutions here!"
   },
   "Validation":{
     "required": "This field is required.",

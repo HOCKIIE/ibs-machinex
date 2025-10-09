@@ -1,6 +1,6 @@
 "use client";
 
-import React,{ useState,useEffect } from 'react';
+import React,{ useState,useEffect,useCallback } from 'react';
 import Link from 'next/link';
 import { BiTrash } from "react-icons/bi";
 import { LuPencil } from "react-icons/lu";
@@ -49,63 +49,67 @@ const Brand = () =>
     const [progress, setProgress] = useState(false);
     const [isAction, setAction] = useState<string>("delete");
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
-    const [selectDelete, setSelectDelete] = useState<boolean>(true)
     const isAllSelected = selectedIds.length > 0;
     const currentUrl = useCurrentUrl();
     const [redirect ,setRedirect] = useState<string|null>(null);
+    
+    useEffect(()=>{
+        setRedirect(currentUrl);
+    },[currentUrl])
 
-    const toggleSelectAll = () => {
+    const toggleSelectAll = useCallback(() => {
         if (isAllSelected) {
             setSelectedIds([]);
-            setSelectDelete(true)
         }else{
             if(data && data.length>0){
                 setSelectedIds(data.map((item:BrandType) => Number(item.id)));
-                setSelectDelete(false)
             }
         }
-    };
-    const toggleSelect = (id: number) => {
+    },[data, isAllSelected]);
+    const toggleSelect = useCallback((id: number) => {
         setSelectedIds((prev) => {
             const updated = prev.includes(id)
                 ? prev.filter((item) => item !== id)
                 : [...prev, id];
-            setSelectDelete(updated.length === 0);
             return updated;
         });
-    };
+    },[]);
 
-    const deleteRecord = async() => {
+    const deleteRecord = useCallback(async() => {
+        if (!id) return;
         setProgress(true);
         try{
             const ids = id?.join(',');
             if (ids !== null) {
                 await deleteData(`${ids}`);
-                successProgress();
             }
         } catch (err) {
             console.error(err);
         } finally {
             setProgress(false);
         }
-    }
-    const successProgress = () => {
-        useProductStore.setState({ 
-            response: { status: null, message: null, statusCode: null }
-        });
-        setModalOpen(!isOpen);
-    }
+    },[id, deleteData]);
 
-    const closeModal = () => {
+    const openModal = () => useCallback((ids: number[]) => {
+        setId(ids);
+        setAction("delete");
+        setModalOpen(true);
+    }, []);
+
+    const closeModal = () => useCallback(() => {
         setModalOpen(false);
         useProductStore.setState({ 
             response: { status: null, message: null, statusCode: null }
         });
-        successProgress();
-    }
-    useEffect(()=>{
-        setRedirect(currentUrl);
-    },[currentUrl])
+        fetchData();
+    }, [fetchData]);
+
+    const handleBulkDelete = useCallback(() => {
+        if (!selectedIds.length) return;
+        //@ts-ignore
+        openModal(selectedIds);
+    }, [selectedIds, openModal]);
+    
 
     return (
         <DefaultLayout>
@@ -126,7 +130,8 @@ const Brand = () =>
                             <div className='flex gap-3'>
                                 <LimitPerPage show={show} limit={limit} updateLimit={updateLimit}/>
                                 <button 
-                                    disabled={selectDelete}
+                                    disabled={!isAllSelected}
+                                    onClick={handleBulkDelete}
                                     title="Remove from select"
                                     type="button"
                                     className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-error-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"
@@ -255,7 +260,7 @@ const Brand = () =>
                 closeModal={closeModal}
                 data={{
                     confirm: deleteRecord,
-                    successProgress:successProgress,
+                    successProgress: fetchData,
                     progress: progress,
                     response: { 
                         status: typeof response.status === 'boolean' ? response.status : null, 

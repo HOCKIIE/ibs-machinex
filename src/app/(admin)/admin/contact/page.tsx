@@ -1,6 +1,6 @@
 "use client"
 
-import React, {useState, useEffect} from 'react';
+import React, {useState, useEffect, useCallback} from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
 import { Paginate, LimitPerPage, SearchBar, OrderBy } from '@/components/admin/Paginate/Paginate';
@@ -13,7 +13,6 @@ import useContactStore from '@/store/useContactStore';
 import Link from 'next/link';
 import { CategoryType } from '@/types/CategoryType';
 
-interface SelectDeleteProps { event: React.MouseEvent<HTMLButtonElement>; }
 const show = [10, 25, 50, 100];
 interface ContactUcType {
     id: number;
@@ -50,17 +49,14 @@ const Contact = () =>
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [isAction, setAction] = useState<string>("delete");
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
-    const [selectDelete, setSelectDelete] = useState<boolean>(true)
     const isAllSelected = selectedIds.length > 0;
 
     const toggleSelectAll = () => {
         if (isAllSelected) {
             setSelectedIds([]);
-            setSelectDelete(true)
         }else{
             if(data && data.length>0){
                 setSelectedIds(data.map((item:CategoryType) => Number(item.id)));
-                setSelectDelete(false)
             }
         }
     };
@@ -68,40 +64,39 @@ const Contact = () =>
         setSelectedIds((prev) =>
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
         );
-        if(selectedIds.length> 0) setSelectDelete(false);
     };
 
-    const SelectDelete: React.FC<SelectDeleteProps> = ({ event }) => {
-        useEffect(() => {
-            console.log(event.target);
-            console.log(selectedIds);
-        }, [event]);
 
-        return null;
-    };
-
-    const deleteRecord = async() => {
+    const deleteRecord = useCallback(async() => {
         try {
             const ids = id?.join(',');
             if (ids !== null) {
                 await deleteData(`${ids}`);
-                successProgress();
             }
         } catch (err) {
             console.error(err);
         } finally {
             setProgress(false);
         }
-    }
-    const successProgress = () => {
-        response.status = null;
-        response.message = null;
-        setModalOpen(!isOpen);
-    }
-    const closeModal = () => {
+    },[id, deleteData]);
+
+
+    const openModal = () => useCallback((ids: number[]) => {
+        setId(ids);
+        setAction("delete");
+        setModalOpen(true);
+    }, []);
+    
+    const closeModal = () => useCallback(() => {
         setModalOpen(false);
-        successProgress();
-    }
+        fetchData();
+    }, [fetchData]);
+    
+    const handleBulkDelete = useCallback(() => {
+        if (!selectedIds.length) return;
+        //@ts-ignore
+        openModal(selectedIds);
+    }, [selectedIds, openModal]);
     
     return (
         <DefaultLayout>
@@ -117,8 +112,8 @@ const Contact = () =>
                             <div className='flex gap-3'>
                                 <LimitPerPage show={show} limit={limit} updateLimit={updateLimit}/>
                                 <button 
-                                    disabled={selectDelete}
-                                    onClick={(e) => <SelectDelete event={e} />}
+                                    disabled={!isAllSelected}
+                                    onClick={handleBulkDelete}
                                     title="Remove from select"
                                     type="button"
                                     className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-error-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"
@@ -227,7 +222,7 @@ const Contact = () =>
                 data={{
                     confirm: deleteRecord,
                     progress: progress,
-                    successProgress: successProgress,
+                    successProgress: fetchData,
                     response: { 
                         status: typeof response.status === 'boolean' ? response.status : null, 
                         statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,

@@ -13,7 +13,7 @@ import TextEditor from '../Editor/TextEditor';
 import { ErrorMessage } from './Validation';
 import { useRouter } from 'next/navigation';
 import Format from '@/utils/Format';
-import { IoMdPricetag, IoMdClose } from "react-icons/io";
+import { IoMdPricetag } from "react-icons/io";
 import { HiExclamation } from "react-icons/hi";
 
 const BlogForm = ({
@@ -52,10 +52,7 @@ const BlogForm = ({
     const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
     const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
     const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
-    const search = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        console.log(value)
-    }
+
     const onCreate = async (data: BlogFormProps) => onSubmit(data);
     const onEdit = async (formData: BlogFormProps) => {
         const modifiedData = { ...formData };
@@ -87,6 +84,7 @@ const BlogForm = ({
                 detail_en: itemState.detail_en,
                 detail_ja: itemState.detail_ja,
                 pathName: itemState.pathName ?? "",
+                recommend: itemState.recommend,
                 status: itemState.status ?? false,
                 published_at: itemState.published_at,
             });
@@ -247,17 +245,34 @@ const BlogForm = ({
                     <div className="border border-gray-300 dark:border-gray-500 p-2 rounded-lg">
                         <div className="setting-content">
                             <div className="setting-header border-b border-gray-300 dark:border-gray-500 px-1 pb-2 flex items-center">
-                                <IoMdPricetag className="me-1"/>Tag
+                                <IoMdPricetag className="me-1"/>Recommend
                             </div> 
                         </div>
                         <div className="setting-body mt-2">   
                             <div className="flex gap-1">
-                                <input placeholder="tags" onChange={search} className="dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-2 py-0 text-sm placeholder:text-gray-400 focus:ring-2 focus:outline-none"/>
-                                <button className="text-sm p-2 bg-indigo-500 hover:bg-indigo-600 text-gray-100 hover:text-white rounded-lg">Add</button>
-                            </div>
-                            <div className="tags mt-2 flex flex-wrap">
-                                <span className="text-sm bg-indigo-500 text-gray-100 ps-2 pe-1 py-[2px] rounded-md flex justify-center">1-CE WIND Co.,Ltd. <button className='bg-transparent' title="Remove"><IoMdClose /></button></span>
-                            </div>                    
+                                <Controller
+                                    name="recommend"
+                                    control={control}
+                                    defaultValue={itemState?.recommend ?? null}
+                                    render={({ field }) => {
+                                        const isChecked = !!field.value;
+                                        return (
+                                            <label className="inline-flex items-center cursor-pointer">
+                                                <input
+                                                type="checkbox"
+                                                className="sr-only peer"
+                                                checked={isChecked}
+                                                onChange={(e) => {
+                                                    const checked = e.target.checked;
+                                                    field.onChange(checked);
+                                                }}
+                                                />
+                                                <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600 dark:peer-checked:bg-indigo-600"></div>
+                                            </label>
+                                        );
+                                    }}
+                                />
+                            </div>                  
                         </div>
                     </div>
                 </div>
@@ -321,7 +336,7 @@ const BlogForm = ({
                                             )}
                                         </div>
                                     </div>
-                                    {/* <div className="col-span-12">
+                                    <div className="col-span-12">
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-2">
                                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Detail </label> <BadgeLang lng="TH"/>
@@ -336,7 +351,7 @@ const BlogForm = ({
                                         {errors?.detail_th?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )} 
-                                    </div> */}
+                                    </div>
                                     
                                 </div>
                             </div>
@@ -373,7 +388,7 @@ const BlogForm = ({
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )}
                                     </div>
-                                    {/* <div className="col-span-12">
+                                    <div className="col-span-12">
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-2">
                                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Detail </label> <BadgeLang lng="EN"/>
@@ -388,7 +403,7 @@ const BlogForm = ({
                                         {errors?.detail_en?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )} 
-                                    </div> */}
+                                    </div>
                                 </div>
                             </div>
                             <div className={`tab ease-in-out duration-300 ${lng=='ja'?``:` hidden`}`} data-tab="ja">
@@ -424,7 +439,7 @@ const BlogForm = ({
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )}
                                     </div>
-                                    {/* <div className="col-span-12">
+                                    <div className="col-span-12">
                                         <div className="space-y-3">
                                             <div className="flex items-center gap-2">
                                                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Detail </label> <BadgeLang lng="JA"/>
@@ -439,7 +454,7 @@ const BlogForm = ({
                                         {errors?.detail_ja?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )} 
-                                    </div> */}
+                                    </div>
                                 </div>
                             </div>
                         </div>

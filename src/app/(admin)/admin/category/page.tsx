@@ -1,6 +1,6 @@
 "use client";
 
-import React,{ useState, useEffect } from 'react';
+import React,{ useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { BiTrash } from "react-icons/bi";
 import { LuPencil } from "react-icons/lu";
@@ -50,53 +50,55 @@ const Category = () =>
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [isAction, setAction] = useState<string>("delete");
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
-    const [selectDelete, setSelectDelete] = useState<boolean>(true)
     const isAllSelected = selectedIds.length > 0;
     const [redirect,setRedirect] = useState<string|null>(null)
 
-    const toggleSelectAll = () => {
+    useEffect(()=> setRedirect(currentUrl), [currentUrl,setRedirect])
+
+    const toggleSelectAll = useCallback(() => {
         if (isAllSelected) {
             setSelectedIds([]);
-            setSelectDelete(true)
         }else{
             if(data && data.length>0){
                 setSelectedIds(data.map((item:CategoryType) => Number(item.id)));
-                setSelectDelete(false)
             }
         }
-    };
-    const toggleSelect = (id: number) => {
+    },[data, isAllSelected]);
+    const toggleSelect = useCallback((id: number) => {
         setSelectedIds((prev) =>
             prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
         );
-        if(selectedIds.length> 0) setSelectDelete(false);
-    };
+    },[]);
 
-    const deleteRecord = async() => {
+    const deleteRecord = useCallback(async() => {
         setProgress(true);
         try{
             if (id && id.length > 0) {
                 await deleteData(id);
-                successProgress();
             }
         } catch (err) {
             console.error(err);
         } finally {
             setProgress(false);
         }
-    }
-    const successProgress = () => {
-        response.status = null;
-        response.message = null;
-        setModalOpen(!isOpen);
-    }
+    },[id, deleteData]);
 
-    const closeModal = () => {
-        setModalOpen(false);
-        successProgress();
-    }
+    const openModal = () => useCallback((ids: number[]) => {
+        setId(ids);
+        setAction("delete");
+        setModalOpen(true);
+    }, []);
     
-    useEffect(()=> setRedirect(currentUrl), [currentUrl,setRedirect])
+    const closeModal = () => useCallback(() => {
+        setModalOpen(false);
+        fetchData();
+    }, [fetchData]);
+    
+    const handleBulkDelete = useCallback(() => {
+        if (!selectedIds.length) return;
+        //@ts-ignore
+        openModal(selectedIds);
+    }, [selectedIds, openModal]);
 
     return (
         <DefaultLayout>
@@ -117,7 +119,8 @@ const Category = () =>
                             <div className='flex gap-3'>
                                 <LimitPerPage show={show} limit={limit} updateLimit={updateLimit}/>
                                 <button 
-                                    disabled={selectDelete}
+                                    disabled={!isAllSelected}
+                                    onClick={handleBulkDelete}
                                     title="Remove from select"
                                     type="button"
                                     className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-error-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"
@@ -235,7 +238,7 @@ const Category = () =>
                 data={{
                     confirm: deleteRecord,
                     progress: progress,
-                    successProgress: successProgress,
+                    successProgress: fetchData,
                     response: { 
                         status: typeof response.status === 'boolean' ? response.status : null, 
                         statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,

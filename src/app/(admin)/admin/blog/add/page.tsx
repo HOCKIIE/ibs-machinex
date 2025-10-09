@@ -25,6 +25,7 @@ export default function Page(){
         detail_ja: "",
         status: false,
         pathName: "",
+        recommend: "",
         category: [],
         categories: [],
         published_at:"",

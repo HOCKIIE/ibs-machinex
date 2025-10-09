@@ -16,7 +16,9 @@ import 'swiper/css/autoplay';
 import 'swiper/css/controller';
 import Api from '@/services/Api';
 
-const BlogSection = () => {
+const BlogSection = () => 
+{
+    const recent = 5;
     const t = useTranslations('blog');
     const locale = useLocale();
     const [blogs, setBlogs] = useState<BlogType[] | null>(null);
@@ -34,7 +36,7 @@ const BlogSection = () => {
     });
     
     const fectchBlogs = async () => {
-        const request = await Api.get<{data: BlogType[]}>('/blog/recent');
+        const request = await Api.get<{data: BlogType[]}>(`/blog/recent/${recent}`);
         return request.data;
     };
     return (

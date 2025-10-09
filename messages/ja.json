@@ -27,7 +27,9 @@
   },
   "blog":{
     "title":"ブログ",
-    "subTitle":"最適なソリューションをここで見つけましょう!"
+    "subTitle":"最適なソリューションをここで見つけましょう!",
+    "recommend": "推薦する",
+    "recommendSubtitle":"最適なソリューションをここで見つけましょう!"
   },
   "Validation":{
     "required": "このフィールドは必須です。",
