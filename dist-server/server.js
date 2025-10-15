@@ -17,15 +17,6 @@ const httpsOptions = {
     cert: fs_1.default.readFileSync(path_1.default.resolve(__dirname, '../localhost.pem')),
 };
 app.prepare().then(() => {
-    setInterval(() => {
-        const used = process.memoryUsage();
-        console.log({
-            rss: (used.rss / 1024 / 1024).toFixed(2) + " MB",
-            heapTotal: (used.heapTotal / 1024 / 1024).toFixed(2) + " MB",
-            heapUsed: (used.heapUsed / 1024 / 1024).toFixed(2) + " MB",
-            external: (used.external / 1024 / 1024).toFixed(2) + " MB",
-        });
-    }, 10000);
     (0, https_1.createServer)(httpsOptions, (req, res) => {
         const parsedUrl = (0, url_1.parse)(req.url, true);
         handle(req, res, parsedUrl);
