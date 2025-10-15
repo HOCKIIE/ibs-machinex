@@ -15,15 +15,6 @@ const httpsOptions = {
 };
 
 app.prepare().then(() => {
-    setInterval(() => {
-        const used = process.memoryUsage();
-        console.log({
-            rss: (used.rss / 1024 / 1024).toFixed(2) + " MB",
-            heapTotal: (used.heapTotal / 1024 / 1024).toFixed(2) + " MB",
-            heapUsed: (used.heapUsed / 1024 / 1024).toFixed(2) + " MB",
-            external: (used.external / 1024 / 1024).toFixed(2) + " MB",
-        });
-    }, 10000);
     createServer(httpsOptions, (req, res) => {
         const parsedUrl = parse(req.url!, true);
         handle(req, res, parsedUrl);

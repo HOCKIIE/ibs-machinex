@@ -15,6 +15,7 @@ import useBlogStore from '@/store/useBlogStore';
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import { BlogType } from '@/types/BlogType';
 import { useCurrentUrl } from '@/utils/useCurrentUrl';
+import Badge from '@/components/admin/ui/Badge';
 
 const show = [10, 25, 50, 100];
 const recordStatus = [
@@ -172,16 +173,21 @@ const Blog = () => {
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 w-10 h-10">
                                                     <img className="w-10 h-10 rounded-full" 
-                                                        src={`${v.image}` || '/storage/fallback-image.jpg'} 
-                                                        alt={v.title_en} 
+                                                        src={`${v.image}` || '/storage/fallback-image.jpg'}
                                                     />
                                                 </div>
-                                                <div className="ml-4">
+                                                <div className="ml-4 space-y-1">
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
+                                                        <Badge type="cyan" title={'TH'}/>
+                                                        {v.title_th}
+                                                    </div>
+                                                    <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
+                                                        <Badge type="primary" title={'EN'}/>
                                                         {v.title_en}
                                                     </div>
-                                                    <div className="text-sm text-gray-500 dark:text-gray-400">
-                                                        {v.description_en}
+                                                    <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
+                                                        <Badge type="pink" title={'JA'}/>
+                                                        {v.title_ja}
                                                     </div>
                                                 </div>
                                             </div>

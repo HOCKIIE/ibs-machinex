@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Head from "next/head";
 import { Inter, IBM_Plex_Sans_Thai } from "next/font/google";
 import "./globals.css";
 import { Header, Footer, Sidebar } from "@/components/main/layout/Layout";
@@ -32,6 +33,9 @@ export default async function RootLayout({children}:{children: React.ReactNode})
 
     return (
         <html lang="en">
+            <Head>
+                <link rel="icon" href="/favicon.ico" />
+            </Head>
             <PageSettingsContext>
                 <NextIntlClientProvider messages={messages} >
                     <body className={`scroll-smooth ${locale == 'th'? th.className :inter.className} antialiased bg-gray-100`}>
