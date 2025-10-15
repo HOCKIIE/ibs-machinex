@@ -10,13 +10,14 @@ import { Link } from '@/i18n/routing';
 
 const RecommendBlog = () => {
     const t = useTranslations('blog');
+    const limit = process.env.NEXT_PUBLIC_RECOMMEND_BLOG_LIMIT ?? 5;
     const locale = useLocale();
     const [data, setData] = useState([]);
     const swiperRef = useRef<SwiperType>();
     const didFetchData = useRef(false);
     const fetchData = useCallback(async()=>{
         try {
-            const response = await Api.get('/blog/recommend/byCustomer');
+            const response = await Api.get('/blog/recommend/byCustomer/'+limit);
             setData(response.data.data);
         } catch (error) {
             console.error("Error fetching category:", error);
@@ -32,14 +33,20 @@ const RecommendBlog = () => {
             <div className="flex justify-center">
                 <h2 className="pt-3 bg-gradient-to-r from-[#0055d3] from-2% via-[#007ecf] via-55% to-[#00a5cb] to-1% text-4xl md:text-5xl font-bold text-transparent bg-clip-text">{t('recommend')}</h2>
             </div>
-            <div className="flex justify-center mt-2"><h3 className="text-black text-xl">ค้นหาวิธีแก้ปัญหาที่ดีที่สุดที่นี่!</h3></div>
+            <div className="flex justify-center mt-2 mb-5"><h3 className="text-black text-xl">ค้นหาวิธีแก้ปัญหาที่ดีที่สุดที่นี่!</h3></div>
             <div className="relative">
                 <div>
                     {data && data.length > 0
                     ? 
                     <Swiper
                         modules={[Navigation, Autoplay, A11y]}
-                        autoplay={true}
+                        autoplay={{ 
+                            delay: 0,
+                            disableOnInteraction: false,
+                            pauseOnMouseEnter: true,
+                        }}
+                        loop={true}
+                        speed={6000}
                         spaceBetween={50}
                         slidesPerView={3}
                         effect='fade'
