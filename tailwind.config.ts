@@ -364,7 +364,7 @@ const config: Config = {
     "text-pink-800", "bg-pink-100", "border-pink-400", "dark:text-pink-400", "dark:bg-pink-950", "dark:border-pink-700",
     "text-indigo-800", "bg-indigo-100", "border-indigo-400", "dark:text-indigo-400", "dark:bg-indigo-950", "dark:border-indigo-700",
     "text-gray-800", "bg-gray-100", "border-gray-400", "dark:text-gray-400", "dark:bg-gray-950","w-[119px]","h-[116px]","border-[7px]",
-    "h-[120%]","w-[120%]","h-[116px]","w-[119px]"
+    "h-[120%]","w-[120%]","h-[116px]","w-[119px]","aspect[1/1]"
   ],
   plugins: [],
 };
