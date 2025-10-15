@@ -1,16 +1,15 @@
 "use client"
 
-import React, {useState, useEffect, useCallback} from 'react';
+import React, {useState, useCallback} from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
 import { Paginate, LimitPerPage, SearchBar, OrderBy } from '@/components/admin/Paginate/Paginate';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import usePagination from '@/hooks/usePagination';
 import { BiTrash } from "react-icons/bi";
-import { LuPencil } from "react-icons/lu";
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import useContactStore from '@/store/useContactStore';
-import Link from 'next/link';
+import { DeleteButton } from '@/components/admin/ui/ActionButton';
 import { CategoryType } from '@/types/CategoryType';
 
 const show = [10, 25, 50, 100];
@@ -81,13 +80,13 @@ const Contact = () =>
     },[id, deleteData]);
 
 
-    const openModal = () => useCallback((ids: number[]) => {
-        setId(ids);
+    const openModal = useCallback((id: number) => {
+        setId([id]);
         setAction("delete");
         setModalOpen(true);
     }, []);
     
-    const closeModal = () => useCallback(() => {
+    const closeModal = useCallback(() => {
         setModalOpen(false);
         fetchData();
     }, [fetchData]);
@@ -178,18 +177,7 @@ const Contact = () =>
                                     <td>
                                     {!loading?
                                         <div className="flex gap-2">
-                                            <button 
-                                                title="Delete"
-                                                onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([Number(v.id)])}}
-                                                className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
-                                                <BiTrash fontSize={24}/>
-                                            </button>
-                                            <Link 
-                                                type="button"
-                                                href={`user/edit/${v.id}`}
-                                                className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-500 dark:hover:text-white/90">
-                                                <LuPencil fontSize={20}/>
-                                            </Link>                                                
+                                            <DeleteButton onClick={() => openModal(Number(v.id))} />                                             
                                         </div>
                                         :
                                         <div className="flex-1 space-y-6 py-1">

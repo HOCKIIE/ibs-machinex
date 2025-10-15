@@ -10,10 +10,9 @@ import useUserStore from '@/store/useUserStore';
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import AddButton from '@/components/admin/Button/AddButton';
 import { BiTrash } from "react-icons/bi";
-import { LuPencil } from "react-icons/lu";
 import { IoSearchOutline } from "react-icons/io5";
-import Link from 'next/link';
 import { useCurrentUrl } from '@/utils/useCurrentUrl';
+import { EditButton, DeleteButton } from '@/components/admin/ui/ActionButton';
 import { UserType } from '@/types/UserType';
 
 const show = [10, 50, 100];
@@ -53,10 +52,8 @@ const Users = () =>
     const isAllSelected = selectedIds.length > 0;
     const currentUrl = useCurrentUrl();
 
-    useEffect(() => {
-        setRedirect(currentUrl)
-    }, [currentUrl,setRedirect]);
-
+    useEffect(() => { setRedirect(currentUrl) }, [currentUrl,setRedirect]);
+    
     const toggleSelectAll = useCallback(() => {
         if (isAllSelected) {
             setSelectedIds([]);
@@ -85,13 +82,13 @@ const Users = () =>
         }
     },[id, deleteUser]);
 
-    const openModal = () => useCallback((ids: number[]) => {
-        setId(ids);
+    const openModal = useCallback((id: number) => {
+        setId([id]);
         setAction("delete");
         setModalOpen(true);
     }, []);
     
-    const closeModal = () => useCallback(() => {
+    const closeModal = useCallback(() => {
         setModalOpen(false);
         fetchData();
     }, [fetchData]);
@@ -105,7 +102,6 @@ const Users = () =>
     return (
         <DefaultLayout>
             <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-                {/* <div className="p-6 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-800 dark:border-gray-700"> */}
                 <div className="control-button mb-3">
                     <div className="flex justify-between">
                         <div><Breadcrumb /></div>
@@ -189,18 +185,8 @@ const Users = () =>
                                     <td className="px-6 py-4">
                                     {!loading?
                                         <div className="flex gap-2">
-                                            <button 
-                                                title="Delete"
-                                                onClick={()=>{setModalOpen(!isOpen); setAction("delete"); setId([Number(v.id)])}}
-                                                className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
-                                                <BiTrash fontSize={24}/>
-                                            </button>
-                                            <Link 
-                                                type="button"
-                                                href={`user/${v.id}?redirect=${redirect}`}
-                                                className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-500 dark:hover:text-white/90">
-                                                <LuPencil fontSize={20}/>
-                                            </Link>                                                
+                                            <DeleteButton onClick={() => openModal(Number(v.id))} />
+                                            <EditButton href={`user/${v.id}?redirect=${redirect}`}/>                                                  
                                         </div>
                                         :
                                         <div className="flex-1 space-y-6 py-1">
