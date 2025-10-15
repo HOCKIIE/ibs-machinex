@@ -1,5 +1,4 @@
 import type { Config } from "tailwindcss";
-import defaultTheme from "tailwindcss/defaultTheme";
 import colors from "tailwindcss/colors";
 
 const config: Config = {
@@ -66,6 +65,7 @@ const config: Config = {
         strokedark: "#2E3A47",
         "form-strokedark": "#3d4d60",
         "form-input": "#1d2a39",
+        
         meta: {
           1: "#DC3545",
           2: "#EFF2F7",
@@ -357,7 +357,14 @@ const config: Config = {
   safelist: [
     "text-green-800", "bg-green-100", "border-green-400", "dark:text-green-400", "dark:bg-green-950", "dark:border-green-700",
     "text-yellow-800", "bg-yellow-100", "border-yellow-400", "dark:text-yellow-400", "dark:bg-yellow-950", "dark:border-yellow-700",
-    "text-red-800", "bg-red-100", "border-red-400", "dark:text-red-400", "dark:bg-red-950", "dark:border-red-700"
+    "text-red-800", "bg-red-100", "border-red-400", "dark:text-red-400", "dark:bg-red-950", "dark:border-red-700",
+    "bg-white/90","bg-white/80","bg-white/70","bg-white/75","bg-white/60","bg-white/55","bg-white/50","bg-white/45","bg-white/40","bg-white/30","bg-white/20","bg-white/10",
+    "text-blue-800", "bg-blue-100", "border-blue-400", "dark:text-blue-400", "dark:bg-blue-950", "dark:border-blue-700",
+    "text-purple-800", "bg-purple-100", "border-purple-400", "dark:text-purple-400", "dark:bg-purple-950", "dark:border-purple-700",
+    "text-pink-800", "bg-pink-100", "border-pink-400", "dark:text-pink-400", "dark:bg-pink-950", "dark:border-pink-700",
+    "text-indigo-800", "bg-indigo-100", "border-indigo-400", "dark:text-indigo-400", "dark:bg-indigo-950", "dark:border-indigo-700",
+    "text-gray-800", "bg-gray-100", "border-gray-400", "dark:text-gray-400", "dark:bg-gray-950","w-[119px]","h-[116px]","border-[7px]",
+    "h-[120%]","w-[120%]","h-[116px]","w-[119px]"
   ],
   plugins: [],
 };

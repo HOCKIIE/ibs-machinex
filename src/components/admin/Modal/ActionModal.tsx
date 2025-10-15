@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence, Variants } from "framer-motion";
 import { ConfirmModalProps } from '@/types/ConfirmModal';
 import { BsExclamationTriangle } from "react-icons/bs";
@@ -56,8 +56,7 @@ const ActionModal: React.FC<ConfirmModalProps> = ({isOpen, onAfterClose, closeMo
     const [btnClassName, setBtnClassName] = useState<string>(btnWarning);
     const [deleteSuccess, setDeleteSuccess] = useState<boolean>(false);
 
-    const closeModalHandler = () => {
-        console.log('debug: closeModalHandler');
+    const closeModalHandler = useCallback(() => {
         setMessage('Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.');
         setBtnTitle('Okay, Got It');
         setBtnClassName(btnWarning);
@@ -66,7 +65,7 @@ const ActionModal: React.FC<ConfirmModalProps> = ({isOpen, onAfterClose, closeMo
         setTitle('Warning Alert!');
         setSpinner(false);
         closeModal();
-    }
+    },[]);
     const ProcessingHandler = async () => {
         setMessage('Processing your request. Please wait...');
         setBtnTitle('Processing...');

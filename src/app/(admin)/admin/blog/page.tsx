@@ -1,9 +1,7 @@
 "use client"
 
 import React,{ useEffect, useState, useCallback, useRef } from 'react';
-import Link from 'next/link';
 import { BiTrash } from "react-icons/bi";
-import { LuPencil } from 'react-icons/lu';
 import { IoSearchOutline } from "react-icons/io5";
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
@@ -15,6 +13,7 @@ import useBlogStore from '@/store/useBlogStore';
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import { BlogType } from '@/types/BlogType';
 import { useCurrentUrl } from '@/utils/useCurrentUrl';
+import { EditButton, DeleteButton } from '@/components/admin/ui/ActionButton';
 import Badge from '@/components/admin/ui/Badge';
 
 const show = [10, 25, 50, 100];
@@ -90,14 +89,14 @@ const Blog = () => {
             setProgress(false);
         }
     },[id, deleteData]);
-    
-    const openModal = () => useCallback((ids: number[]) => {
-        setId(ids);
+
+    const openModal = useCallback((id: number) => {
+        setId([id]);
         setAction("delete");
         setModalOpen(true);
     }, []);
     
-    const closeModal = () => useCallback(() => {
+    const closeModal = useCallback(() => {
         setModalOpen(false);
         fetchData();
     }, [fetchData]);
@@ -178,15 +177,15 @@ const Blog = () => {
                                                 </div>
                                                 <div className="ml-4 space-y-1">
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                        <Badge type="cyan" title={'TH'}/>
+                                                        <Badge variant="success" title={'TH'} className='mr-1'/>
                                                         {v.title_th}
                                                     </div>
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                        <Badge type="primary" title={'EN'}/>
+                                                        <Badge variant="primary" title={'EN'} className='mr-1'/>
                                                         {v.title_en}
                                                     </div>
                                                     <div className="text-sm font-medium text-gray-900 dark:text-gray-200">
-                                                        <Badge type="pink" title={'JA'}/>
+                                                        <Badge variant="pink" title={'JA'} className='mr-1'/>
                                                         {v.title_ja}
                                                     </div>
                                                 </div>
@@ -198,19 +197,8 @@ const Blog = () => {
                                         <td className="px-6 py-4">
                                         {!loading?
                                             <div className="flex gap-2">
-                                                <button 
-                                                    title="Delete"
-                                                    //@ts-ignore
-                                                    onClick={() => openModal([Number(v.id)])}
-                                                    className="p-1 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-500 dark:bg-gray-700 dark:hover:bg-red-700 dark:hover:text-red-200">
-                                                    <BiTrash fontSize={24}/>
-                                                </button>
-                                                <Link 
-                                                    type="button"
-                                                    href={`blog/${v.id}?redirect=${redirect}`}
-                                                    className="p-1 rounded-md bg-gray-100 hover:bg-gray-200 text-gray-500 hover:text-gray-800 dark:text-gray-400 dark:bg-gray-700 dark:hover:bg-gray-500 dark:hover:text-white/90">
-                                                    <LuPencil fontSize={20}/>
-                                                </Link>                                                
+                                                <DeleteButton onClick={() => openModal(Number(v.id))} />
+                                                <EditButton href={`blog/${v.id}?redirect=${redirect}`}/>                                            
                                             </div>
                                             :
                                             <div className="flex-1 space-y-6 py-1">
