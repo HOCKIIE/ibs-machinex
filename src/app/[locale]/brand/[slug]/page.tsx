@@ -37,7 +37,7 @@ const Brand = ({ params }:{ params: {slug:string} }) => {
                     </div>
                     <iframe 
                         className="w-full"
-                        src={`${process.env.NEXT_PUBLIC_API_URL}/api/proxy/${itemState.apiName}`} 
+                        src={`${process.env.NEXT_PUBLIC_API_URL_PROD}/api/proxy/${itemState.apiName}`} 
                         height="1080" 
                         loading="lazy" 
                         referrerPolicy="no-referrer-when-downgrade"
