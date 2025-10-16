@@ -382,7 +382,7 @@ const ImageModal = ({
             setPreview(prev => [...(prev || []), URL.createObjectURL(f) ]);
         }
     };
-    const handleInsert = () => {
+    const handlerInsert = () => {
         if (tab === "upload" && preview) {
             onInsert(preview);
             onClose();
@@ -425,34 +425,34 @@ const ImageModal = ({
             setUploading(false);
         }
     }
+    const handlerSelectImage = (url: string) => {
+        if(selected && selected.includes(url)){
+            setSelected(selected.filter(u => u !== url));
+        }else{
+            setSelected(selected ? [...selected, url] : [url]);
+        }
+    }
     const deleteImage = async () => {
         if(!selected || selected.length === 0) return;
         if(!confirm("Are you sure to delete selected image?")) return;
         try {
             const request = await Api.post("/gallery/delete", {
-                urls: selected,
-                type: thisType,
-                id: thisId
+                images: selected,
+                _method: "DELETE",
             });
             await getGallery();
-            if(request.data.status === true){
-                setMessage({'status':'success','message':"Delete successful."});
-                setSelected(null);
-                setTimeout(() => {
-                    setMessage(null);
-                },3000);
-            }else{
-                setMessage({'status':'error','message':request.data.message || "Delete failed."});
-            }
+            setMessage({'status':'success','message':"Delete successful."});
+            setSelected(null);
+            setFile(null);
+            setPreview([]);
+            setTimeout(() => { setMessage(null) },1500);
         } catch (err) {
-            setMessage({'status':'error','message':"Delete failed."});
             console.error(err);
         }
     }
-    const handlerCancelUpload = () => {
+    const handlerResetFile = () => {
         setFile(null);
-        setPreview(null);
-        setTab('gallery');
+        setPreview([]);
     }
     useEffect(() => {
         if (!didFetchGallery.current) {
@@ -463,13 +463,13 @@ const ImageModal = ({
 
     return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-40 z-99">
-        <div className="bg-white rounded-lg w-full lg:w-[1130px] h-full lg:h-[800px] shadow-lg relative">
-            <div className="flex justify-between items-center border-b pb-2 pt-4 px-6">
+        <div className="bg-white rounded-lg w-full lg:w-[1130px] h-full lg:h-[800px] shadow-lg flex flex-col">
+            <div className="flex justify-between items-center border-b p-6">
                 <h2 className="text-lg font-semibold">Insert Image</h2>
                 <button type="button" onClick={onClose} className="text-gray-500 hover:text-black">✕</button>
             </div>
-            <div className="p-6">
-                <div className="flex gap-4 justify-between mb-6 border-b">
+            <div className="flex flex-col h-full p-6 pb-0">
+                <div className="flex gap-4 justify-between border-b">
                     <div className="flex gap-4">
                         <button
                             type="button"
@@ -489,47 +489,50 @@ const ImageModal = ({
                     {tab === "gallery" &&
                     <div className="flex gap-2">
                         <button type="button" className="p-2 bg-transparent rounded-md hover:ring-2 hover:ring-gray-300/50" onClick={getGallery}><IoRefresh/></button>
-                        <button type="button" className="p-2 bg-transparent rounded-md hover:ring-2 hover:ring-gray-300/50 disabled:text-gray-300" disabled onClick={deleteImage}><IoTrashBinOutline/></button>
+                        <button type="button" className="p-2 bg-transparent rounded-md hover:ring-2 hover:ring-gray-300/50 disabled:text-gray-300 hover:bg-red-100 hover:text-red-500 hover:ring-red-50" disabled={selected && selected.length > 0 ?false :true} onClick={deleteImage}><IoTrashBinOutline/></button>
                     </div>
                     }
                 </div>
                 {tab === "upload" && (
-                    <div className="h-[87%]">
-                        <input 
+                    <div className="h-full mt-4">
+                        { preview &&  preview.length === 0 && <input 
                             type="file" 
-                            className="block w-full text-sm text-slate-500
-                            file:mr-4 file:py-2 file:px-4
-                            file:rounded-full file:border-0
-                            file:text-sm file:font-semibold
-                            file:bg-violet-50 file:text-violet-700
-                            hover:file:bg-violet-100"
+                            className="rounded-md w-full h-full file:h-full file:w-full
+                                text-sm text-slate-500
+                                file:py-2 file:px-4
+                                file:rounded-none file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-violet-50 file:text-violet-700
+                                hover:file:bg-violet-100"
                             accept="image/*" 
                             multiple 
                             onChange={handleFileChange}
-                        />
+                        />}
                         {message && <div className="my-4">
                             <div className={`${message.status=='success'?`bg-green-100 text-green-600 border-green-400`:`bg-red-100 text-red-500 border-red-400`} p-2 border rounded-lg flex items-center justify-between`}>
                                 {message.message}
                                 <button type="button" className={`bg-transparent ${message.status==='success'?`text-green-600`:`text-red-500 p-2`}`}><IoClose/></button>
                             </div>
                         </div>}
-                        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 h-[77%] overflow-y-auto p-1">
-                            {preview && preview.map((img,k)=>(
-                            <div key={k} className="border rounded-md overflow-hidden cursor-pointer h-32 w-37 flex justify-center items-center">
-                                <img src={img} alt="preview" className="object-cover h-full" />
-                            </div>
+                        {preview && preview.length > 0 &&
+                            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 h-[77%] overflow-y-auto p-1">
+                            {preview.map((img,k)=>(
+                                <div key={k} className="border rounded-md overflow-hidden cursor-pointer h-32 w-37 flex justify-center items-center">
+                                    <img src={img} alt="preview" className="object-cover h-full" />
+                                </div>
                             ))}
-                        </div>
+                            </div>
+                        }
                     </div>
                 )}
                 {tab === "gallery" && (
                 <>
-                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 h-[77%] overflow-y-auto p-1">
+                    <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 h-[77%] overflow-y-auto p-1 mt-2">
                         {gallery && gallery.map((img,k) => 
                             <div
                                 key={k}
                                 className={`border rounded-md overflow-hidden cursor-pointer h-32 w-37 flex item-center justify-center ${selected && selected.includes(img.url) ? "ring-2 ring-blue-500" : ""}`}
-                                onClick={() => setSelected([img.url])}
+                                onClick={()=>handlerSelectImage(img.url)}
                             >
                                 <img src={img.url} alt="gallery image" className="object-cover h-full" />
                             </div>
@@ -538,19 +541,19 @@ const ImageModal = ({
                 </>
                 )}
             </div>
-            <div className="w-full m-6 flex justify-end gap-3 absolute bottom-0 object-fit right-0">
-                <button type="button" onClick={onClose} className={`px-3 py-1 rounded bg-gray-100 border-gray-200  hover:bg-gray-200 hover:ring-2 hover:ring-gray-300/70 ${tab === 'upload' ? 'hidden' : ''}`}>Cancel</button>
+            <div className="w-full flex justify-end gap-3 bottom-0 object-fit p-6 right-0">
+                <button type="button" onClick={onClose} className={`px-3 py-1 rounded bg-gray-100 border-gray-200 text-gray-400 hover:text-gray-500 hover:bg-gray-200 hover:ring-2 hover:ring-gray-300/70`}>Cancel</button>
                 <button
                     type="button"
-                    onClick={handleInsert}
+                    onClick={handlerInsert}
                     className={`px-3 py-1 rounded bg-blue-500 text-white disabled:opacity-50 hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-600 ${tab === 'upload' ? 'hidden' : ''}`}
                     disabled={tab === "upload" ? !file : !selected}
                 >Insert</button>
                 <button 
                     type="button" 
-                    className={`bg-gray-100 hover:bg-gray-200 hover:ring-2 hover:ring-gray-300/70 disabled:bg-gray-100 disabled:text-gray-500 text-gray-700 px-3 py-1 rounded  ${tab !== 'upload' ? 'hidden' : ''}`}
-                    onClick={()=>handlerCancelUpload}
-                >Cancel</button>
+                    className={`bg-red-100 hover:bg-red-200 hover:ring-2 hover:ring-red-300/70 disabled:bg-red-100 disabled:text-red-200 text-red-300 hover:text-red-500 px-3 py-1 rounded  ${tab !== 'upload' ? 'hidden' : ''}`}
+                    onClick={handlerResetFile}
+                >Reset</button>
                 <button 
                     type="button" 
                     className={`bg-indigo-600 hover:ring-2 hover:ring-indigo-500/50 hover:bg-indigo-600 disabled:bg-indigo-300 disabled:cursor-not-allowed text-white rounded px-3 py-1 ${tab !== 'upload' ? 'hidden' : ''}`} 

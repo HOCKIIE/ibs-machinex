@@ -5,6 +5,7 @@ import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import BlogForm from '@/components/admin/Form/BlogForm';
 import useBlogStore from '@/store/useBlogStore';
 import { BlogFormProps } from '@/types/BlogType';
+import OutlineButton from '@/components/admin/Button/OutlineButton';
 
 const Page = ({ params }: { params: { id: string } }) => 
 {
@@ -68,8 +69,9 @@ const Page = ({ params }: { params: { id: string } }) =>
                     </div>
                 </div>
                 <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-                    <div className="px-5 py-4 sm:px-6 sm:py-5">
-                        <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Add a new blog</h3>
+                    <div className="px-5 py-4 sm:px-6 sm:py-5 flex justify-between">
+                        <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Edit blog</h3>
+                        <OutlineButton href={`/th/blog/preview/${blogState.id}`} title="Preview" variant="primary" size="sm"/>
                     </div>
                     <hr />
                     <BlogForm itemState={blogState} onSubmit={handleSubmit} type="edit" />

@@ -4,6 +4,7 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Api from '@/services/Api';
 import { toast } from "react-hot-toast";
 import { Meta } from "@/types/PaginationType";
+import { set } from "lodash";
 
 interface UsePaginationProps {
     initialLimit?: number;
@@ -122,20 +123,24 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
 
     }
 
-    const handlerPageChangeFromBtn = (page:number) => {
+    const handlerPageChangeFromBtn = useCallback((page:number) => {
         if (debounceTimeout.current) {
             clearTimeout(debounceTimeout.current);
         }
         debounceTimeout.current = setTimeout(()=>{
+            const currentPage = parseInt(searchParams.get('page') || '1', 10);
             console.log('page >> ',page)
-            if(!isNaN(Number(page))){
+            if(!isNaN(Number(page)) && page !== currentPage){
                 setPage(Number(page))
+                const params = new URLSearchParams(searchParams.toString());
+                params.set('page', page.toString());
+                router.push(`?${params.toString()}`);
             }else{
                 toast.error("Invalid number.")
                 return;
             }
         },DEBOUNCE_DELAY);
-    }
+    },[setPage, searchParams, router, pathname]);
 
     const handlerOrderBy = (e: React.ChangeEvent<HTMLSelectElement>) => {
         if (debounceTimeout.current) {
