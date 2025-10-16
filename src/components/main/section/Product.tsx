@@ -34,23 +34,23 @@ const ProductSection = () => {
         return params;
     }, [searchParams]);
 
-    const fetchAndSetProducts = useCallback(async () => {
+    // const fetchAndSetProducts = useCallback(async () => {
         
-        const params = getQueryParam();
-        const path = `/category/brand?${params}`;
-        const request = await Api.get(path);
-        return request;
-    }, [getQueryParam]);
+    //     const params = getQueryParam();
+    //     const path = `/category/brand?${params}`;
+    //     const request = await Api.get(path);
+    //     return request;
+    // }, [getQueryParam]);
 
-    const fetchCategory = async () => {
+    const fetchCategory = useCallback(async() => {
         try {
-            const response = await fetchAndSetProducts();
+            const response = await Api.get(`/category/brand`);
             setCategory(response.data);
             ScrollToSearchEl()
         } catch (error) {
             console.error("Error fetching category:", error);
         }
-    };
+    },[getQueryParam]);
 
     const fetchAllCategory = useCallback(async() => {
         try {
@@ -172,7 +172,7 @@ const ProductSection = () => {
                 <h3 className="text-black text-xl">{t('subtitle')}</h3>
             </div>
             <div className="mt-20" ref={searchRef}>
-                {Array.isArray(category) && category.map((item: CategoryType) => (
+                {category && category.map((item: CategoryType) => (
                     <div key={item.id} id={`category-${item.id}`} className="grid grid-cols-12 gap-5 mt-5 group">
                         <div className="col-span-12 xl:col-span-4 p-5 rounded-3xl border border-blue-800 bg-white group-hover:bg-blue-800/90 transition-all duration-300 ease-in-out">
                             <div className="text-blue-800 text-3xl font-bold relative group-hover:text-white">

@@ -33,7 +33,7 @@ const RecommendBlog = () => {
             <div className="flex justify-center">
                 <h2 className="pt-3 bg-gradient-to-r from-[#0055d3] from-2% via-[#007ecf] via-55% to-[#00a5cb] to-1% text-4xl md:text-5xl font-bold text-transparent bg-clip-text">{t('recommend')}</h2>
             </div>
-            <div className="flex justify-center mt-2 mb-5"><h3 className="text-black text-xl">ค้นหาวิธีแก้ปัญหาที่ดีที่สุดที่นี่!</h3></div>
+            <div className="flex justify-center mt-2 mb-5"><h3 className="text-black text-xl">{t('recommendSubtitle')}</h3></div>
             <div className="relative">
                 <div>
                     {data && data.length > 0
