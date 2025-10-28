@@ -1,7 +1,7 @@
 "use client";
 
 import { ReactNode, createContext, useContext, useState, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 // import { UserType } from "@/types/UserType";
 import { setAccessToken } from "@/services/Api";
 import { getUser } from "@/services/Auth";
@@ -23,6 +23,7 @@ interface AuthContextType {
     toggleSidebar: () => void;
     userMenu: boolean;
     setUserMenu: (active: boolean) => void;
+    refreshUser: () => void
 }
 
 export const AdminContext = createContext<AuthContextType>({
@@ -34,12 +35,14 @@ export const AdminContext = createContext<AuthContextType>({
     isSidebarOpen: false,
     toggleSidebar: () => {},
     userMenu: false,
-    setUserMenu: () => {}
+    setUserMenu: () => {},
+    refreshUser: () => {}
 });
 
 export default function AdminContextProvider({ children }: { children: ReactNode })
 {
     const router = useRouter();
+    const pathname = usePathname();
     const [isSidebarOpen, setSidebarOpen] = useState(true);
     const [user, setUser] = useState<UserType|null>(null);
     const [menuActive, setMenuActive] = useState<string>('');
@@ -49,7 +52,7 @@ export default function AdminContextProvider({ children }: { children: ReactNode
 
     const toggleSidebar = () => setSidebarOpen(!isSidebarOpen);
     const toggleLoading = () => setLoading(!loading)
-    const fetchUser = async () => {
+    const fetchUser = async (): Promise<void> => {
         try {
             const res = await getUser();
             setUser({
@@ -65,15 +68,25 @@ export default function AdminContextProvider({ children }: { children: ReactNode
         }
         setLoading(false);
     };
+    const refreshUser = async (): Promise<void> => {
+        setLoading(true);
+        return fetchUser();
+    };
     useEffect(() => {
         if (didFetchUserData.current) return;
         didFetchUserData.current = true;
         fetchUser()
     }, []);
-
+    useEffect(() => {
+        const isAdminPath = pathname.startsWith("/admin");
+        const isSigninPage = pathname === "/admin/signin";
+        if (!loading && isAdminPath && !isSigninPage && !user) {
+            router.replace(`/admin/signin?redirect=${pathname}`);
+        }
+    }, [loading, pathname, user, router]);
 
     return (
-        <AdminContext.Provider value={{ user, loading, toggleLoading, menuActive, setMenuActive, isSidebarOpen, toggleSidebar, userMenu, setUserMenu }}>
+        <AdminContext.Provider value={{ user, loading, toggleLoading, menuActive, setMenuActive, isSidebarOpen, toggleSidebar, userMenu, setUserMenu, refreshUser }}>
         {children}
         </AdminContext.Provider>
     );

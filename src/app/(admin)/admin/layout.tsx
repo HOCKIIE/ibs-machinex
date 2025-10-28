@@ -7,6 +7,7 @@ import AdminContext from "@/contexts/AdminContext";
 import { Outfit } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import Loader from "@/components/admin/Loader";
+import Api from "@/services/Api";
 
 
 const outfit = Outfit({
@@ -18,6 +19,7 @@ const outfit = Outfit({
 export default function RootLayout({children}:{children: React.ReactNode})
 {
     const [loading, setLoading] = useState<boolean>(true);
+
     useEffect(() => {
         const timer = setTimeout(() => setLoading(false), 2000);
         return () => clearTimeout(timer);

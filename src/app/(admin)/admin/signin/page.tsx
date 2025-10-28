@@ -1,14 +1,15 @@
 "use client"
 
 import React, { useState } from 'react';
+import { useRouter, useSearchParams } from "next/navigation";
 import { useTheme } from 'next-themes';
 import { useForm } from "react-hook-form";
 import * as z from "zod";
+import Alert from '@/utils/Alert';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginUser } from '@/services/Auth';
-import { useRouter, useSearchParams } from "next/navigation";
-import Alert from '@/utils/Alert';
 import { AlertType } from '@/types/AlertType';
+import { useAuth } from '@/contexts/AdminContext';
 
 const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
@@ -18,6 +19,7 @@ const loginSchema = z.object({
 
 const Signin = () => 
 {
+    const { refreshUser } = useAuth();
     const router = useRouter();
     const searchParams = useSearchParams();
     const redirect = searchParams.get('redirect');
@@ -39,7 +41,7 @@ const Signin = () =>
 
     const [status, setStatus] = useState<string | null>('error');
     const [message , setMessage] = useState<string | null>(null);
-    const onSubmit = async (data: { email: string; password: string }) => {
+    const onSubmit = async (data: { email: string; password: string }): Promise<void> => {
         setMessage(null);
         try {
             const request = await loginUser(data.email, data.password);
@@ -47,6 +49,7 @@ const Signin = () =>
                 setStatus('success')
                 setMessage('Success, The system is redirecting.')
                 const redirectTo = typeof redirect === 'string' ? redirect : '/admin';
+                await refreshUser();
                 router.push(redirectTo);
             }else{
                 setStatus('error')
