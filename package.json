@@ -36,6 +36,7 @@
     "slate": "^0.112.0",
     "slate-react": "^0.112.1",
     "slate-serializers": "^2.2.3",
+    "slate-table": "^0.1.1",
     "swiper": "^11.2.10",
     "tailwind-merge": "^3.3.1",
     "typescript-cookie": "^1.0.6",
