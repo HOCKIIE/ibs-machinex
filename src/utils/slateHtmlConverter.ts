@@ -93,6 +93,7 @@ export function serializeNode(node: CustomText): string {
             return `<img src="${node?.url || ""}" alt="${node.alt || ""}" class="${cleanClass || "max-w-full h-auto"}" style="${node.style ? Object.entries(node.style).map(([k, v]) => `${k}:${v}`).join(";") : ""}" />`;
         case "table":
             return `<table  className="${cleanClass || DEFAULT_CLASSES.table}" ><tbody>${children}</tbody></table>`;
+        case "table-body": return `<tbody>${children}</tbody>`;
         case "table-row": return `<tr >${children}</tr>`;
         case "table-cell": return `<td  className="${cleanClass||''}" >${children}</td>`;
         case 'grid': return `<div class="grid grid-cols-${node.columns || 12} gap-4 mb-4">${children}</div>`;
@@ -218,10 +219,29 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[] {
                 className: mergeClassNames(className, DEFAULT_CLASSES.hr),
                 children: [{ text: "" }],
             };
-        case "table": return [{ type: "table", className: mergeClassNames(className, DEFAULT_CLASSES.table), children: ensureText(children.filter((c: any) => c.type === "table-row")), }];
-        case "tbody": return children;
-        case "tr": return [{ type: "table-row", className: className, children: ensureText(children.filter((c: any) => c.type === "table-cell")), }];
-        case "td": return [{ type: "table-cell", className: className, children: ensureText(children), }];
+        case "table": 
+            return {
+                type: "table",
+                className: mergeClassNames(className, DEFAULT_CLASSES.table),
+                children: ensureText(children.filter((c: any) => c.type === "table-body" || c.type === "table-row")),
+            };
+        case "tbody": 
+            return {
+                type: "table-body",
+                children: ensureText(children.filter((c: any) => c.type === "table-row")),
+            };
+        case "tr": 
+            return {
+                type: "table-row",
+                className,
+                children: ensureText(children.filter((c: any) => c.type === "table-cell")),
+            };
+        case "td": 
+            return {
+                type: "table-cell",
+                className,
+                children: ensureText(children),
+            };
         case "div":
             if (classList.includes("grid")) {
                 const cols = parseInt(classList.find((c) => c.startsWith("grid-cols-"))?.split("-")[2] || "12", 10);
