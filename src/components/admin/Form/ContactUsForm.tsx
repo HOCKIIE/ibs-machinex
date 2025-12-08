@@ -4,13 +4,16 @@ import useContactUsStore from '@/store/useContactUsStore';
 import { ContactUsType } from '@/types/ContactUsType';
 import { useForm  } from "react-hook-form";
 import { ErrorMessage } from './Validation';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 
 const ContactUsForm = ({
-    source
+    source,
+    company
 }:{
-    source:string
+    source:string;
+    company?:any
 }) => {
+    const locale = useLocale();
     const t = useTranslations('ContactUsForm');
     const vt = useTranslations('Validation');
     const { createData } = useContactUsStore();
@@ -39,8 +42,21 @@ const ContactUsForm = ({
     <>
         <form onSubmit={handleSubmitForm(onSubmit)}>
             <div className="grid gap-7">
+                <input type="hidden" {...register('source')} defaultValue={source}/>
+                {company && (
+                    <div className="col-span-12">
+                        <label htmlFor="company" className="block mb-2 text-sm text-gray-900 dark:text-white">{t('company')}</label>
+                        <input 
+                            type="text" 
+                            className={`bg-white disabled:bg-gray-100 disabled:text-gray-400 dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-50 focus:ring-2 ${validClass} focus:outline-none`} 
+                            readOnly={true}
+                            disabled={true}
+                            placeholder={t('company')}
+                            defaultValue={company?.[`title_${locale}`] ?? ''}
+                        />
+                    </div>
+                )}
                 <div className="col-span-12 xl:col-span-6">
-                    <input type="hidden" {...register('source')} defaultValue={source}/>
                     <div>
                         <label htmlFor="first_name" className="block mb-2 text-sm text-gray-900 dark:text-white">{t('firstName')}</label>
                         <input 
@@ -81,6 +97,21 @@ const ContactUsForm = ({
                             placeholder={t('email')}
                         />
                         {errors?.email?.type === "required" && (
+                            <ErrorMessage>{vt('required')}</ErrorMessage>
+                        )} 
+                    </div>
+                </div>
+                <div className='col-span-12'>
+                    <div>
+                        <label htmlFor="telephone" className="block mb-2 text-sm text-gray-900 dark:text-white">{t('telephone')}</label>
+                        <input 
+                            {...register('telephone',{required:true})}
+                            type="text" 
+                            id="telephone"
+                            className={`bg-white dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.telephone ? `${invalidClass} `:`${validClass} `}focus:outline-none`} 
+                            placeholder={t('telephone')}
+                        />
+                        {errors?.telephone?.type === "required" && (
                             <ErrorMessage>{vt('required')}</ErrorMessage>
                         )} 
                     </div>

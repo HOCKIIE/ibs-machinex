@@ -9,14 +9,16 @@
     "subtitle":"Find the Best Solutions Here!",
     "searchBoxTitle":"Products and Services",
     "searchPlaceholder":"Keyword Search",
-    "CategoryCaption":"Choose the category you are interested in.",
+    "CategoryCaption":"Choose the categories you are interested in.",
     "or":"OR"
   },
   "ContactUsForm": {
+    "company":"Company",
     "contact": "Contact",
     "firstName": "First Name",
     "lastName": "Last Name",
     "email": "Email Address",
+    "telephone": "Telephone",
     "message": "Your message",
     "submit": "Submit",
     "successMessage": "Thank you for contacting us! We will get back to you soon.",
@@ -28,7 +30,7 @@
   "blog":{
     "title":"Blog",
     "subTitle":"Find the best solutions here!",
-    "recommend": "Recommend",
+    "recommend": "SPECIAL FEATURE",
     "recommendSubtitle":"Find the best solutions here!"
   },
   "Validation":{
