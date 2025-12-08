@@ -42,7 +42,7 @@ const BlogSection = () =>
     return (
         <div className="container px-2 lg:px-0" id="blog">
             <div className="flex justify-center">
-                <h2 className="text-4xl md:text-[3rem] font-bold bg-gradient-to-r from-[#00a5cb] to-[#0055d3]  bg-clip-text text-transparent [-webkit-background-clip:text]">{t('title')}</h2>
+                <h2 className="font-bold bg-gradient-to-r from-[#00a5cb] to-[#0055d3] text-4xl md:text-5xl text-transparent bg-clip-text pb-2">{t('title')}</h2>
             </div>
             <div className="flex justify-center mb-[4rem]">
                 <h3 className="text-black text-lg">{t('subTitle')}</h3>

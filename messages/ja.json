@@ -13,10 +13,12 @@
     "or":"又は"
   },
   "ContactUsForm": {
+    "company":"会社",
     "contact": "お問い合わせ",
     "firstName": "名",
     "lastName": "姓",
     "email": "メールアドレス",
+    "telephone": "電話",
     "message": "メッセージ",
     "submit": "送信",
     "successMessage": "お問い合わせありがとうございます！すぐにご連絡いたします。",

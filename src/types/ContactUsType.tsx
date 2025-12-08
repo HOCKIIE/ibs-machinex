@@ -2,6 +2,8 @@ export interface ContactUsType {
     firstName: string;
     lastName: string;
     email: string;
+    telephone?: string;
+    company?: string;
     message: string;
     source: string;
 }
