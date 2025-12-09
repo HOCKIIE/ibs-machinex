@@ -1,18 +1,22 @@
 "use client";
 
-import { useRef, useState, useLayoutEffect } from "react";
+import { useEffect, useRef, useState, useLayoutEffect } from "react";
+import { motion, useTransform , useScroll, useMotionValue, AnimatePresence, useAnimation } from "framer-motion";
+import { useTranslations, useLocale } from 'next-intl';
+import { useGlobal } from "@/contexts/PageSettingsContext";
+import { Link } from "@/i18n/routing";
+import Api from "@/services/Api";
+import { UserType } from "@/types/UserType";
+import { OwnerType } from "@/types/OwnerType";
 import MenuItem from "@/assets/Menu.json"
 import { BsTelephoneFill } from "react-icons/bs";
 import { HiMiniUserCircle } from "react-icons/hi2";
 import { RiCloseLargeFill } from "react-icons/ri";
 import MenuToggle from "../button/MenuToggle";
 import BackToTop from "../button/BackToTop";
-import { useGlobal } from "@/contexts/PageSettingsContext";
-import { useEffect } from "react";
 import LanguageSwitcher from "../dropdown/LanguageSwitcher";
-import { Link } from "@/i18n/routing";
-import {useTranslations, useLocale} from 'next-intl';
-import { motion, useTransform , useScroll, useMotionValue } from "framer-motion";
+import DOMPurify from "dompurify";
+import ReactPlayer from 'react-player'
 
 export const Header = () => {
     const t = useTranslations('header');
@@ -59,43 +63,63 @@ export const Header = () => {
     </>
 }
 export const Footer = () => {
+    const locale = useLocale();
+    const t = useTranslations('footer');
+    const [user, setUser] = useState<UserType[] | []>([]);
+    const [owner, setOwner] = useState<OwnerType | null>(null);
+    const didFetchData = useRef(false);
+    
+    const fetchData = async () => {
+        try {
+            const resUser = await Api.get(`/sales`);
+            setUser(resUser.data);
+            
+            const resOwner = await Api.get(`/owner`);
+            setOwner(resOwner.data);
+
+        } catch (error) {
+            console.error("Error fetching data:", error);
+        }
+    }
+
+    const keyT = `title_${locale}` as keyof OwnerType;
+    const keyA = `address_${locale}` as keyof OwnerType;
+    const safeHtml = DOMPurify.sanitize(owner?.[keyA]?.replace(/\n/g, "<br/>") ?? "");
+
+    useEffect(() => {
+        if (didFetchData.current) return;
+        didFetchData.current = true;
+        fetchData();
+    }, []);
+
     return <>
         <BackToTop />
         <div className="bg-blue-900 text-gray-300">
             <div className="container px-2 xl:px-0">
                 <div className="grid grid-cols-12 gap-4 pt-10 pb-3">
                     <div className="col-span-12 md:col-span-7 lg:col-span-6">
-                        <h5 className="mb-6">IBS Machinex(Thailand) Co.,Ltd.</h5>
-                        <p className="font-light">116/11 4th Floor, Soonthornkosa Road,<br/>
-                            Klongtoey, Klongtoey Bangkok 10110<br/>
-                            Tax ID: 0105555072251
-                        </p>
+                        <h5 className="mb-6">{owner?.[keyT]}</h5>
+                        <p className="font-light" dangerouslySetInnerHTML={{ __html: safeHtml}} />
                     </div>
                     <div className="col-span-12 md:col-span-5 lg:col-span-6">
-                        <h5 className="mb-6 mt-5 md:mt-0">Contact us</h5>
-                        <div className="flex gap-4 mb-2">
-                            <BsTelephoneFill/> <a href="tel:02-312-0078" className="block "> 02-312-0078 (Head office)</a>
-                        </div>
-                        <div className="flex gap-4 mb-2">
-                            <HiMiniUserCircle/> 
-                            <div className="font-light">
-                                <span> K.Bum (Sales)</span><br/>
-                                <a href="mailto:patznun@machinex.co.t"> patznun@machinex.co.th</a><br/>
-                                <a href="tel:065-256-2226">065-256-2226</a><br/>
+                        <h5 className="mb-6 mt-5 md:mt-0">{t('contactUs')}</h5>
+                        {owner && <div className="flex gap-4 mb-2">
+                            <BsTelephoneFill/> <a href={`tel:${(owner as OwnerType).phone}`} className="block "> {(owner as OwnerType).phone}</a>
+                        </div>}
+                        {user && user.map((v:UserType,k: number) =>
+                            <div key={k} className="flex gap-4 mb-2">
+                                <HiMiniUserCircle/> 
+                                <div className="font-light">
+                                    <span>{v.title}</span><br/>
+                                    <a href={`mailto:${v.email}`}> {v.email}</a><br/>
+                                    <a href={`tel:${v.phone}`}>{v.phone}</a><br/>
+                                </div>
                             </div>
-                        </div>
-                        <div className="flex gap-4 mb-2">
-                            <HiMiniUserCircle/>
-                            <div className="font-light">
-                                <span> Mr.Fuji (Sales Japanese)</span><br/>
-                                <a href="mailto:fujii@machinex.co.t"> fujii@machinex.co.th</a><br/>
-                                <a href="tel:099-709-1624"> 099-709-1624</a>
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
                 <div className="border-t border-gray-500 py-6 font-extralight text-gray-400">
-                    &copy; 2025 IBS MACHINEX THAILAND
+                    &copy; 2025 IBS MACHINEX (THAILAND) COMPANY LIMITED
                 </div>
             </div>
         </div>
@@ -153,7 +177,7 @@ export const Sidebar = () => {
     )
 }
 
-export const VideoBackground = () => {
+export const SrollOutVideo = () => {
 
     const containerRef = useRef<HTMLElement | null>(null);
     const scrollY = useMotionValue(0);
@@ -228,4 +252,85 @@ export const VideoBackground = () => {
             </div>
         </motion.section>
     )
+}
+
+export const PlayVDOFor10s = () => {
+
+    const controls = useAnimation();
+    const [hideVideo, setHideVideo] = useState(false);
+    const [isLoaded, setIsLoaded] = useState(false);
+    const [isEnded, setIsEnded] = useState(false);
+    const videoRef = useRef<HTMLVideoElement | null>(null);
+
+ 
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video) return;
+
+        const MIN_LOADING_TIME = 2000; // 2 sec loading minimum
+        const VIDEO_PLAY_TIME = 15000; // 15 sec
+
+        const ensureMinLoadTime = new Promise<void>((resolve) =>
+        setTimeout(resolve, MIN_LOADING_TIME)
+        );
+
+        const handleVideoLoad = () => {
+        Promise.all([
+            ensureMinLoadTime,
+            new Promise<void>((resolve) => {
+            if (video.readyState >= 3) resolve();
+            else video.addEventListener("canplay", () => resolve(), { once: true });
+            })
+        ]).then(() => {
+            setIsLoaded(true);
+            video.play().catch(() => {});
+
+            // Auto fade-out after video play time
+            setTimeout(() => {
+                setIsEnded(true);
+                setHideVideo(true);
+            }, VIDEO_PLAY_TIME);
+        });
+        };
+
+        video.addEventListener("loadeddata", handleVideoLoad);
+        return () =>
+        video.removeEventListener("loadeddata", handleVideoLoad);
+    }, []);
+
+    const src = "/videos/intro.mp4";
+    const handleCanPlay = () => {
+        setIsLoaded(true);
+        videoRef.current?.play();
+    };
+
+    return (
+        <motion.section className={`relative w-full ${hideVideo?'h-auto':'h-screen'} overflow-hidden bg-slate-900 z-50`}>
+            {!isLoaded && (
+                <div className="absolute inset-0 flex items-center justify-center bg-slate-900/70 text-white">
+                <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+                </div>
+            )}
+            <AnimatePresence>
+                {!hideVideo && (
+                    <motion.div
+                        initial={{ opacity: 1, scale: 1, y: 0 }}
+                        animate={controls}
+                        exit={{ opacity: 0 }}
+                        className="fixed top-0 left-0 w-full h-screen z-50 pointer-events-none overflow-hidden"
+                    >
+                        <video
+                            ref={videoRef}
+                            className={`w-full h-full object-cover transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+                            muted
+                            playsInline
+                            preload="auto"
+                        >
+                            <source src={src} type="video/mp4" />
+                        </video>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.section>
+    );
 }

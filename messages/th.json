@@ -12,6 +12,9 @@
     "CategoryCaption":"เลือกหมวดหมู่ที่คุณสนใจ",
     "or":"หรือ"
   },
+  "footer":{
+    "contactUs":"ติดต่อเรา"
+  },
   "ContactUsForm": {
     "company":"บริษัท",
     "contact": "ติดต่อเรา",

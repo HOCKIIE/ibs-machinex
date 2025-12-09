@@ -12,6 +12,9 @@
     "CategoryCaption":"Choose the categories you are interested in.",
     "or":"OR"
   },
+  "footer":{
+    "contactUs":"Contact us"
+  },
   "ContactUsForm": {
     "company":"Company",
     "contact": "Contact",

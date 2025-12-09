@@ -2,12 +2,12 @@ export interface OwnerType {
     id: string;
     logo: string;
     email: string;
-    title_th: string;
-    title_en: string;
-    title_ja: string;
-    address_th: string;
-    address_en: string;
-    address_ja: string;
+    title_th: string | null;
+    title_en: string | null;
+    title_ja: string | null;
+    address_th: string | null;
+    address_en: string | null;
+    address_ja: string | null;
     phone: string;
     mobile: string;
     gmap: string;

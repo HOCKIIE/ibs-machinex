@@ -129,7 +129,7 @@ const UserForm = ({
                                         <input
                                             type="checkbox"
                                             className="peer absolute opacity-0 w-0 h-0"
-                                            checked={field.value === "1"}
+                                            checked={field.value == "1" ? true : false}
                                             onChange={(e) => field.onChange(e.target.checked?"1":"0")}
                                             ref={field.ref}
                                         />
@@ -148,7 +148,7 @@ const UserForm = ({
                                         <input
                                             type="checkbox"
                                             className="peer absolute opacity-0 w-0 h-0"
-                                            checked={field.value === "1"}
+                                            checked={field.value == "1" ? true : false}
                                             onChange={(e) => field.onChange(e.target.checked?"1":"0")}
                                             ref={field.ref}
                                         />
