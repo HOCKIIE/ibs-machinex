@@ -28,15 +28,15 @@ export default function LanguageSwitcher()
                 className="flex items-center gap-1 bg-blue-800 text-white font-light md:text-sm xl:text-base rounded-md ps-2 pe-1 py-[5px] cursor-pointer"
                 type="button"
             >
-                <span>{locale.toUpperCase()}</span><FiChevronDown />
+                <span>{locale != 'ja' ? locale.toUpperCase() : `JP`}</span><FiChevronDown />
             </button>
             <div id="dropdown" className={`${!dropdown?'hidden ':''}absolute z-20 mt-1 right-0 bg-white divide-y divide-gray-100 border border-gray-100 rounded-lg shadow-md w-20`}>
                 <div className="py-2 text-sm text-gray-700">
                     <div>
                         {languages && languages.map((lang) => (
                         <div key={lang}>
-                            <Link href="/" locale={lang} type="button" className="block px-4 py-2 hover:bg-gray-200 w-full">
-                                {lang.toUpperCase()}
+                            <Link href="/" locale={lang} className="block px-4 py-2 hover:bg-gray-200 w-full">
+                                {(lang == 'ja')? `JP` : lang.toUpperCase()}
                             </Link>
                         </div>
                         ))}

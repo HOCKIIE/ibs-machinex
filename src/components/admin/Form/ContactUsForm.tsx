@@ -1,5 +1,5 @@
 "use client";
-import React, { useRef } from 'react';
+import React, { useRef,useState } from 'react';
 import useContactUsStore from '@/store/useContactUsStore';
 import { ContactUsType } from '@/types/ContactUsType';
 import { useForm  } from "react-hook-form";
@@ -13,6 +13,7 @@ const ContactUsForm = ({
     source:string;
     company?:any
 }) => {
+    const [response, setResponse] = useState<{status:boolean|null; message:string|null}>({ status: null, message: null });
     const locale = useLocale();
     const t = useTranslations('ContactUsForm');
     const vt = useTranslations('Validation');
@@ -30,6 +31,9 @@ const ContactUsForm = ({
 
     const onSubmit = async (data: ContactUsType) => {
         const res = await createData(data);
+        if(res){
+            setResponse({ status: res.status ?? null, message: res.message ?? null });
+        }
         if(res?.status === true){
             if (didSubmit.current) return;
             didSubmit.current = true;
@@ -47,6 +51,7 @@ const ContactUsForm = ({
                     <div className="col-span-12">
                         <label htmlFor="company" className="block mb-2 text-sm text-gray-900 dark:text-white">{t('company')}</label>
                         <input 
+                            {...register('company')}
                             type="text" 
                             className={`bg-white disabled:bg-gray-100 disabled:text-gray-400 dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-50 focus:ring-2 ${validClass} focus:outline-none`} 
                             readOnly={true}
@@ -131,6 +136,11 @@ const ContactUsForm = ({
                         )} 
                     </div>
                 </div>
+                {response?.status && (
+                    <div className="col-span-12">
+                        <p className={`text-sm p-4 rounded-lg border ${response.status ? 'bg-green-200 text-green-800 border-green-300' : 'bg-red-200 text-red-700 border-red-300'}`}>{response.status ? t('successMessage'): t('errorMessage')}</p>
+                    </div>
+                )}
                 <div className="col-span-12">
                     <button type="submit" className="bg-red-700 text-white block p-3 rounded-md w-full" title="Submit">{t('submit')}</button>
                 </div>
