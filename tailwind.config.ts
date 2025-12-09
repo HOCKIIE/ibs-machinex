@@ -356,9 +356,9 @@ const config: Config = {
   },
   safelist: [
     "md:col-span-1","md:col-span-2","md:col-span-3","md:col-span-4","md:col-span-5","md:col-span-6","","md:col-span-7","md:col-span-8","md:col-span-9","md:col-span-10","md:col-span-11","md:col-span-12",
-    "text-green-800", "border-green-400", "dark:text-green-400", "dark:bg-green-950", "dark:border-green-700",
+    "text-green-800", "border-green-600","border-green-400", "border-green-300", "dark:text-green-400", "dark:bg-green-950", "dark:border-green-700",
     "text-yellow-800", "border-yellow-400", "dark:text-yellow-400", "dark:bg-yellow-950", "dark:border-yellow-700",
-    "text-red-800", "border-red-400", "dark:text-red-400", "dark:bg-red-950", "dark:border-red-700",
+    "text-red-800", "border-red-600", "border-red-400", "border-red-300", "dark:text-red-400", "dark:bg-red-950", "dark:border-red-700",
     "bg-white/90","bg-white/80","bg-white/70","bg-white/75","bg-white/60","bg-white/55","bg-white/50","bg-white/45","bg-white/40","bg-white/30","bg-white/20","bg-white/10",
     "text-blue-800", "border-blue-400", "dark:text-blue-400", "dark:bg-blue-950", "dark:border-blue-700",
     "text-purple-800", "border-purple-400", "dark:text-purple-400", "dark:bg-purple-950", "dark:border-purple-700",

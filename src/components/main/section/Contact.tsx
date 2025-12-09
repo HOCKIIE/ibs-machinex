@@ -96,7 +96,7 @@ const ContactSection = () => {
                     </p>
                 </div>
             </div>
-            { sales && sales.map((item:UserType, k:number) => (
+            {sales && sales.map((item:UserType, k:number) => (
             <div key={k} className="col-span-12 xl:col-span-4">
                 <div className="h-full bg-white text-gray-800 rounded-2xl shadow-[0_0px_1px_2px_rgba(0,0,0,0.05)] p-4">
                     <span className="font-semibold">{item.name}</span><br/>

@@ -130,7 +130,7 @@ const UserForm = ({
                                             type="checkbox"
                                             className="peer absolute opacity-0 w-0 h-0"
                                             checked={field.value === "1"}
-                                            onChange={(e) => field.onChange(e.target.checked)}
+                                            onChange={(e) => field.onChange(e.target.checked?"1":"0")}
                                             ref={field.ref}
                                         />
                                         <div className="w-5 h-5 border-2 border-gray-300 rounded-md flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition-colors">
@@ -149,7 +149,7 @@ const UserForm = ({
                                             type="checkbox"
                                             className="peer absolute opacity-0 w-0 h-0"
                                             checked={field.value === "1"}
-                                            onChange={(e) => field.onChange(e.target.checked)}
+                                            onChange={(e) => field.onChange(e.target.checked?"1":"0")}
                                             ref={field.ref}
                                         />
                                         <div className="w-5 h-5 border-2 border-gray-300 rounded-md flex items-center justify-center peer-checked:bg-indigo-600 peer-checked:border-indigo-600 transition-colors">
