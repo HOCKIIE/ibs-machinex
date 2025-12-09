@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Head from "next/head";
 import { Inter, IBM_Plex_Sans_Thai,Noto_Sans_JP } from "next/font/google";
 import "./globals.css";
-import { Header, Footer, Sidebar, VideoBackground } from "@/components/main/layout/Layout";
+import { Header, Footer, Sidebar, PlayVDOFor10s } from "@/components/main/layout/Layout";
 import PageSettingsContext from "@/contexts/PageSettingsContext";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
@@ -59,6 +59,7 @@ export default async function RootLayout({children}:{children: React.ReactNode})
                 <NextIntlClientProvider messages={messages} >
                     <body className={`scroll-smooth ${languageClass} antialiased bg-gray-100`}>
                         <Sidebar />
+                        <PlayVDOFor10s />
                         <main>
                             <Header />
                             {children}

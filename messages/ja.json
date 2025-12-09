@@ -12,6 +12,9 @@
     "CategoryCaption":"興味のあるカテゴリを選択してください。",
     "or":"又は"
   },
+   "footer":{
+    "contactUs":"お問い合わせ"
+  },
   "ContactUsForm": {
     "company":"会社",
     "contact": "お問い合わせ",
