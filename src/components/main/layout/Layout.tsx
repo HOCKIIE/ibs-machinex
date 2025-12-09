@@ -16,7 +16,6 @@ import MenuToggle from "../button/MenuToggle";
 import BackToTop from "../button/BackToTop";
 import LanguageSwitcher from "../dropdown/LanguageSwitcher";
 import DOMPurify from "dompurify";
-import ReactPlayer from 'react-player'
 
 export const Header = () => {
     const t = useTranslations('header');
@@ -262,7 +261,6 @@ export const PlayVDOFor10s = () => {
     const [isEnded, setIsEnded] = useState(false);
     const videoRef = useRef<HTMLVideoElement | null>(null);
 
- 
     useEffect(() => {
         const video = videoRef.current;
         if (!video) return;
@@ -299,10 +297,6 @@ export const PlayVDOFor10s = () => {
     }, []);
 
     const src = "/videos/intro.mp4";
-    const handleCanPlay = () => {
-        setIsLoaded(true);
-        videoRef.current?.play();
-    };
 
     return (
         <motion.section className={`relative w-full ${hideVideo?'h-auto':'h-screen'} overflow-hidden bg-slate-900 z-50`}>

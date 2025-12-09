@@ -5,8 +5,8 @@ import ContactUsForm from '@/components/admin/Form/ContactUsForm';
 import { useLocale, useTranslations } from 'next-intl';
 import { usePathname } from 'next/navigation';
 import { BrandType } from '@/types/BrandType';
-import Image from 'next/image';
 import Api from '@/services/Api';
+import DOMPurify from "dompurify";
 
 const Brand = ({ params }:{ params: {slug:string} }) => {
     const { slug } = params;
@@ -27,9 +27,12 @@ const Brand = ({ params }:{ params: {slug:string} }) => {
         fetchData();
     });
 
+    const key = `detail_${locale}` as keyof BrandType;
+    const safeHtml = DOMPurify.sanitize(itemState?.[key] as string || "");
+
     return (
         <div className='md:container px-2 pt-20 xl:px-4' id="contact">
-            {!itemState?.website && <div dangerouslySetInnerHTML={{ __html: itemState?.[`detail_${locale}` as keyof BrandType] ?? "" }} />}
+            {!itemState?.website && <div dangerouslySetInnerHTML={{ __html: safeHtml }} />}
             {itemState?.website && 
                 <div className="border-2 border-gray-300 rounded-lg overflow-hidden">
                     <div className="bg-gray-300 p-3">
