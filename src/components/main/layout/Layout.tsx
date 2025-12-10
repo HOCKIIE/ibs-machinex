@@ -16,6 +16,7 @@ import MenuToggle from "../button/MenuToggle";
 import BackToTop from "../button/BackToTop";
 import LanguageSwitcher from "../dropdown/LanguageSwitcher";
 import DOMPurify from "dompurify";
+import { useIntroStore } from "@/store/useIntroStore";
 
 export const Header = () => {
     const t = useTranslations('header');
@@ -255,76 +256,99 @@ export const SrollOutVideo = () => {
 
 export const PlayVDOFor10s = () => {
 
+    const { hideVideo, endIntro } = useIntroStore();
     const controls = useAnimation();
-    const [hideVideo, setHideVideo] = useState(false);
+
     const [isLoaded, setIsLoaded] = useState(false);
-    const [isEnded, setIsEnded] = useState(false);
     const videoRef = useRef<HTMLVideoElement | null>(null);
+
+
 
     useEffect(() => {
         const video = videoRef.current;
         if (!video) return;
 
-        const MIN_LOADING_TIME = 2000; // 2 sec loading minimum
-        const VIDEO_PLAY_TIME = 15000; // 15 sec
+        const MIN_LOADING_TIME = 2000;
+        const VIDEO_PLAY_TIME = 15000;
 
         const ensureMinLoadTime = new Promise<void>((resolve) =>
-        setTimeout(resolve, MIN_LOADING_TIME)
+            setTimeout(resolve, MIN_LOADING_TIME)
         );
 
-        const handleVideoLoad = () => {
-        Promise.all([
-            ensureMinLoadTime,
-            new Promise<void>((resolve) => {
-            if (video.readyState >= 3) resolve();
-            else video.addEventListener("canplay", () => resolve(), { once: true });
-            })
-        ]).then(() => {
+        const startVideoFlow = () => {
             setIsLoaded(true);
             video.play().catch(() => {});
-
-            // Auto fade-out after video play time
             setTimeout(() => {
-                setIsEnded(true);
-                setHideVideo(true);
+                endIntro();
             }, VIDEO_PLAY_TIME);
-        });
         };
 
-        video.addEventListener("loadeddata", handleVideoLoad);
-        return () =>
-        video.removeEventListener("loadeddata", handleVideoLoad);
+        // 🧠 ถ้าวิดีโอโหลดไปแล้วก่อน component remount
+        if (video.readyState >= 3) {
+            startVideoFlow();
+            return;
+        }
+
+        const handleVideoLoad = () => {
+            Promise.all([
+                ensureMinLoadTime,
+                new Promise<void>((resolve) => {
+                    resolve();
+                })
+            ]).then(startVideoFlow);
+        };
+
+        video.addEventListener("canplay", handleVideoLoad, { once: true });
+        return () => video.removeEventListener("canplay", handleVideoLoad);
     }, []);
+
+    useEffect(() => {
+        if (!hideVideo) document.body.style.overflow = "hidden";
+        else document.body.style.overflow = "";
+
+        return () => {
+            document.body.style.overflow = "";
+        };
+    }, [hideVideo]);
 
     const src = "/videos/intro.mp4";
 
     return (
-        <motion.section className={`relative w-full ${hideVideo?'h-auto':'h-screen'} overflow-hidden bg-slate-900 z-50`}>
+        <motion.section className={`relative w-full ${hideVideo?'h-auto':'h-screen'} bg-slate-900 z-50 overflow-hidden`}>
             {!isLoaded && (
                 <div className="absolute inset-0 flex items-center justify-center bg-slate-900/70 text-white">
-                <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+                    <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
                 </div>
             )}
             <AnimatePresence>
                 {!hideVideo && (
-                    <motion.div
-                        initial={{ opacity: 1, scale: 1, y: 0 }}
-                        animate={controls}
-                        exit={{ opacity: 0 }}
-                        className="fixed top-0 left-0 w-full h-screen z-50 pointer-events-none overflow-hidden"
-                    >
-                        <video
-                            ref={videoRef}
-                            className={`w-full h-full object-cover transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
-                            muted
-                            playsInline
-                            preload="auto"
+                    <>
+                        <motion.div
+                            initial={{ opacity: 1, scale: 1, y: 0 }}
+                            animate={controls}
+                            exit={{ opacity: 0 }}
+                            className="fixed top-0 left-0 w-full h-screen z-50 pointer-events-none overflow-hidden"
                         >
-                            <source src={src} type="video/mp4" />
-                        </video>
-                    </motion.div>
+                            <video
+                                ref={videoRef}
+                                className={`w-full h-full object-cover transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
+                                muted
+                                playsInline
+                                preload="auto"
+                            >
+                                <source src={src} type="video/mp4" />
+                            </video>
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
+            {!hideVideo && (
+                <motion.div className="fixed bottom-0 left-0 w-full block justify-center z-[99999] bg-gradient-to-t from-black/80 via-black/20 to-transparent">
+                    <h1 className="pt-20 pb-5 text-center text-xl md:text-2xl xl:text-3xl font-bold text-slate-50">
+                        <button type="button" className="px-5 py-3 rounded-xl hover:bg-slate-900 hover:bg-black/40 to-transparent transition-all duration-300" onClick={endIntro}>Enter the website</button>
+                    </h1>
+                </motion.div>
+            )}
         </motion.section>
     );
 }
