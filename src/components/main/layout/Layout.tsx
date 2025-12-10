@@ -333,6 +333,7 @@ export const PlayVDOFor10s = () => {
                                 ref={videoRef}
                                 className={`w-full h-full object-cover transition-opacity duration-700 ${isLoaded ? 'opacity-100' : 'opacity-0'}`}
                                 muted
+                                autoPlay
                                 playsInline
                                 preload="auto"
                             >
