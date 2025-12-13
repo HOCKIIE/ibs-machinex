@@ -3,7 +3,7 @@ export interface ContactUsType {
     lastName: string;
     email: string;
     telephone?: string;
-    company?: string;
+    company: string;
     message: string;
     source: string;
 }

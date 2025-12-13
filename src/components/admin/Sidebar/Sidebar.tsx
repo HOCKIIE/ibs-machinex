@@ -4,12 +4,13 @@ import Link from 'next/link';
 import { FiBarChart2 } from "react-icons/fi";
 import { RxDashboard } from "react-icons/rx";
 import { BsCardText, BsPersonVcard, BsBox, BsMailbox  } from "react-icons/bs";
+import { IoSettingsOutline } from "react-icons/io5";
 import { MdOutlineCategory } from "react-icons/md";
 import { TbTagStarred } from "react-icons/tb";
 import { TbUsers } from "react-icons/tb";
 import { useAuth } from "@/contexts/AdminContext";
 
-type menuName = "Dashboard"|"Category"|"Brand"|"Product"|"Blog"|"About"|"Contact"|"User";
+type menuName = "Dashboard"|"Category"|"Brand"|"Product"|"Blog"|"About"|"Contact"|"Homepage_Settings"|"User";
 interface IconProps { type: menuName }
 const Icon : React.FC<IconProps> = ({ type }) => {
     const iconMap : Record<menuName, JSX.Element> = {
@@ -20,6 +21,7 @@ const Icon : React.FC<IconProps> = ({ type }) => {
         Blog:<BsCardText fontSize={20}/>,
         About:<BsPersonVcard fontSize={20}/>,
         Contact:<BsMailbox fontSize={20}/>,
+        Homepage_Settings:<IoSettingsOutline fontSize={20}/>,
         User: <TbUsers fontSize={20}/>
     };
     return (iconMap[type])?<>{iconMap[type]}</>:<></>;
@@ -33,6 +35,7 @@ const menuItem: { name: menuName, path: string }[] = [
     { name:"Blog", path:"/admin/blog" },
     { name:"About", path:"/admin/about" },
     { name:"Contact", path:"/admin/contact" },
+    { name:"Homepage_Settings", path:"/admin/homepage-settings" },
     { name:"User", path:"/admin/user" }
 ];
 
@@ -71,7 +74,7 @@ const Sidebar = () => {
                         className={`menu-item group hover:bg-slate-100 ${menuActive === name ? ` bg-indigo-100 text-indigo-600` : ``}`}
                     >
                         <Icon type={name} />
-                        <span className={`menu-item-text ${!isSidebarOpen?`hidden`:``}`}>{name}</span>
+                        <span className={`menu-item-text ${!isSidebarOpen?`hidden`:``}`}>{name.replace('_', ' ')}</span>
                     </Link>
                 </li>
                 )}
