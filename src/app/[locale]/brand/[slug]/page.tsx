@@ -56,7 +56,7 @@ const Brand = ({ params }:{ params: {slug:string} }) => {
                 </div>
 
                 <div className="col-span-12 xl:col-span-6">
-                    <ContactUsForm source={`${pathname}`} company={itemState}/>
+                    <ContactUsForm source={`${pathname}`}/>
                 </div>
                 <div className='mt-10'></div>
             </div>
