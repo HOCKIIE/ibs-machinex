@@ -8,6 +8,7 @@ import UpdateButton from '@/components/admin/Button/UpdateButton';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { UsersFormProps } from '@/types/UserType';
 import { getUser } from '@/services/Auth';
+import { HiExclamation } from "react-icons/hi";
 
 
 const UserForm = ({
@@ -54,6 +55,11 @@ const UserForm = ({
             password_confirmation: ""
         },
     });
+    const Exclamation = () => <HiExclamation className="text-rose-500" fontSize={18}/>;
+    const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
+    const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
+    const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
+
     password.current = watch("password", "");
     const create = type === "create";
     const edit = type === "edit";
@@ -178,9 +184,9 @@ const UserForm = ({
                     </div>
                     <div className="col-span-12">
                         <div className="flex gap-1">
-                            <button type="button" className={`py-2 px-4 text-sm rounded-lg ${tab=="th"?'bg-indigo-50 text-indigo-600':'bg-gray-50'}`} onClick={languageTab} data-tab="th">Thai</button>
-                            <button type="button" className={`py-2 px-4 text-sm rounded-lg ${tab=="en"?'bg-indigo-50 text-indigo-600':'bg-gray-50'}`} onClick={languageTab} data-tab="en">English</button>
-                            <button type="button" className={`py-2 px-4 text-sm rounded-lg ${tab=="ja"?'bg-indigo-50 text-indigo-600':'bg-gray-50'}`} onClick={languageTab} data-tab="ja">Japanese</button>
+                            <button type="button" className={`py-2 px-4 text-sm rounded-lg flex items-center ${tab=="th"?'bg-indigo-50 text-indigo-600':'bg-gray-50'}`} onClick={languageTab} data-tab="th">Thai {hasThaiErrors && <Exclamation/>}</button>
+                            <button type="button" className={`py-2 px-4 text-sm rounded-lg flex items-center ${tab=="en"?'bg-indigo-50 text-indigo-600':'bg-gray-50'}`} onClick={languageTab} data-tab="en">English {hasEnglishErrors && <Exclamation/>}</button>
+                            <button type="button" className={`py-2 px-4 text-sm rounded-lg flex items-center ${tab=="ja"?'bg-indigo-50 text-indigo-600':'bg-gray-50'}`} onClick={languageTab} data-tab="ja">Japanese {hasJapaneseErrors && <Exclamation/>}</button>
                         </div>
                         <div className="bg-indigo-50 rounded-lg p-4 mt-1">
                             <div className={`col-span-12 ${tab=="th"?'':' hidden'}`}>

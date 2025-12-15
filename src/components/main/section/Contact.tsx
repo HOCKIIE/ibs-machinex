@@ -63,6 +63,7 @@ const ContactSection = () => {
         fetchData();
     });
     const address = owner?.[`address_${locale}` as keyof ContactType] || '';
+    const keyT = `title_${locale}` as keyof UserType;
 
     return (
     <div className='md:container px-2 xl:px-4' id="contact">
@@ -99,7 +100,7 @@ const ContactSection = () => {
             {sales && sales.map((item:UserType, k:number) => (
             <div key={k} className="col-span-12 xl:col-span-4">
                 <div className="h-full bg-white text-gray-800 rounded-2xl shadow-[0_0px_1px_2px_rgba(0,0,0,0.05)] p-4">
-                    <span className="font-semibold">{item.name}</span><br/>
+                    <span className="font-semibold">{item[keyT]}</span><br/>
                     <a className="mt-1" href={`mailto:${item.email}`}> {item.email}</a><br/>
                     <a href={`tel:${item.phone}`}>{item.phone}</a><br/>
                 </div>

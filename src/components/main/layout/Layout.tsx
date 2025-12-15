@@ -85,6 +85,7 @@ export const Footer = () => {
     const keyT = `title_${locale}` as keyof OwnerType;
     const keyA = `address_${locale}` as keyof OwnerType;
     const safeHtml = DOMPurify.sanitize(owner?.[keyA]?.replace(/\n/g, "<br/>") ?? "");
+    const keyN = `title_${locale}` as keyof UserType;
 
     useEffect(() => {
         if (didFetchData.current) return;
@@ -110,7 +111,7 @@ export const Footer = () => {
                             <div key={k} className="flex gap-4 mb-2">
                                 <HiMiniUserCircle/> 
                                 <div className="font-light">
-                                    <span>{v.title}</span><br/>
+                                    <span>{v[keyN] }</span><br/>
                                     <a href={`mailto:${v.email}`}> {v.email}</a><br/>
                                     <a href={`tel:${v.phone}`}>{v.phone}</a><br/>
                                 </div>
