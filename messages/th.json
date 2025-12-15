@@ -16,7 +16,7 @@
     "contactUs":"ติดต่อเรา"
   },
   "ContactUsForm": {
-    "company":"บริษัท",
+    "company":"ชื่อบริษัท",
     "contact": "ติดต่อเรา",
     "firstName": "ชื่อ",
     "lastName": "นามสกุล",

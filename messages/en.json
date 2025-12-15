@@ -6,7 +6,7 @@
     "contact": "Contact"
   },
   "sectionHead":{
-    "subtitle":"Find the Best Solutions Here!",
+    "subtitle":"Find the best solutions here!",
     "searchBoxTitle":"Products and Services",
     "searchPlaceholder":"Keyword Search",
     "CategoryCaption":"Choose the categories you are interested in.",
@@ -16,7 +16,7 @@
     "contactUs":"Contact us"
   },
   "ContactUsForm": {
-    "company":"Company",
+    "company":"Company Name",
     "contact": "Contact",
     "firstName": "First Name",
     "lastName": "Last Name",
