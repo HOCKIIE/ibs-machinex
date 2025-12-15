@@ -1,17 +1,14 @@
 "use client";
 
-import { useState, DragEvent } from "react";
+import { DragEvent } from "react";
 import { IoCloudUploadOutline,IoTrashOutline } from "react-icons/io5";
 import { useIntroVideoStore } from "@/store/useIntroVideoStore";
-import { VideoIntroProps } from "@/types/SettingType";
 
 
 export default function VideoUpload({
-    defaultVideoUrl,
-    onSubmit
+    defaultVideoUrl
 }: {
     defaultVideoUrl?: string | null;
-    onSubmit: (data: VideoIntroProps) => Promise<void>;
 }) {
 
 
@@ -36,7 +33,7 @@ export default function VideoUpload({
     const handlerUpload = async() => 
     {
         if (!videoFile) return;
-        const res = await updateData(videoFile);
+        await updateData(videoFile);
     }
 
     return (

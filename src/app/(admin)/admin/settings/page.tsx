@@ -18,10 +18,7 @@ const page = () => {
         updateData
     } = useIntroVideoStore();
 
-    // const [videoUrl, setVideoUrl] = useState<string | undefined>(undefined);
     const didFetchVideoEffect = useRef(false);
-
-    const handleSubmit = async (data: VideoIntroProps) => await updateData(data);
     
     const fetchVideoEffect = async() => {
         const res = await Api.get('/admin/settings/video-effect');
@@ -52,7 +49,7 @@ const page = () => {
                             <h2>Video Effect</h2>
                             <div className="flex justify-between w-full mt-4">
                                 <div className='flex gap-3'>
-                                    <VideoUpload defaultVideoUrl={videoUrl} onSubmit={handleSubmit}/>
+                                    <VideoUpload defaultVideoUrl={videoUrl} />
                                 </div>
                             </div>
                             
