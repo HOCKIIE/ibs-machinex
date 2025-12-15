@@ -17,6 +17,7 @@
     "contactUs":"Contact us"
   },
   "ContactUsForm": {
+    "office":"Office",
     "company":"Company Name",
     "contact": "Contact",
     "firstName": "First Name",
