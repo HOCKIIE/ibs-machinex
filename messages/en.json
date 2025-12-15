@@ -10,7 +10,8 @@
     "searchBoxTitle":"Products and Services",
     "searchPlaceholder":"Keyword Search",
     "CategoryCaption":"Choose the categories you are interested in.",
-    "or":"OR"
+    "or":"OR",
+    "comingSoon":"Coming soon"
   },
   "footer":{
     "contactUs":"Contact us"
@@ -34,7 +35,12 @@
     "title":"Blog",
     "subTitle":"Find the best solutions here!",
     "recommend": "SPECIAL FEATURE",
-    "recommendSubtitle":"Find the best solutions here!"
+    "recommendSubtitle":"Find the best solutions here!",
+    "all":{
+      "title":"Looking for interesting articles? Start reading now!",
+      "subTitle":"Engaging content, expert insights, and valuable information are all here.",
+      "title2":"Looking for High-Quality Industrial Machinery?"
+    }
   },
   "Validation":{
     "required": "This field is required.",

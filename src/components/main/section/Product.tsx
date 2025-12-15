@@ -182,7 +182,7 @@ const ProductSection = () => {
                             <div className="text-black text-xl mt-5 group-hover:text-white">{item[`description_${locale}`]}</div>
                         </div>
                         <div className="col-span-12 xl:col-span-8 p-5 rounded-3xl border border-blue-800 bg-white group-hover:bg-blue-800/90 transition-all duration-300 ease-in-out">
-                            {item.brands ?<div className="grid grid-cols-3 md:grid-cols-5 xl:grid-cols-7 gap-3">
+                            {Array.from(item.brands ?? []).length > 0 ?<div className="grid grid-cols-3 md:grid-cols-5 xl:grid-cols-7 gap-3">
                                     {item.brands?.map((brand: BrandType, k:number) => (
                                         <div key={k} className="flex items-center group-hover:text-white">
                                             <Link
@@ -194,7 +194,7 @@ const ProductSection = () => {
                                         </div>)
                                     )}
                                 </div>
-                                :<div className="flex justify-center text-gray-800 group-hover:text-white"><span>Coming soon</span></div>
+                                :<div className="flex items-center justify-center text-gray-800 group-hover:text-white h-full"><span>Coming soon</span></div>
                             }
                         </div>
                         <div className="col-span-12 relative my-10">

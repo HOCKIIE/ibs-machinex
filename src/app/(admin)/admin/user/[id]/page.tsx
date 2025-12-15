@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, use, useRef  } from 'react';
+import React, { useState, useEffect, useRef  } from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import UserForm from '@/components/admin/Form/UserForm';
@@ -11,11 +11,14 @@ const EditUser = ({ params }: { params:  { id: string } }) =>
     {
     const {id} = params;
     const didFetchData = useRef(false);
+    const [tab, setTab] = useState<string>('th')
     const { fetchUserById, updateUser, users } = useUserStore();
     const [userState, setUserState] = useState<UsersFormProps>({
         id: "",
         role: "",
-        title: "",
+        title_th: "",
+        title_en: "",
+        title_ja: "",
         contact_sale: "",
         name: "",
         phone: "",
@@ -57,7 +60,9 @@ const EditUser = ({ params }: { params:  { id: string } }) =>
         if (users?.length > 0) {
             setUserState({
                 id: String(users[0]?.id),
-                title: users[0]?.title,
+                title_th: users[0]?.title_th,
+                title_en: users[0]?.title_en,
+                title_ja: users[0]?.title_ja,
                 contact_sale: users[0]?.contact_sale,
                 role: users[0]?.role,
                 name: users[0]?.name,
@@ -83,6 +88,8 @@ const EditUser = ({ params }: { params:  { id: string } }) =>
                     </div>
                     <hr />
                     <UserForm 
+                        tab={tab}
+                        setTab={setTab}
                         itemState={userState}
                         setItemState={handleChange}
                         handleSubmit={handleSubmit}

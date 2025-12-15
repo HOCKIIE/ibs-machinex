@@ -69,8 +69,8 @@ const BlogSection = () =>
                             <SwiperSlide key={k} virtualIndex={k}>
                                 <div className="bg-white rounded-2xl overflow-hidden">
                                     <Link href={`/blog/${item.pathName}`}>
-                                        <div className="h-[180px] overflow-hidden">
-                                            <img src={item.image} alt={item[`title_${locale}`]} height={180} className="object-cover"/>
+                                        <div className="h-[260px] overflow-hidden">
+                                            <img src={item.image} alt={item[`title_${locale}`]} height={260} className="object-cover"/>
                                         </div>
                                         <div className="min-h-[260px] p-4">
                                             <span className="text-gray-500">{item.published_at}</span>
