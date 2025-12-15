@@ -8,10 +8,13 @@ import useUserStore from '@/store/useUserStore';
 
 const FormAdd = () => {
     const { createUser } = useUserStore();
+    const [tab, setTab] = useState<string>('th');
     const [userState, setUserState] = useState<UsersFormProps>({
         id: "",
         role: "",
-        title: "",
+        title_th: "",
+        title_en: "",
+        title_ja: "",
         contact_sale: "",
         name: "",
         phone: "",
@@ -56,6 +59,8 @@ const FormAdd = () => {
                     </div>
                     <hr />
                     <UserForm 
+                        tab={tab}
+                        setTab={setTab}
                         itemState={userState}
                         setItemState={handleChange}
                         handleSubmit={handleSubmit}

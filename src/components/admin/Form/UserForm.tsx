@@ -11,11 +11,15 @@ import { getUser } from '@/services/Auth';
 
 
 const UserForm = ({
+    tab,
+    setTab,
     itemState,
     setItemState: setData,
     handleSubmit,
     type
 } : {
+    tab: string;
+    setTab: (tab: string) => void;
     itemState: UsersFormProps;
     setItemState: (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
     handleSubmit: (data: UsersFormProps) => Promise<void>
@@ -39,7 +43,9 @@ const UserForm = ({
             id: itemState.id || "",
             role: itemState.role || "",
             contact_sale: itemState.contact_sale || "0",
-            title: itemState.title || "",
+            title_th: itemState.title_th || "",
+            title_en: itemState.title_en || "",
+            title_ja: itemState.title_ja || "",
             name: itemState.name || "",
             phone: itemState.phone || "",
             email: itemState.email || "",
@@ -73,12 +79,21 @@ const UserForm = ({
         setCurrentUser(request.user);
     }
 
+    const languageTab = (e: React.MouseEvent<HTMLButtonElement>) => {
+        const selectedTab = e.currentTarget.getAttribute('data-tab');
+        if (selectedTab) {
+            setTab(selectedTab);
+        }
+    }
+
     useEffect(() => {
         if (itemState.role) {
             reset({ 
                 id: itemState.id,
                 role: itemState.role,
-                title: itemState.title,
+                title_th: itemState.title_th,
+                title_en: itemState.title_en,
+                title_ja: itemState.title_ja,
                 contact_sale: itemState.contact_sale,
                 name: itemState.name,
                 phone: itemState.phone,
@@ -162,21 +177,66 @@ const UserForm = ({
                         </div>                        
                     </div>
                     <div className="col-span-12">
-                        <div className="space-y-3">
-                            <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title</label>
-                            <input 
-                                {...register("title", { required: true })}
-                                type="text" 
-                                onChange={setData}
-                                className={`dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
-                                placeholder="Title" />
-                            {errors?.title?.type === "required" && (
-                                <p className="text-xs text-rose-600 dark:text-rose-700">
-                                    {create
-                                    ? "This field is required."
-                                    : "Recheck the field."}
-                                </p>
-                            )}
+                        <div className="flex gap-1">
+                            <button type="button" className={`py-2 px-4 text-sm rounded-lg ${tab=="th"?'bg-indigo-50 text-indigo-600':'bg-gray-50'}`} onClick={languageTab} data-tab="th">Thai</button>
+                            <button type="button" className={`py-2 px-4 text-sm rounded-lg ${tab=="en"?'bg-indigo-50 text-indigo-600':'bg-gray-50'}`} onClick={languageTab} data-tab="en">English</button>
+                            <button type="button" className={`py-2 px-4 text-sm rounded-lg ${tab=="ja"?'bg-indigo-50 text-indigo-600':'bg-gray-50'}`} onClick={languageTab} data-tab="ja">Japanese</button>
+                        </div>
+                        <div className="bg-indigo-50 rounded-lg p-4 mt-1">
+                            <div className={`col-span-12 ${tab=="th"?'':' hidden'}`}>
+                                <div className="space-y-3">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title TH</label>
+                                    <input 
+                                        {...register("title_th", { required: true })}
+                                        type="text" 
+                                        onChange={setData}
+                                        className={`bg-white dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_th ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                                        placeholder="Title TH" />
+                                    {errors?.title_th?.type === "required" && (
+                                        <p className="text-xs text-rose-600 dark:text-rose-700">
+                                            {create
+                                            ? "This field is required."
+                                            : "Recheck the field."}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className={`col-span-12 ${tab=="en"?'':' hidden'}`}>
+                                <div className="space-y-3">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title EN</label>
+                                    <input 
+                                        {...register("title_en", { required: true })}
+                                        type="text" 
+                                        onChange={setData}
+                                        className={`bg-white dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_en ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                                        placeholder="Title" />
+                                    {errors?.title_en?.type === "required" && (
+                                        <p className="text-xs text-rose-600 dark:text-rose-700">
+                                            {create
+                                            ? "This field is required."
+                                            : "Recheck the field."}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
+                            <div className={`col-span-12 ${tab=="ja"?'':' hidden'}`}>
+                                <div className="space-y-3">
+                                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Title JA</label>
+                                    <input 
+                                        {...register("title_ja", { required: true })}
+                                        type="text" 
+                                        onChange={setData}
+                                        className={`bg-white dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.title_ja ? `${invalidClass} `:`${validClass} `}focus:outline-none`}
+                                        placeholder="Title" />
+                                    {errors?.title_ja?.type === "required" && (
+                                        <p className="text-xs text-rose-600 dark:text-rose-700">
+                                            {create
+                                            ? "This field is required."
+                                            : "Recheck the field."}
+                                        </p>
+                                    )}
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div className="col-span-12">

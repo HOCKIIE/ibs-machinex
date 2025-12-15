@@ -2,7 +2,9 @@ export interface UserType {
     id:number;
     role:string;
     name:string;
-    title:string;
+    title_th:string;
+    title_en:string;
+    title_ja:string;
     contact_sale:string;
     email:string;
     phone:string;
@@ -18,7 +20,9 @@ export interface ApiResponse {
 }
 export interface UsersFormProps {
     id: string;
-    title: string;
+    title_th: string;
+    title_en: string;
+    title_ja: string;
     contact_sale: string;
     role: string;
     name: string;
