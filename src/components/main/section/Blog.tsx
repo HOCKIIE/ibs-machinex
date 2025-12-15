@@ -20,7 +20,7 @@ const BlogSection = () =>
 {
     const recent = 5;
     const t = useTranslations('blog');
-    const btn = useTranslations('button');
+    const btn = useTranslations('Button');
     const locale = useLocale();
     const [blogs, setBlogs] = useState<BlogType[] | null>(null);
     const swiperRef = useRef<SwiperType>();
