@@ -20,6 +20,7 @@ const BlogSection = () =>
 {
     const recent = 5;
     const t = useTranslations('blog');
+    const btn = useTranslations('button');
     const locale = useLocale();
     const [blogs, setBlogs] = useState<BlogType[] | null>(null);
     const swiperRef = useRef<SwiperType>();
@@ -104,7 +105,7 @@ const BlogSection = () =>
 
             </div>
             <div className="flex justify-center mt-10">
-                <Link href={'/blog'} className="text-white bg-red-700 px-[50px] py-3 rounded-md">View More</Link>
+                <Link href={'/blog'} className="text-white bg-red-700 px-[50px] py-3 rounded-md">{btn('viewMore')}</Link>
             </div>
             <hr className="my-10" />
         </div>

@@ -16,7 +16,7 @@
     "contactUs":"お問い合わせ"
   },
   "ContactUsForm": {
-    "company":"会社",
+    "company":"会社名",
     "contact": "お問い合わせ",
     "firstName": "名",
     "lastName": "姓",
