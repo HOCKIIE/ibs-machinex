@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useLayoutEffect } from "react";
+import { useEffect, useRef, useState, useLayoutEffect, useCallback } from "react";
 import { motion, useTransform , useScroll, useMotionValue, AnimatePresence, useAnimation } from "framer-motion";
 import { useTranslations, useLocale } from 'next-intl';
 import { useGlobal } from "@/contexts/PageSettingsContext";
@@ -141,7 +141,6 @@ export const Sidebar = () => {
     <div className={`fixed z-9999 flex inset-0 transition-opacity duration-300 ${SidebarActive ? "opacity-100 visible" : "opacity-0 invisible"}`}>
         <div className={`bg-black/20 backdrop-blur-md h-full w-full transition-opacity duration-300 ${SidebarActive?` opacity-100`:` opacity-0`}`}></div>
         <aside className={`bg-blue-950 w-[85%] md:w-[35%] h-full fixed top-0 right-0 transform transition-transform duration-300 ${SidebarActive ? "translate-x-0" : "translate-x-full"}`}>
-            {/* <div className="backdrop bg-black-2/20 w-full h-full"></div> */}
             <div className="p-1 pe-2">
                 <div className="flex justify-end">
                     <button title="Close sidebar" onClick={ToggleSidebarHandle} className="flex items-center justify-center rounded-full w-10 h-10 bg-gray-100 text-gray-500 hover:bg-red-200 hover:text-red-600 focus:bg-red-200 focus:text-red-600 focus:ring ring-red-200/50 transition-all duration-300"><RiCloseLargeFill fontSize={20}/></button>
@@ -258,11 +257,15 @@ export const PlayVDOFor10s = () => {
 
     const { hideVideo, endIntro } = useIntroStore();
     const controls = useAnimation();
-
     const [isLoaded, setIsLoaded] = useState(false);
     const videoRef = useRef<HTMLVideoElement | null>(null);
+    const [video, setVideo] = useState("/videos/intro.mp4");
+    const didFetchVideoData  = useRef(false);
 
-
+    const fetchVideoData = useCallback(async()=>{
+        const res  = await Api.get('/intro/video-effect');
+        setVideo(res.data ?? video);
+    },[]);
 
     useEffect(() => {
         const video = videoRef.current;
@@ -311,7 +314,11 @@ export const PlayVDOFor10s = () => {
         };
     }, [hideVideo]);
 
-    const src = "/videos/intro.mp4";
+    useEffect(()=>{
+        if(didFetchVideoData.current) return;
+        didFetchVideoData.current = true;
+        fetchVideoData();
+    },[]);
 
     return (
         <motion.section className={`relative w-full ${hideVideo?'h-auto':'h-screen'} bg-slate-900 z-50 overflow-hidden`}>
@@ -337,7 +344,7 @@ export const PlayVDOFor10s = () => {
                                 playsInline
                                 preload="auto"
                             >
-                                <source src={src} type="video/mp4" />
+                                <source src={video} type="video/mp4" />
                             </video>
                         </motion.div>
                     </>

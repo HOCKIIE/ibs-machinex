@@ -10,7 +10,7 @@ import { TbTagStarred } from "react-icons/tb";
 import { TbUsers } from "react-icons/tb";
 import { useAuth } from "@/contexts/AdminContext";
 
-type menuName = "Dashboard"|"Category"|"Brand"|"Product"|"Blog"|"About"|"Contact"|"Homepage_Settings"|"User";
+type menuName = "Dashboard"|"Category"|"Brand"|"Product"|"Blog"|"About"|"Contact"|"Settings"|"User";
 interface IconProps { type: menuName }
 const Icon : React.FC<IconProps> = ({ type }) => {
     const iconMap : Record<menuName, JSX.Element> = {
@@ -21,7 +21,7 @@ const Icon : React.FC<IconProps> = ({ type }) => {
         Blog:<BsCardText fontSize={20}/>,
         About:<BsPersonVcard fontSize={20}/>,
         Contact:<BsMailbox fontSize={20}/>,
-        Homepage_Settings:<IoSettingsOutline fontSize={20}/>,
+        Settings:<IoSettingsOutline fontSize={20}/>,
         User: <TbUsers fontSize={20}/>
     };
     return (iconMap[type])?<>{iconMap[type]}</>:<></>;
@@ -35,7 +35,7 @@ const menuItem: { name: menuName, path: string }[] = [
     { name:"Blog", path:"/admin/blog" },
     { name:"About", path:"/admin/about" },
     { name:"Contact", path:"/admin/contact" },
-    { name:"Homepage_Settings", path:"/admin/homepage-settings" },
+    { name:"Settings", path:"/admin/settings" },
     { name:"User", path:"/admin/user" }
 ];
 

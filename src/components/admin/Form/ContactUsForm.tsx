@@ -44,19 +44,7 @@ const ContactUsForm = ({
         <form onSubmit={handleSubmitForm(onSubmit)}>
             <div className="grid gap-x-7 gap-y-3">
                 <input type="hidden" {...register('source')} defaultValue={source}/>
-                <div className="col-span-12">
-                    <label htmlFor="company" className="block mb-2 text-sm text-gray-900 dark:text-white">{t('company')}</label>
-                    <input 
-                        {...register('company',{required:true})}
-                        type="text" 
-                        id="company"
-                        className={`bg-white dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.company ? `${invalidClass} `:`${validClass} `}focus:outline-none`} 
-                        placeholder={t('company')}
-                    />
-                    {errors?.company?.type === "required" && (
-                        <ErrorMessage>{vt('required')}</ErrorMessage>
-                    )} 
-                </div>
+                
                 <div className="col-span-12 xl:col-span-6">
                     <div>
                         <label htmlFor="first_name" className="block mb-2 text-sm text-gray-900 dark:text-white">{t('firstName')}</label>
@@ -116,6 +104,19 @@ const ContactUsForm = ({
                             <ErrorMessage>{vt('required')}</ErrorMessage>
                         )} 
                     </div>
+                </div>
+                <div className="col-span-12">
+                    <label htmlFor="company" className="block mb-2 text-sm text-gray-900 dark:text-white">{t('company')}</label>
+                    <input 
+                        {...register('company',{required:true})}
+                        type="text" 
+                        id="company"
+                        className={`bg-white dark:bg-dark-900 shadow-theme-xs w-full rounded-lg border bg-transparent px-4 py-2 text-sm placeholder:text-gray-400 focus:ring-2 ${errors.company ? `${invalidClass} `:`${validClass} `}focus:outline-none`} 
+                        placeholder={t('company')}
+                    />
+                    {errors?.company?.type === "required" && (
+                        <ErrorMessage>{vt('required')}</ErrorMessage>
+                    )} 
                 </div>
                 <div className="col-span-12">
                     <div>
