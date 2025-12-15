@@ -20,7 +20,7 @@ const ContactSection = () => {
 
     const fetchData = async () => {
         const owner = await Api.get('/owner');
-        setOwner(owner.data);
+        setOwner(owner.data.data);
 
         const sales = await Api.get('/sales');
         setSales(Array.isArray(sales.data) ? sales.data : []);

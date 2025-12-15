@@ -75,7 +75,7 @@ export const Footer = () => {
             setUser(resUser.data);
             
             const resOwner = await Api.get(`/owner`);
-            setOwner(resOwner.data);
+            setOwner(resOwner.data.data);
 
         } catch (error) {
             console.error("Error fetching data:", error);
