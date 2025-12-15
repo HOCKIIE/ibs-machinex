@@ -121,7 +121,7 @@ const ProductSection = () => {
             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-3/4 bg-gradient-to-b from-[#0052b2] to-[#05a6d9] text-white p-6 h-[350px] xl:h-[500px] w-[100%] max-w-[2300px] rounded-[20px] md:rounded-[80px] xl:rounded-[150px] 2xl:rounded-[230px] 3xl:rounded-[300px] z-1"></div>
             <div className="absolute top-[0.5rem] md:top-[2rem] xl:top-[3rem] left-1/2 -translate-x-1/2 container mt-16 p-2 md:p-0 z-9">
                 <div className="p-5 bg-white rounded-3xl shadow-md border border-gray-300 md:w-[80%] m-auto">
-                    <div className="flex justify-center"><h2 className="font-bold text-3xl bg-gradient-to-r from-[#00a5cb] to-[#0055d3] text-transparent bg-clip-text">{t('searchBoxTitle')}</h2></div>
+                    <div className="flex justify-center"><h2 className="font-bold text-3xl bg-gradient-to-r from-[#00a5cb] to-[#0055d3] text-transparent bg-clip-text">{t('searchBoxTitle').toUpperCase()}</h2></div>
                     <div className="mt-4">
                         <form onSubmit={(e) => handleSearch(e)}>   
                             <div className="flex gap-5">
@@ -166,7 +166,7 @@ const ProductSection = () => {
         <RecommendBlog />
         <div className="container md:px-0 mt-20">
             <div className="flex justify-center">
-                <h2 className="pt-3 bg-gradient-to-r from-[#0055d3] from-2% via-[#007ecf] via-55% to-[#00a5cb] to-1% text-4xl md:text-5xl font-bold text-transparent bg-clip-text">{t('searchBoxTitle')}</h2>
+                <h2 className="pt-3 bg-gradient-to-r from-[#0055d3] from-2% via-[#007ecf] via-55% to-[#00a5cb] to-1% text-4xl md:text-5xl font-bold text-transparent bg-clip-text">{t('searchBoxTitle').toUpperCase()}</h2>
             </div>
             <div className="flex justify-center mt-2">
                 <h3 className="text-black text-xl">{t('subtitle')}</h3>

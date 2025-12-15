@@ -69,7 +69,7 @@ const ContactSection = () => {
         <hr className="my-14" />
         <div className="grid grid-cols-12 gap-4">
             <div className="col-span-12">
-                <div className="flex items-center"><h3 className="text-black text-4xl font-bold bg-gradient-to-r from-[#00a5cb] to-[#0055d3] text-transparent bg-clip-text">{t('contact')}</h3></div>
+                <div className="flex items-center"><h3 className="text-black text-4xl font-bold bg-gradient-to-r from-[#00a5cb] to-[#0055d3] text-transparent bg-clip-text">{t('contact').toUpperCase()}</h3></div>
             </div>
             <div className="col-span-12 xl:col-span-6">
                 <div className="relative bg-contain h-[488px] overflow-hidden">
