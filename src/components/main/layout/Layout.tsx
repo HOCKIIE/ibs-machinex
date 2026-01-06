@@ -17,6 +17,7 @@ import BackToTop from "../button/BackToTop";
 import LanguageSwitcher from "../dropdown/LanguageSwitcher";
 import DOMPurify from "dompurify";
 import { useIntroStore } from "@/store/useIntroStore";
+import { getCookie, setCookie } from "@/lib/cookies.client";
 
 export const Header = () => {
     const t = useTranslations('header');
@@ -257,7 +258,6 @@ export const SrollOutVideo = () => {
 export const PlayVDOFor10s = () => {
 
     const pathname = usePathname();
-    const [showVideo, setShowVideo] = useState(false)
     const prefix = process.env.NODE_ENV == 'production' ? process.env.NEXT_PUBLIC_API_URL_PROD : process.env.NEXT_PUBLIC_API_URL_DEV;
     const { hideVideo, endIntro } = useIntroStore();
     const controls = useAnimation();
@@ -267,26 +267,23 @@ export const PlayVDOFor10s = () => {
     const videoDefault = `${prefix}/${uriSegment}uploads/videos/default_video.mp4`;
     const [video, setVideo] = useState<string | null>();
     const didFetchVideoData  = useRef(false);
-
     const fetchVideoData = useCallback( async() =>{
         const res  = await Api.get('/intro/video-effect');
         console.log(`${prefix}${uriSegment}${res.data}`)
         setVideo(res.data ? `${prefix}${uriSegment}${res.data}` : videoDefault);
     },[]);
 
-    useEffect(() => {
-        const hasSeen = sessionStorage.getItem('hasSeenIntro')
-        setShowVideo(!hasSeen)
-    }, []);
+    const hasPlayedIntro = () => getCookie("introPlayed") === "1";
+    const hasPlayed = hasPlayedIntro();
+    const markPlayedIntro = () => setCookie("introPlayed", "1", { maxAge:(60 * 60) });
 
     const handleVideoEnd = () => {
-        sessionStorage.setItem('hasSeenIntro', 'true')
-        setShowVideo(false)
-        endIntro()
+        endIntro();
+        markPlayedIntro();
     }
 
     useEffect(() => {
-        if (!showVideo) return
+
 
         const video = videoRef.current
         if (!video) return
@@ -317,10 +314,10 @@ export const PlayVDOFor10s = () => {
 
         video.addEventListener("canplay", handleVideoLoad, { once: true })
         return () => video.removeEventListener("canplay", handleVideoLoad)
-    }, [showVideo]);
+    }, []);
 
     useEffect(() => {
-        if (showVideo && !hideVideo) document.body.style.overflow = "hidden";
+        if (!hideVideo) document.body.style.overflow = "hidden";
         else document.body.style.overflow = "";
 
         return () => {
@@ -336,15 +333,15 @@ export const PlayVDOFor10s = () => {
 
     return (
         <>
-            { pathname == '/' && showVideo &&
+            { pathname == '/' && !hasPlayed &&
             <motion.section className={`relative w-full ${hideVideo ?'h-auto':'h-screen'} bg-slate-900 z-50 overflow-hidden`}>
-                {!isLoaded && (
+                {!isLoaded && !hasPlayed && (
                     <div className="absolute inset-0 flex items-center justify-center bg-slate-900/70 text-white">
                         <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
                     </div>
                 )}
                 <AnimatePresence>
-                    {!hideVideo && (
+                    {!hideVideo && !hasPlayed && (
                         <>
                             <motion.div
                                 initial={{ opacity: 1, scale: 1, y: 0 }}
@@ -367,7 +364,7 @@ export const PlayVDOFor10s = () => {
                         </>
                     )}
                 </AnimatePresence>
-                {showVideo && !hideVideo && (
+                {!hasPlayed && !hideVideo && (
                     <motion.div className="fixed bottom-0 left-0 w-full block justify-center z-[99999] bg-gradient-to-t from-black/80 via-black/20 to-transparent">
                         <h1 className="pt-20 pb-5 text-center text-xl md:text-2xl xl:text-3xl font-bold text-slate-50">
                             <button type="button" className="px-5 py-3 rounded-xl hover:bg-slate-900 hover:bg-black/40 to-transparent transition-all duration-300" onClick={handleVideoEnd}>Enter the website</button>
