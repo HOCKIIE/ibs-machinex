@@ -263,14 +263,15 @@ export const PlayVDOFor10s = () => {
     const controls = useAnimation();
     const [isLoaded, setIsLoaded] = useState(false);
     const videoRef = useRef<HTMLVideoElement | null>(null);
-    const videoDefaut = `${prefix}/storage/uploads/videos/default_video.mp4`;
+    const uriSegment = process.env.NODE_ENV == 'production' ? `${process.env.NEXT_PUBLIC_PREFIX_PROD}/` : process.env.NEXT_PUBLIC_PREFIX_DEV;
+    const videoDefault = `${prefix}/${uriSegment}uploads/videos/default_video.mp4`;
     const [video, setVideo] = useState<string | null>();
     const didFetchVideoData  = useRef(false);
 
     const fetchVideoData = useCallback( async() =>{
         const res  = await Api.get('/intro/video-effect');
-        console.log(`${prefix}/storage${res.data}`)
-        setVideo(res.data ? `${prefix}/storage${res.data}` : videoDefaut);
+        console.log(`${prefix}${uriSegment}${res.data}`)
+        setVideo(res.data ? `${prefix}${uriSegment}${res.data}` : videoDefault);
     },[]);
 
     useEffect(() => {
@@ -369,7 +370,7 @@ export const PlayVDOFor10s = () => {
                 {showVideo && !hideVideo && (
                     <motion.div className="fixed bottom-0 left-0 w-full block justify-center z-[99999] bg-gradient-to-t from-black/80 via-black/20 to-transparent">
                         <h1 className="pt-20 pb-5 text-center text-xl md:text-2xl xl:text-3xl font-bold text-slate-50">
-                            <button type="button" className="px-5 py-3 rounded-xl hover:bg-slate-900 hover:bg-black/40 to-transparent transition-all duration-300" onClick={endIntro}>Enter the website</button>
+                            <button type="button" className="px-5 py-3 rounded-xl hover:bg-slate-900 hover:bg-black/40 to-transparent transition-all duration-300" onClick={handleVideoEnd}>Enter the website</button>
                         </h1>
                     </motion.div>
                 )}
