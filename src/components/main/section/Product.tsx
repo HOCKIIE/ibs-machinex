@@ -34,30 +34,22 @@ const ProductSection = () => {
         return params;
     }, [searchParams]);
 
-    // const fetchAndSetProducts = useCallback(async () => {
-        
-    //     const params = getQueryParam();
-    //     const path = `/category/brand?${params}`;
-    //     const request = await Api.get(path);
-    //     return request;
-    // }, [getQueryParam]);
-
     const fetchCategory = useCallback(async() => {
         try {
-            const response = await Api.get(`/category/brand`);
+            const response = await Api.get(`/category/brand${queryString?`?${queryString}`:``}`);
             setCategory(response.data);
             ScrollToSearchEl()
         } catch (error) {
             console.error("Error fetching category:", error);
         }
-    },[getQueryParam]);
+    },[queryString]);
 
     const fetchAllCategory = useCallback(async() => {
         try {
             const response = await Api.get("/category");
             setAllCategory(response.data);
         }
-        catch (error) {
+        catch (error) {  
             console.error("Error fetching category:", error);
         }
     }, []);
@@ -86,8 +78,7 @@ const ProductSection = () => {
     const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         setKeyword(e.currentTarget.search.value);
-        setMultipleParams({"keyword":e.currentTarget.search.value});
-        fetchCategory();
+        setMultipleParams({keyword: e.currentTarget.search.value});
     }
 
     type ScrollTarget = string | HTMLElement | null;
@@ -109,11 +100,10 @@ const ProductSection = () => {
     },[fetchAllCategory, getQueryParam]);
     
     useEffect(() => {
-
         if(didfetchCategory.current === queryString) return;
         didfetchCategory.current = queryString;
         fetchCategory();
-    },[]);
+    },[queryString, fetchCategory]);
 
     return (
     <div>
