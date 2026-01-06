@@ -42,7 +42,6 @@ export const Paginate: React.FC<PaginationType> = ({meta,prevPage,handlePageChan
                     Next <GoChevronRight fontSize={20}/>
                 </button>
             </div>
-
         </div>
     )
 }

@@ -5,14 +5,17 @@ const Badge = ({
     title,
     variant,
     className,
-    custom
+    custom,
+    href
 }:{
     title: string;
     variant?: string;
     className?: string;
-    custom?: boolean
+    custom?: boolean;
+    href?: string
 }) => {
     const defaultClass: string = 'p-[3px] rounded-md bg-indigo-400 text-white text-[11px]';
+    const linkClass:string = `px-2 py-1 rounded-md bg-indigo-400 text-white text-[11px] hover:bg-indigo-500 ease-in-out duration-500`
     const variantClasses: Record<string, string> = {
         primary: "bg-indigo-400",
         success: "bg-emerald-300",
@@ -27,7 +30,9 @@ const Badge = ({
     
     const colorClass = variant ? variantClasses[variant] || variantClasses["primary"] : "bg-indigo-400";
     const finalClass = `${defaultClass.replace("bg-indigo-400",colorClass)}${className ? " " + className : ""}`;
-    return <span className={finalClass}>{title}</span>;
+    return href 
+        ? <a className={linkClass} href={href} target="_blank"> {title}</a> 
+        : <span className={finalClass}>{title}</span>;
 }
 
 export default Badge
