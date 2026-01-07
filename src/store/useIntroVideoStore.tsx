@@ -5,10 +5,6 @@ import { create } from "zustand";
 import { ProcessToast } from "@/utils/ProcessToast";
 
 const apiPrefix = '/admin/settings';
-const env = process.env.NEXT_PUBLIC_ENV;
-const prefix = env === "development" 
-    ? process.env.NEXT_PUBLIC_PREFIX_DEV 
-    : process.env.NEXT_PUBLIC_PREFIX_PROD;
 
 type IntroVideoState = {
     response: { status: null, statusCode: number|null, message: null, path: string|null };
@@ -24,12 +20,7 @@ export const useIntroVideoStore = create<IntroVideoState>((set) => ({
     response: { status: null , statusCode: null, message: null, path:null },
     videoUrl: null,
     videoFile: null,
-    setVideoUrl: (url) => {
-        if (env === "development")
-            set({ videoUrl: url })
-        else
-            set({ videoUrl: (prefix ? '/'+prefix:'')+url })
-    },
+    setVideoUrl: (url) => set({ videoUrl: url }),
     setVideoFile: (file) => set({ videoFile: file }),
     resetToOld: () => set({videoFile: null}),
 
