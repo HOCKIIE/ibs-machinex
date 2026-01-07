@@ -31,6 +31,9 @@ const ja = Noto_Sans_JP({
 export const metadata : Metadata = {
     title: "IBS Machinex Co.,ltd.",
     description: "IBS Machinex Co.,lt",
+    verification: {
+        google: "5j_86ouroaNlwm_AAXPDfHMQhljTz7g6ZT4EM6ASyGg",
+    },
 };
 
 export default async function RootLayout({children}:{children: React.ReactNode}) {
@@ -54,7 +57,6 @@ export default async function RootLayout({children}:{children: React.ReactNode})
         <html lang="en">
             <Head>
                 <link rel="icon" href="/favicon.ico" />
-                <meta name="google-site-verification" content="5j_86ouroaNlwm_AAXPDfHMQhljTz7g6ZT4EM6ASyGg" />
             </Head>
             <PageSettingsContext>
                 <NextIntlClientProvider messages={messages} >
