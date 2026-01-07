@@ -11,10 +11,13 @@ export default function VideoUpload({
     defaultVideoUrl?: string | null;
 }) {
 
-
-    const prefix = process.env.NODE_ENV === "development" 
+    const env = process.env.NEXT_PUBLIC_ENV;
+    const prefix = process.env.NEXT_PUBLIC_ENV === "development" 
         ? process.env.NEXT_PUBLIC_API_URL_DEV 
         : process.env.NEXT_PUBLIC_API_URL_PROD;
+    const urlPrefix = env === "development"
+        ? prefix
+        : prefix+(process.env.NEXT_PUBLIC_PREFIX_PROD ? '/'+process.env.NEXT_PUBLIC_PREFIX_PROD : '');
     const { updateData, videoFile, setVideoFile } = useIntroVideoStore();
 
     const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +51,7 @@ export default function VideoUpload({
                         <p className="font-medium mb-3">วิดีโอปัจจุบัน</p>
                         <video
                             controls
-                            src={`${prefix}${defaultVideoUrl}`}
+                            src={`${urlPrefix}${defaultVideoUrl}`}
                             className="w-full rounded-lg"
                         />
                         <div className="flex gap-4 items-center justify-center mt-4">

@@ -6,16 +6,11 @@ import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import VideoUpload from '@/components/admin/Videos/VideoUpload';
 import { useIntroVideoStore } from "@/store/useIntroVideoStore";
-import { VideoIntroProps } from "@/types/SettingType";
 
 const page = () => {
     const {
         videoUrl,
-        videoFile,
-        setVideoUrl,
-        setVideoFile,
-        resetToOld,
-        updateData
+        setVideoUrl
     } = useIntroVideoStore();
 
     const didFetchVideoEffect = useRef(false);
