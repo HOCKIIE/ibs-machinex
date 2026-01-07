@@ -15,9 +15,10 @@ export default function VideoUpload({
     const prefix = process.env.NEXT_PUBLIC_ENV === "development" 
         ? process.env.NEXT_PUBLIC_API_URL_DEV 
         : process.env.NEXT_PUBLIC_API_URL_PROD;
-    const urlPrefix = env === "development"
-        ? prefix
-        : prefix+(process.env.NEXT_PUBLIC_PREFIX_PROD ? '/'+process.env.NEXT_PUBLIC_PREFIX_PROD : '');
+
+    const urlPrefix = env === "production"
+        ? prefix+(process.env.NEXT_PUBLIC_PREFIX_PROD ? '/'+process.env.NEXT_PUBLIC_PREFIX_PROD : '')
+        : prefix
     const { updateData, videoFile, setVideoFile } = useIntroVideoStore();
 
     const handleSelect = (e: React.ChangeEvent<HTMLInputElement>) => {

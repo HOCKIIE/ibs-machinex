@@ -258,20 +258,22 @@ export const PlayVDOFor10s = () => {
 
     const pathname = usePathname();
     const [showVideo, setShowVideo] = useState(false)
+    const env = process.env.NEXT_PUBLIC_ENV;
     const prefix = process.env.NODE_ENV == 'production' ? process.env.NEXT_PUBLIC_API_URL_PROD : process.env.NEXT_PUBLIC_API_URL_DEV;
     const { hideVideo, endIntro } = useIntroStore();
     const controls = useAnimation();
     const [isLoaded, setIsLoaded] = useState(false);
     const videoRef = useRef<HTMLVideoElement | null>(null);
-    const uriSegment = process.env.NODE_ENV == 'production' ? `${process.env.NEXT_PUBLIC_PREFIX_PROD}/` : process.env.NEXT_PUBLIC_PREFIX_DEV;
-    const videoDefault = `${prefix}/${uriSegment}uploads/videos/default_video.mp4`;
+    const uriSegment = process.env.NODE_ENV == 'production' ? process.env.NEXT_PUBLIC_PREFIX_PROD : process.env.NEXT_PUBLIC_PREFIX_DEV;
+    const videoDefault = `${prefix}/${uriSegment}/uploads/videos/default_video.mp4`;
     const [video, setVideo] = useState<string | null>();
     const didFetchVideoData  = useRef(false);
 
     const fetchVideoData = useCallback( async() =>{
         const res  = await Api.get('/intro/video-effect');
-        console.log(`${prefix}${uriSegment}${res.data}`)
-        setVideo(res.data ? `${prefix}${uriSegment}${res.data}` : videoDefault);
+        const videoUrl = env === "production" ? `${prefix}/${uriSegment}${res.data}` : `${prefix}${res.data}`;
+        console.log(videoUrl)
+        setVideo(res.data ? videoUrl : videoDefault);
     },[]);
 
     useEffect(() => {
