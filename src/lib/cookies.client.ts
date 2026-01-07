@@ -25,7 +25,7 @@ export const setCookie = (
     const {
         maxAge = 3600,
         path = "/",
-        sameSite = "Lax",
+        sameSite = "None",
         secure = false,
     } = options;
 
