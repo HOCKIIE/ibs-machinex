@@ -54,6 +54,10 @@ export default async function RootLayout({children}:{children: React.ReactNode})
         <html lang="en">
             <Head>
                 <link rel="icon" href="/favicon.ico" />
+                <meta
+                    name="google-site-verification"
+                    content="googleff2bcb4da7296a98.html"
+                />
             </Head>
             <PageSettingsContext>
                 <NextIntlClientProvider messages={messages} >
