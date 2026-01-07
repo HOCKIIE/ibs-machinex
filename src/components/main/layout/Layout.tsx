@@ -263,14 +263,14 @@ export const PlayVDOFor10s = () => {
     const controls = useAnimation();
     const [isLoaded, setIsLoaded] = useState(false);
     const videoRef = useRef<HTMLVideoElement | null>(null);
-    const uriSegment = process.env.NODE_ENV == 'production' ? `${process.env.NEXT_PUBLIC_PREFIX_PROD}/` : process.env.NEXT_PUBLIC_PREFIX_DEV;
+    const uriSegment = process.env.NODE_ENV == 'production' ? process.env.NEXT_PUBLIC_PREFIX_PROD : process.env.NEXT_PUBLIC_PREFIX_DEV;
     const videoDefault = `${prefix}/${uriSegment}uploads/videos/default_video.mp4`;
     const [video, setVideo] = useState<string | null>();
     const didFetchVideoData  = useRef(false);
     const fetchVideoData = useCallback( async() =>{
         const res  = await Api.get('/intro/video-effect');
-        console.log(`${prefix}${uriSegment}${res.data}`)
-        setVideo(res.data ? `${prefix}${uriSegment}${res.data}` : videoDefault);
+        console.log(`${prefix}/${uriSegment}${res.data}`)
+        setVideo(res.data ? `${prefix}/${uriSegment}${res.data}` : videoDefault);
     },[]);
 
     const hasPlayedIntro = () => getCookie("introPlayed") === "1";
