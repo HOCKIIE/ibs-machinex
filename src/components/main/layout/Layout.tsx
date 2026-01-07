@@ -275,7 +275,11 @@ export const PlayVDOFor10s = () => {
 
     const hasPlayedIntro = () => getCookie("introPlayed") === "1";
     const hasPlayed = hasPlayedIntro();
-    const markPlayedIntro = () => setCookie("introPlayed", "1", { maxAge:(60 * 60) });
+    const markPlayedIntro = () => setCookie("introPlayed", "1", { 
+        maxAge: 3600,
+        sameSite: "Lax",
+        secure: true,
+    });
 
     const handleVideoEnd = () => {
         endIntro();
