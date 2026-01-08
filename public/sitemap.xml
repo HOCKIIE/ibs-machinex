@@ -2,39 +2,39 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <!-- หน้าแรก -->
     <url>
-        <loc>https://ibsmachinex.com/th/</loc>
+        <loc>https://www.ibsmachinex.com/th/</loc>
         <lastmod>2025-01-01</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://ibsmachinex.com/en/</loc>
+        <loc>https://www.ibsmachinex.com/en/</loc>
         <lastmod>2025-01-01</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://ibsmachinex.com/ja/</loc>
+        <loc>https://www.ibsmachinex.com/ja/</loc>
         <lastmod>2025-01-01</lastmod>
         <changefreq>weekly</changefreq>
         <priority>1.0</priority>
     </url>
     <url>
-        <loc>https://ibsmachinex.com/th/blog</loc>
+        <loc>https://www.ibsmachinex.com/th/blog</loc>
         <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
 
     <url>
-        <loc>https://ibsmachinex.com/en/blog</loc>
+        <loc>https://www.ibsmachinex.com/en/blog</loc>
         <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.8</priority>
     </url>
 
     <url>
-        <loc>https://ibsmachinex.com/ja/blog</loc>
+        <loc>https://www.ibsmachinex.com/ja/blog</loc>
         <lastmod>2025-01-01</lastmod>
         <changefreq>monthly</changefreq>
         <priority>0.7</priority>
