@@ -272,7 +272,6 @@ export const PlayVDOFor10s = () => {
     const fetchVideoData = useCallback( async() =>{
         const res  = await Api.get('/intro/video-effect');
         const videoUrl = env === "production" ? `${prefix}/${uriSegment}${res.data}` : `${prefix}${res.data}`;
-        console.log(videoUrl)
         setVideo(res.data ? videoUrl : videoDefault);
     },[]);
 
