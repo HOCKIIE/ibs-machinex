@@ -27,13 +27,9 @@ const ja = Noto_Sans_JP({
     style: ["normal"],
     display: "swap",
 });
-// 5j_86ouroaNlwm_AAXPDfHMQhljTz7g6ZT4EM6ASyGg
 export const metadata : Metadata = {
     title: "IBS Machinex Co.,ltd.",
     description: "IBS Machinex Co.,lt",
-    verification: {
-        google: "MlNHq5nNc6TG6dlmy4YT3YQXvbVol6Fkc5_UrkfbYlA",
-    },
     alternates: {
         canonical: 'https://www.ibsmachinex.com',
     },
