@@ -35,7 +35,7 @@ export const metadata : Metadata = {
         google: "MlNHq5nNc6TG6dlmy4YT3YQXvbVol6Fkc5_UrkfbYlA",
     },
     alternates: {
-        canonical: 'https://ibsmachinex.com',
+        canonical: 'https://www.ibsmachinex.com',
     },
 };
 
