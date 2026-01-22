@@ -29,7 +29,7 @@ const ja = Noto_Sans_JP({
 });
 export const metadata : Metadata = {
     title: "IBS Machinex Co.,ltd.",
-    description: "IBS Machinex Co.,lt",
+    description: "IBS Machinex Co.,ltd",
     alternates: {
         canonical: 'https://www.ibsmachinex.com',
     },
