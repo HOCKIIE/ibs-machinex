@@ -27,13 +27,75 @@ const ja = Noto_Sans_JP({
     style: ["normal"],
     display: "swap",
 });
-export const metadata : Metadata = {
-    title: "IBS Machinex Co.,ltd.",
-    description: "IBS Machinex Co.,ltd",
-    alternates: {
-        canonical: 'https://www.ibsmachinex.com',
-    },
+type Props = {
+    params: {
+        locale: 'th' | 'en' | 'ja';
+    };
 };
+
+export async function generateMetadata(
+    { params }: Props
+): Promise<Metadata> {
+
+    const { locale } = params;
+
+    const baseUrl = 'https://www.ibsmachinex.com';
+
+    const titles = {
+        th: 'IBS MACHINEX (THAILAND) CO.,LTD.',
+        en: 'IBS MACHINEX (THAILAND) CO.,LTD.',
+        ja: 'IBS MACHINEX (THAILAND) CO.,LTD.'
+    };
+
+    const descriptions = {
+        th: 'ผู้ให้บริการเครื่องจักรอุตสาหกรรมคุณภาพสูงในประเทศไทย',
+        en: 'A leading provider of industrial machinery and equipment in Thailand.',
+        ja: 'タイにおける産業機械および設備の主要プロバイダーです。'
+    };
+
+    return {
+        title: titles[locale],
+        description: descriptions[locale],
+
+        alternates: {
+        canonical: `${baseUrl}/${locale}/`,
+        languages: {
+            th: `${baseUrl}/th/`,
+            en: `${baseUrl}/en/`,
+            ja: `${baseUrl}/ja/`,
+        },
+        },
+
+        openGraph: {
+        title: titles[locale],
+        description: descriptions[locale],
+        url: `${baseUrl}/${locale}/`,
+        siteName: 'IBS MACHINEX',
+        images: [
+            {
+            url: `${baseUrl}/og.jpg`,
+            width: 1200,
+            height: 630,
+            alt: 'IBS Machinex',
+            },
+        ],
+        locale: locale === 'th' ? 'th_TH' : locale === 'ja' ? 'ja_JP' : 'en_US',
+        type: 'website',
+        },
+
+        twitter: {
+        card: 'summary_large_image',
+        title: titles[locale],
+        description: descriptions[locale],
+        images: [`${baseUrl}/og.jpg`],
+        },
+
+        robots: {
+        index: true,
+        follow: true,
+        },
+    };
+}
 
 export default async function RootLayout({children}:{children: React.ReactNode}) {
     const locale = await getLocale();
