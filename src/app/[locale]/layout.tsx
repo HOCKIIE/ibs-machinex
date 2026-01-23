@@ -33,9 +33,7 @@ type Props = {
     };
 };
 
-export async function generateMetadata(
-    { params }: Props
-): Promise<Metadata> {
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
     const { locale } = params;
 
@@ -70,13 +68,13 @@ export async function generateMetadata(
         title: titles[locale],
         description: descriptions[locale],
         url: `${baseUrl}/${locale}/`,
-        siteName: 'IBS MACHINEX',
+        siteName: 'IBS MACHINEX (THAILAND) CO.,LTD.',
         images: [
             {
-            url: `${baseUrl}/og.jpg`,
-            width: 1200,
-            height: 630,
-            alt: 'IBS Machinex',
+                url: `${baseUrl}/og.jpg`,
+                width: 1200,
+                height: 630,
+                alt: 'IBS MACHINEX (THAILAND) CO.,LTD.',
             },
         ],
         locale: locale === 'th' ? 'th_TH' : locale === 'ja' ? 'ja_JP' : 'en_US',
