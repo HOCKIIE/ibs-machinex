@@ -28,7 +28,7 @@ const Brand = ({ params }:{ params: {slug:string} }) => {
     });
 
     const key = `detail_${locale}` as keyof BrandType;
-    const safeHtml = DOMPurify.sanitize(itemState?.[key] as string || "");
+    const safeHtml = itemState?.[key] ? DOMPurify.sanitize(itemState?.[key] as string) : '';
 
     return (
         <div className='md:container px-2 pt-20 xl:px-4' id="contact">

@@ -84,7 +84,7 @@ export const Footer = () => {
 
     const keyT = `title_${locale}` as keyof OwnerType;
     const keyA = `address_${locale}` as keyof OwnerType;
-    const safeHtml = DOMPurify.sanitize(owner?.[keyA]?.replace(/\n/g, "<br/>") ?? "");
+    const safeHtml = owner?.[keyA] ? DOMPurify.sanitize(owner[keyA].replace(/\n/g, '<br />')) : '';
     const keyN = `title_${locale}` as keyof UserType;
 
     useEffect(() => {
