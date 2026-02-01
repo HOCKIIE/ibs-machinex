@@ -56,47 +56,51 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         description: descriptions[locale],
 
         alternates: {
-        canonical: `${baseUrl}/${locale}/`,
-        languages: {
-            th: `${baseUrl}/th/`,
-            en: `${baseUrl}/en/`,
-            ja: `${baseUrl}/ja/`,
-        },
+            canonical: `${baseUrl}/${locale}/`,
+            languages: {
+                th: `${baseUrl}/th/`,
+                en: `${baseUrl}/en/`,
+                ja: `${baseUrl}/ja/`,
+            },
         },
 
         openGraph: {
-        title: titles[locale],
-        description: descriptions[locale],
-        url: `${baseUrl}/${locale}/`,
-        siteName: 'IBS MACHINEX (THAILAND) CO.,LTD.',
-        images: [
-            {
-                url: `${baseUrl}/og.jpg`,
-                width: 1200,
-                height: 630,
-                alt: 'IBS MACHINEX (THAILAND) CO.,LTD.',
-            },
-        ],
-        locale: locale === 'th' ? 'th_TH' : locale === 'ja' ? 'ja_JP' : 'en_US',
-        type: 'website',
+            title: titles[locale],
+            description: descriptions[locale],
+            url: `${baseUrl}/${locale}/`,
+            siteName: 'IBS MACHINEX (THAILAND) CO.,LTD.',
+            images: [
+                {
+                    url: `${baseUrl}/og.jpg`,
+                    width: 1200,
+                    height: 630,
+                    alt: 'IBS MACHINEX (THAILAND) CO.,LTD.',
+                },
+            ],
+            locale: locale === 'th' ? 'th_TH' : locale === 'ja' ? 'ja_JP' : 'en_US',
+            type: 'website',
         },
 
         twitter: {
-        card: 'summary_large_image',
-        title: titles[locale],
-        description: descriptions[locale],
-        images: [`${baseUrl}/og.jpg`],
+            card: 'summary_large_image',
+            title: titles[locale],
+            description: descriptions[locale],
+            images: [`${baseUrl}/og.jpg`],
         },
 
         robots: {
-        index: true,
-        follow: true,
+            index: true,
+            follow: true,
         },
     };
 }
 
 export default async function RootLayout({children}:{children: React.ReactNode}) {
+
+    
     const locale = await getLocale();
+    if (!routing.locales.includes(locale as string)) notFound();
+
     const languageClassName  = async() => {
         switch (locale) {
             case 'th':
@@ -107,19 +111,17 @@ export default async function RootLayout({children}:{children: React.ReactNode})
                 return inter.className;
         }
     }
-
     const languageClass = await languageClassName();
     const messages = await getMessages();
-    if (!routing.locales.includes(locale as string)) notFound();
 
     return (
-        <html lang="en">
-            <Head>
+        <html lang={locale}>
+            <head>
                 <link rel="icon" href="/favicon.ico" />
-            </Head>
-            <PageSettingsContext>
-                <NextIntlClientProvider messages={messages} >
-                    <body className={`scroll-smooth ${languageClass} antialiased bg-gray-100`}>
+            </head>
+            <body className={`scroll-smooth ${languageClass} antialiased bg-gray-100`}>
+                <PageSettingsContext>
+                    <NextIntlClientProvider messages={messages} >
                         <Sidebar />
                         <PlayVDOFor10s />
                         <main>
@@ -127,9 +129,9 @@ export default async function RootLayout({children}:{children: React.ReactNode})
                             {children}
                             <Footer />
                         </main>
-                    </body>
-                </NextIntlClientProvider>
-            </PageSettingsContext>
+                    </NextIntlClientProvider>
+                </PageSettingsContext>
+            </body>
         </html>
     );
 }

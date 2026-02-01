@@ -37,7 +37,6 @@ const Blog = () =>
 
     const fetchRecent = async () => {
         const request = await Api.get(`/blog/recent/${recent}`);
-        console.log('recent blog:', request.data.data);
         setRecent(request.data.data.slice(1, recent));
         setFirstBlog(request.data.data.shift());
     }
