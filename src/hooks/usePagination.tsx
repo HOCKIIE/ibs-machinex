@@ -4,8 +4,6 @@ import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import Api from '@/services/Api';
 import { toast } from "react-hot-toast";
 import { Meta } from "@/types/PaginationType";
-import { set } from "lodash";
-
 interface UsePaginationProps {
     initialLimit?: number;
     endpoint: string;
@@ -129,7 +127,6 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
         }
         debounceTimeout.current = setTimeout(()=>{
             const currentPage = parseInt(searchParams.get('page') || '1', 10);
-            console.log('page >> ',page)
             if(!isNaN(Number(page)) && page !== currentPage){
                 setPage(Number(page))
                 const params = new URLSearchParams(searchParams.toString());

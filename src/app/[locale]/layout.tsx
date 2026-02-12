@@ -116,9 +116,9 @@ export default async function RootLayout({children}:{children: React.ReactNode})
 
     return (
         <html lang={locale}>
-            <head>
+            <Head>
                 <link rel="icon" href="/favicon.ico" />
-            </head>
+            </Head>
             <body className={`scroll-smooth ${languageClass} antialiased bg-gray-100`}>
                 <PageSettingsContext>
                     <NextIntlClientProvider messages={messages} >
