@@ -1,14 +1,14 @@
 import React, { useEffect,useState } from 'react';
 import { LiaTimesSolid } from "react-icons/lia";
-import { UseFormRegister, UseFormSetValue, UseFormStateReturn, UseFormWatch, Path } from 'react-hook-form';
+import { UseFormRegister, UseFormSetValue, UseFormStateReturn, UseFormWatch, Controller, Path, FieldValues, UseControllerProps,UseFormReturn } from 'react-hook-form';
 import { ErrorMessage } from '@/components/admin/Form/Validation';
-import { FieldValues } from "react-hook-form";
 
 interface CoverImageUploadFormValues {
     image: File | string | null;
 }
 
 interface CoverImageUploadProps<T extends FieldValues> {
+    control: UseFormReturn<T>["control"];
     register: UseFormRegister<T>;
     watch: UseFormWatch<T>;
     setValue: UseFormSetValue<T>;
@@ -16,7 +16,7 @@ interface CoverImageUploadProps<T extends FieldValues> {
     errors: UseFormStateReturn<T>["errors"];
 }
 
-const CoverImageUpload =  <T extends FieldValues>({ register, setValue, defaultValue, errors }: CoverImageUploadProps<T>) => {
+const CoverImageUpload =  <T extends FieldValues>({ control, register, setValue, defaultValue, errors }: CoverImageUploadProps<T>) => {
 
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [dragActive, setDragActive] = useState(false);
@@ -86,19 +86,19 @@ const CoverImageUpload =  <T extends FieldValues>({ register, setValue, defaultV
                 onDrop={handleDrop}
             >
                 <div className="text-center">
-                    {previewUrl ? (
-                        <div className="relative">
-                            <img src={previewUrl} alt="Preview" className="h-auto min-h-[300px] max-h-[300px] w-auto max-w-full rounded-md shadow" />
-                            {/* <Image src={previewUrl} alt="Preview" width={300} height={300} className="h-auto min-h-[300px] max-h-[300px] w-auto max-w-full rounded-md shadow" />  */}
-                            <button
-                                title="Reset"
-                                type="button"
-                                onClick={handleResetImage}
-                                className="absolute flex items-center justify-center top-2 right-2 w-8 h-8 rounded-full bg-red-50 border-red-300 border hover:bg-red-100 text-red-600 dark:text-red-200 dark:bg-red-2000 dark:hover px-2 py-1 text-xs"
-                            ><LiaTimesSolid/></button>
-                        </div>
-                    ):(
-                        <>
+                        { previewUrl && 
+                            <div className="relative">
+                                <img src={previewUrl} alt="Preview" className="h-auto min-h-[300px] max-h-[300px] w-auto max-w-full rounded-md shadow" />
+                                {/* <Image src={previewUrl} alt="Preview" width={300} height={300} className="h-auto min-h-[300px] max-h-[300px] w-auto max-w-full rounded-md shadow" />  */}
+                                <button
+                                    title="Reset"
+                                    type="button"
+                                    onClick={handleResetImage}
+                                    className="absolute flex items-center justify-center top-2 right-2 w-8 h-8 rounded-full bg-red-50 border-red-300 border hover:bg-red-100 text-red-600 dark:text-red-200 dark:bg-red-2000 dark:hover px-2 py-1 text-xs"
+                                ><LiaTimesSolid/></button>
+                            </div>
+                        }
+                        <div className={previewUrl? "hidden" : ""}>
                             <svg className="mx-auto size-12 text-gray-300" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" data-slot="icon">
                                 <path 
                                     fillRule="evenodd" 
@@ -109,34 +109,39 @@ const CoverImageUpload =  <T extends FieldValues>({ register, setValue, defaultV
                             <div className="mt-4 flex text-sm/6 text-gray-600 dark:text-gray-400">
                                 <label htmlFor="file-upload" className="relative cursor-pointer rounded-md bg-transparent font-semibold text-indigo-600 focus-within:ring-2 focus-within:ring-indigo-600 focus-within:ring-offset-2 focus-within:outline-hidden hover:text-indigo-500 focus:outline-none">
                                 <span>Upload a file</span>
-                                <input 
-                                    type="file" 
-                                    id="file-upload"
-                                    accept="image/*"
-                                    className="sr-only focus:outline-none"
-                                    {...register("image" as Parameters<typeof register>[0], {
-                                        required: true,
+                                <Controller
+                                    name={"image" as Path<T>}
+                                    control={control}   // 👈 ต้องรับ control มาจาก props ด้วย
+                                    rules={{
+                                        required: "This field is required.",
                                         validate: {
-                                            required: (value) => value ? true : "This field is required.",
-                                            fileType: (value) => {
-                                                if (value && typeof value === "object" && "type" in value) return value.type.startsWith("image/") || "Only image files are allowed.";
+                                            fileType: (value: any) => {
+                                                if (!value || typeof value === "string") return true;
+                                                if (value instanceof File) return value.type.startsWith("image/") || "Only image files allowed";
                                                 return true;
                                             },
-                                            fileSize: (value) => {
-                                                if (value && typeof value === "object" && "type" in value) return value.size <= 2 * 1024 * 1024 || "Max 2MB";
+                                            fileSize: (value: any) => {
+                                                if (!value || typeof value === "string") return true;
+                                                if (value instanceof File) return value.size <= 2 * 1024 * 1024 || "Max 2MB";
                                                 return true;
-                                            },
+                                            }
                                         },
-
-                                    })}
-                                    onChange={handleImageChange}
-                                />
+                                    }}
+                                    render={({ field }) => (
+                                        <input 
+                                            type="file" 
+                                            id="file-upload"
+                                            accept="image/*"
+                                            className="sr-only focus:outline-none"
+                                            onChange={handleImageChange}
+                                        />)}
+                                    />
                                 </label>
                                 <p className="pl-1">or drag and drop</p>
                             </div>
                             <p className="text-xs/5 text-gray-600 dark:text-gray-400">PNG, JPG, GIF up to 2MB</p>
-                        </>
-                    )}
+                        </div>
+                    
                 </div>
             </div>
             {errors?.image && <ErrorMessage className="mt-1">This field is required.</ErrorMessage>}

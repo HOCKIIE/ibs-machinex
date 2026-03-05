@@ -1,7 +1,7 @@
 import Api from '@/services/Api';
 import React, { useState, useRef, useEffect } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
-import { useForm, Controller  } from "react-hook-form";
+import { Controller, UseFormReturn  } from "react-hook-form";
 import { CategoryType } from '@/types/CategoryType';
 import { BiSolidCategoryAlt } from "react-icons/bi";
 import { LiaLanguageSolid } from "react-icons/lia";
@@ -17,13 +17,15 @@ import { IoMdPricetag } from "react-icons/io";
 import { HiExclamation } from "react-icons/hi";
 
 const BlogForm = ({
-    itemState,
+    form,
     onSubmit,
-    type
+    type,
+    draftId
 } : {
-    itemState: BlogFormProps;
+    form: UseFormReturn<BlogFormProps>;
     onSubmit: (data: BlogFormProps) => Promise<void>;
     type: string;
+    draftId?: string;
 }) => {
 
     const didFetchData = useRef(false);
@@ -36,18 +38,17 @@ const BlogForm = ({
     const validClass = "border-gray-300 text-gray-800 focus:border-indigo-300 focus:ring-indigo-500/10 dark:focus:border-indigo-800 dark:border-gray-700 dark:bg-gray-900 dark:text-white/70 dark:placeholder:text-white/20";
     const create = type === "create";
     const edit = type === "edit";
+
     const {
-        register,
-        handleSubmit: handleSubmitForm,
-        formState: { errors },
-        setValue,
-        control,
         watch,
-        reset
-    } = useForm<BlogFormProps>({
-        mode: 'onChange',
-        criteriaMode: 'all'
-    });
+        control,
+        register,
+        setValue,
+        handleSubmit,
+        formState: { errors }
+    } = form
+
+    const item = form.getValues();
     const Exclamation = () => <HiExclamation className="text-rose-500" fontSize={18}/>;
     const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
     const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
@@ -63,41 +64,18 @@ const BlogForm = ({
         const res = await Api.get('/category');
         setCategory(res.data);
     };
+
+    const submitHandler = type === "create" ? onCreate : onEdit;
+
     useEffect(()=>{
         if(didFetchData.current) return;
         didFetchData.current = true;
         fetchCategory();
     });
-    useEffect(() => {
-        if (itemState) {
-            reset({
-                id: itemState.id,
-                image: itemState.image,
-                categories: itemState.categories,
-                title_th: itemState.title_th,
-                title_en: itemState.title_en,
-                title_ja: itemState.title_ja,
-                description_th: itemState.description_th,
-                description_en: itemState.description_en,
-                description_ja: itemState.description_ja,
-                detail_th: itemState.detail_th,
-                detail_en: itemState.detail_en,
-                detail_ja: itemState.detail_ja,
-                pathName: itemState.pathName ?? "",
-                recommend: itemState.recommend,
-                status: itemState.status ?? false,
-                published_at: itemState.published_at,
-            });
-            if (itemState?.categories) {
-                const categoryIds = itemState.categories.map((c) => String(c.id));
-                setValue("category", categoryIds);
-            }
-        }
-    }, [itemState, reset, setValue]);
 
     return (
         <div className="p-4">
-            <form onSubmit={handleSubmitForm(type === "create" ? onCreate : onEdit)}>
+            <form onSubmit={handleSubmit(submitHandler)}>
             <div className="flex gap-4">
                 <div className="grid-flow-col space-y-4 settings w-2/12">
                     <div className="border border-gray-300 dark:border-gray-500 p-2 rounded-lg">
@@ -186,7 +164,7 @@ const BlogForm = ({
                                 <Controller
                                     name="status"
                                     control={control}
-                                    defaultValue={!!itemState?.status}
+                                    defaultValue={!!item?.status}
                                     render={({ field }) => (
                                         <label className="inline-flex items-center cursor-pointer">
                                             <input type="checkbox" value="1" className="sr-only peer" checked={Boolean(field.value)} onChange={(e) => field.onChange(e.target.checked)}/>
@@ -208,7 +186,7 @@ const BlogForm = ({
                             <Controller
                                 name="published_at"
                                 control={control}
-                                defaultValue={itemState?.published_at ?? null}
+                                defaultValue={item?.published_at ?? null}
                                 render={({ field }) => {
                                     const isChecked = !!field.value;
                                     return (
@@ -221,7 +199,7 @@ const BlogForm = ({
                                                 const checked = e.target.checked;
                                                 field.onChange(checked ? Format.date(new Date()) : null);
                                             }}
-                                            disabled={!!itemState?.published_at}
+                                            disabled={!!item?.published_at}
                                             />
                                             <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-indigo-600 dark:peer-checked:bg-indigo-600"></div>
                                             <span className="ms-3 text-sm font-medium text-gray-900 dark:text-gray-300">Publish:</span>
@@ -229,9 +207,9 @@ const BlogForm = ({
                                     );
                                 }}
                             />
-                            {itemState?.published_at && (
+                            {item?.published_at && (
                                 <div className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                                    <span className="text-sm text-gray-500 dark:text-gray-400">Published at: {new Date(itemState?.published_at).toLocaleDateString('en-US', {
+                                    <span className="text-sm text-gray-500 dark:text-gray-400">Published at: {new Date(item?.published_at).toLocaleDateString('en-US', {
                                         year: 'numeric',
                                         month: '2-digit',
                                         day: '2-digit',
@@ -253,7 +231,7 @@ const BlogForm = ({
                                 <Controller
                                     name="recommend"
                                     control={control}
-                                    defaultValue={itemState?.recommend ?? null}
+                                    defaultValue={item?.recommend ?? null}
                                     render={({ field }) => {
                                         const isChecked = !!field.value;
                                         return (
@@ -278,11 +256,17 @@ const BlogForm = ({
                 </div>
                 <div className="w-10/12">
                     <div className="w-full">
+                        {type=="create" && 
+                            <div className="col-span-12 mb-4">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Draft ID</label>
+                                <input type='text' readOnly {...register('draftId')} className="w-full bg-gray-100 border rounded-md p-2"/>
+                            </div>
+                        }
                         <div className="grid grid-cols-12">
                             <div className="col-span-12">
-                                <CoverImageUpload<BlogFormProps> register={register} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
+                                <CoverImageUpload<BlogFormProps> control={control} register={register}  watch={watch} setValue={setValue} defaultValue={item.image} errors={errors}/>
                             </div>
-                            <div className="col-span-12">
+                            <div className="col-span-12 mt-4">
                                 <div className="space-y-3">
                                     <div className="flex items-center gap-2">
                                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Path Name </label> 
@@ -345,8 +329,8 @@ const BlogForm = ({
                                         <Controller
                                             name="detail_th"
                                             control={control}
-                                            defaultValue={itemState.detail_th}
-                                            render={({field}) => <TextEditor name={field.name} value={field.value} type="blog" id={itemState.id} onChange={field.onChange} /> }
+                                            defaultValue={item.detail_th}
+                                            render={({field}) => <TextEditor name={field.name} value={field.value} type="blog" action={type} id={item.id} draftId={draftId} onChange={field.onChange} /> }
                                         />                        
                                         {errors?.detail_th?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
@@ -397,8 +381,8 @@ const BlogForm = ({
                                         <Controller
                                             name="detail_en"
                                             control={control}
-                                            defaultValue={itemState.detail_en}
-                                            render={({field}) => <TextEditor name={field.name} value={field.value} type="blog" id={itemState.id} onChange={field.onChange} /> }
+                                            defaultValue={item.detail_en}
+                                            render={({field}) => <TextEditor name={field.name} value={field.value} type="blog" action={type} id={item.id} draftId={draftId} onChange={field.onChange} /> }
                                         />                        
                                         {errors?.detail_en?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
@@ -448,8 +432,8 @@ const BlogForm = ({
                                         <Controller
                                             name="detail_ja"
                                             control={control}
-                                            defaultValue={itemState.detail_ja}
-                                            render={({field}) => <TextEditor name={field.name} value={field.value} type="blog" id={itemState.id} onChange={field.onChange} /> }
+                                            defaultValue={item.detail_ja}
+                                            render={({field}) => <TextEditor name={field.name} value={field.value} type="blog" action={type} id={item.id} draftId={draftId} onChange={field.onChange} /> }
                                         />                        
                                         {errors?.detail_ja?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
