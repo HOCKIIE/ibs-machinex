@@ -2,7 +2,7 @@
 
 import Api from "@/services/Api";
 import { create } from "zustand";
-import { BlogType, BlogState, ApiResponse } from "@/types/BlogType";
+import { BlogType, BlogState, BlogFormProps, ApiResponse } from "@/types/BlogType";
 import { ProcessToast } from "@/utils/ProcessToast";
 
 const prefix = '/admin/blog';
@@ -42,40 +42,43 @@ const useBlogStore = create<BlogState>((set) => ({
     },
     
 
-    createData: async (newData, router) => {
+    createData: async (blogData) => {
         try {
             ProcessToast.show('Saving data...');
             const formData = new FormData();
-            Object.entries(newData).forEach(([key, value]) => {
+            Object.entries(blogData).forEach(([key, value]) => {
                 if (key === "category" && Array.isArray(value)) {
                     value.forEach((val) => formData.append("category[]", val));
                 } else if (key === "image" && value instanceof File) {
+                    console.log("Appending image file:", value);
                     formData.append("image", value);
                 } else {
                     formData.append(key, value as string);
                 }
             });
             const response = await Api.post(`${prefix}/store`, formData);
-            const { status, message } = response.data as { status: boolean; message: string };
+            const { status, message, data } = response.data as { status: boolean; message: string, data:BlogFormProps };
             if (status) { 
                 await ProcessToast.success(message);
-                router.push(prefix);
+                return { status, message, data };
             } else {
                 await ProcessToast.error(message);
+                return { status: false, message: message, data:null };
             }
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
             ProcessToast.error(errorMessage);
+            return { status: false, message: errorMessage, data: null  };
         }
     },
 
-    updateData: async (id, data) => {
+    updateData: async (id, blogData) => {
         set({ items:[] })
         try {
             ProcessToast.show('Saving data...')
             const formData = new FormData();
-            Object.entries(data).forEach(([key, value]) => {
+            Object.entries(blogData).forEach(([key, value]) => {
                 if (key === "category" && Array.isArray(value)) {
                     value.forEach((val) => formData.append("category[]", val));
                 } else if (key === "image" && value instanceof File) {
@@ -91,16 +94,19 @@ const useBlogStore = create<BlogState>((set) => ({
                 },
             });
             set((state) => ({ items: state.items.map((item) => String(item.id) === String(id) ? response.data.data : item  ) }));
-            const { status, message } = response.data as { status: boolean; message: string };
+            const { status, message, data } = response.data as { status: boolean; message: string, data:BlogFormProps };
             if (status) { 
                 ProcessToast.success(message);
+                return {status, message, data}
             } else { 
                 ProcessToast.error(message);
+                return { status, message, data:null }
             }
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
             ProcessToast.error(errorMessage);
+            return { status: false, message: errorMessage, data:null };
         }
     },
 

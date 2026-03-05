@@ -1,3 +1,4 @@
+import { BlogFormProps } from "@/types/BlogType";
 import { clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -33,4 +34,28 @@ export function filterClasses(classString: string) {
             .map((c:string) => c.trim())
             .filter((c:string) => c && c !== 'undefined' && c !== 'null')
 
+}
+
+export function setBlogChanged<K extends keyof BlogFormProps>(
+    target: Partial<BlogFormProps>,
+    key: K,
+    value: BlogFormProps[K]
+) {
+    target[key] = value;
+}
+
+export function isEqual(a: any, b: any) {
+    if (a === b) return true;
+
+    // array of primitive
+    if (Array.isArray(a) && Array.isArray(b)) {
+        return JSON.stringify(a) === JSON.stringify(b);
+    }
+
+    // object
+    if (typeof a === "object" && typeof b === "object") {
+        return JSON.stringify(a) === JSON.stringify(b);
+    }
+
+    return false;
 }

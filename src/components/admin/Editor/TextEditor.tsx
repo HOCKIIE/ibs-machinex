@@ -1,6 +1,6 @@
 "use client";
 import "./TextEditor.scss"
-import React, { useCallback, useMemo, useState, useEffect, useRef, Dispatch, SetStateAction } from 'react';
+import React, { useCallback, useMemo, useState, useEffect, useRef, Dispatch, SetStateAction, use } from 'react';
 import { 
     createEditor, 
     BaseElement, 
@@ -12,12 +12,13 @@ import {
     Editor, 
     Text, 
     Node,
-    Path
+    Path,
+    BaseEditor
 } from 'slate';
-import { Slate, Editable, withReact, useSlate, RenderElementProps, RenderLeafProps, ReactEditor  } from 'slate-react';
+import { Slate, Editable, withReact, useSlate, RenderElementProps, RenderLeafProps, ReactEditor, useSelected, useFocused  } from 'slate-react';
 import { Range } from 'slate';
 import { TableEditor } from "slate-table";
-import { withHistory } from 'slate-history';
+import { HistoryEditor, withHistory } from 'slate-history';
 import { serialize, deserialize  } from '@/utils/slateHtmlConverter';
 import { 
     RiBold, RiItalic, RiUnderline, 
@@ -36,6 +37,8 @@ import { filterClasses } from "@/utils/utils";
 import CancelButton from "../Button/CancelBotton";
 import CreateButton from "../Button/CreateButton";
 import { TableElement, TableRowElement, TableCellElement } from "../Table/Table";
+import Image from "./render.elements/Image";
+import { url } from "inspector";
 
 type MyElement = Element & { type: string, className?: string; };
 const paddingOptions = [
@@ -154,8 +157,29 @@ const Button: React.FC<{
     title?: string;
     setModal?: (value: boolean) => void;
     onClick?: () => void;
-}> = ({ format, action, align, label, title,setModal, onClick }) => {
+    onImageEdit?: (data: {
+        url: string;
+        alt?: string;
+        path: any;
+    }) => void;
+}> = ({ 
+    format, action, align, label, title,setModal, onClick, onImageEdit 
+}) => {
     const editor = useSlate();
+
+    const getSelectedImageEntry = () => {
+        const { selection } = editor;
+        if (!selection) return null;
+
+        const [match] = Editor.nodes(editor, {
+            match: (n) =>
+                !Editor.isEditor(n) &&
+                Element.isElement(n) &&
+                n.type === "image",
+        });
+
+        return match ?? null; // [node, path]
+    };
     const handleMouseDown = (e: React.MouseEvent) => {
         e.preventDefault();
         if (action === 'mark' && format) toggleMark(editor, format);
@@ -163,8 +187,18 @@ const Button: React.FC<{
         else if (align) toggleAlign(editor, align);
         else if (format === 'text-indent') TextIndent(editor,'in');
         else if (format === 'text-outdent') TextIndent(editor,'out');
-        if(typeof setModal == 'function') {
-            setModal(true)
+        // 👇 ส่วน image
+        else if (action === 'image') {
+            const entry = getSelectedImageEntry();
+            if (entry) {
+                const [node, path] = entry;
+                typeof onImageEdit === 'function' && onImageEdit({
+                    url: node.url,
+                    alt: node.alt,
+                    path
+                });
+            };
+            typeof setModal === 'function' && setModal(true);
         }
     }
         
@@ -408,7 +442,6 @@ const TableDropdown = ({
 
     const handleSelect = (cols: number, rows: number) => {
         if (!editor.selection || !Range.isCollapsed(editor.selection)) return;
-        console.log(`✅ สร้างตารางขนาด ${cols}×${rows}`);
         insertTable(editor, cols, rows)
         setOpen(false);
     };
@@ -572,28 +605,40 @@ type galleryType = {
 const ImageModal = ({
     id,
     type,
+    action,
+    draftId,
     onClose,
-    onInsert
+    onInsert,
+    defaultUrl,
+    defaultAlt
 }: {
     id?: string;
     type?: string;
+    action?: string;
+    draftId?: string;
     onClose: () => void;
-    onInsert: (url: string[]) => void;
+    onInsert: (url: string, alt:string) => void;
+    defaultUrl: string | "";
+    defaultAlt: string | "";
 }) => {
-    const [tab, setTab] = useState<"upload" | "gallery">("gallery");
+    const [tab, setTab] = useState<"selection"|"upload"|"gallery">("selection");
     const [file, setFile] = useState<File[] | null>([]);
     const [preview, setPreview] = useState<string[] | null>([]);
     const [gallery,setGallery] = useState<galleryType[]>([]);
     const [uploading, setUploading] = useState(false);
+    const [selection, setSelection] = useState<{url: string; alt: string}>({url:defaultUrl||"",alt:defaultAlt||""});
     const [selected, setSelected] = useState<string[] | null>([]);
     const [message, setMessage] = useState<{status: string; message: string} | null>(null);
     const [thisId] = useState<string | null>(id || "");
     const [thisType] = useState<string | null>(type || "");
+    const thisDraftId = action === "create" ? draftId || "" : "";
     const didFetchGallery = useRef(false);
+    const urlRef = useRef<HTMLInputElement>(null);
+    const altRef = useRef<HTMLInputElement>(null);
     
     const getGallery = async () => {
-        const response = await Api.get(`/gallery?type=${thisType}&id=${thisId}`);
-        console.log('Gallery response:', response.data.gallery);
+        const path = thisDraftId ? `/gallery?type=${thisType}&draftId=${draftId}` : `/gallery?type=${thisType}&id=${thisId}`;
+        const response = await Api.get(path);
         setGallery(response?.data.gallery);
     }
     useEffect(() => {
@@ -610,11 +655,8 @@ const ImageModal = ({
         }
     };
     const handlerInsert = () => {
-        if (tab === "upload" && preview) {
-            onInsert(preview);
-            onClose();
-        } else if (tab === "gallery" && selected) {
-            onInsert(selected);
+        if (tab === "selection" && selected) {
+            onInsert(selection.url, selection.alt);
             onClose();
         }
     };
@@ -628,7 +670,8 @@ const ImageModal = ({
         });
         formData.append("_method", "PUT");
         formData.append("type", thisType ?? "");
-        formData.append("id", thisId ?? "");
+        formData.append("id", action == "edit" ? thisId ?? "" :"");
+        formData.append("draftId", action === "create" ? draftId ?? "" :"");
 
         try {
             setUploading(true);
@@ -638,7 +681,7 @@ const ImageModal = ({
                 setMessage({'status':'success','message':"Upload successful."});
                 setTimeout(() => {
                     setFile(null);
-                    setPreview(null);
+                    setPreview([]);
                     setTab('gallery');
                     setMessage(null);
                 },3000);
@@ -650,6 +693,12 @@ const ImageModal = ({
             console.error(err);
         } finally {
             setUploading(false);
+        }
+    }
+    const handlerSelection = () => {
+        if(selected && selected.length > 0){
+            setTab("selection");
+            setSelection({url: selected[0], alt: ""});
         }
     }
     const handlerSelectImage = (url: string) => {
@@ -679,6 +728,7 @@ const ImageModal = ({
     const handlerResetFile = () => {
         setFile(null);
         setPreview([]);
+        setMessage(null)
     }
     useEffect(() => {
         if (!didFetchGallery.current) {
@@ -697,6 +747,13 @@ const ImageModal = ({
             <div className="flex flex-col h-full p-6 pb-0">
                 <div className="flex gap-4 justify-between border-b">
                     <div className="flex gap-4">
+                        <button
+                            type="button"
+                            className={`pb-2 ${tab === "selection" ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-500"}`}
+                            onClick={() => setTab("selection")}
+                        >
+                            Selection
+                        </button>
                         <button
                             type="button"
                             className={`pb-2 ${tab === "gallery" ? "border-b-2 border-blue-600 text-blue-600" : "text-gray-500"}`}
@@ -719,6 +776,28 @@ const ImageModal = ({
                     </div>
                     }
                 </div>
+                {tab === "selection" && <div className="grid grid-cols-3 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                        <div className="col-span-12 mt-4">
+                            <label htmlFor="url">Image Selection</label>
+                            <div className="flex">
+                                <input id="url" type="text" name="url" className="w-full border rounded-md p-2" 
+                                    ref={urlRef}
+                                    value={selection.url}
+                                    onChange={(e) => setSelection({...selection, url: e.target.value})}
+                                />
+                                <button type="button" className="ml-2 px-4 py-2 bg-blue-500 text-white rounded-md" onClick={()=> setTab('gallery')}>Select</button>
+                            </div>
+                        </div>
+                        <div className="col-span-12">
+                            <label htmlFor="alt">ALT text for image selection.</label>
+                            <input id="alt" type="text" className="w-full border rounded-md p-2" 
+                                ref={altRef}
+                                value={selection.alt}
+                                onChange={(e) => setSelection({...selection, alt: e.target.value})}
+                            />
+                        </div>
+                    </div>
+                }
                 {tab === "upload" && (
                     <div className="h-full mt-4">
                         { preview &&  preview.length === 0 && <input 
@@ -772,9 +851,14 @@ const ImageModal = ({
                 <button
                     type="button"
                     onClick={handlerInsert}
-                    className={`px-3 py-1 rounded bg-blue-500 text-white disabled:opacity-50 hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-600 ${tab === 'upload' ? 'hidden' : ''}`}
+                    className={`px-3 py-1 rounded bg-blue-500 text-white disabled:opacity-50 hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-600 ${tab === 'selection' ? '' : 'hidden'}`}
                     disabled={tab === "upload" ? !file : !selected}
                 >Insert</button>
+                <button 
+                    type="button"
+                    className={`px-3 py-1 rounded bg-blue-500 text-white disabled:opacity-50 hover:ring-2 hover:ring-blue-500/50 hover:bg-blue-600 ${tab === 'gallery' ? '' : 'hidden'}`}
+                    onClick={handlerSelection}
+                >Select</button>
                 <button 
                     type="button" 
                     className={`bg-red-100 hover:bg-red-200 hover:ring-2 hover:ring-red-300/70 disabled:bg-red-100 disabled:text-red-200 text-red-300 hover:text-red-500 px-3 py-1 rounded  ${tab !== 'upload' ? 'hidden' : ''}`}
@@ -819,13 +903,17 @@ const LinkModal = ({
     const target = useRef<HTMLSelectElement>(null);
     useEffect(() => {
         if (linkData) {
-            console.log('Link data in modal:', linkData);
             if (url.current) url.current.value = linkData.url;
             if (display.current) display.current.value = linkData.display;
             if (target.current) target.current.value = linkData.target;
         }
     }, [linkData]);
     const handlerInsert = () => {
+        console.log("Inserting link with data:", {
+            url: url.current?.value,
+            display: display.current?.value,
+            target: target.current?.value
+        });
         onInsert(
             url.current?.value || '',
             display.current?.value || '',
@@ -907,21 +995,42 @@ const getFontSize = (editor: Editor): string | null => {
 }
 interface EditorProps {
     type?: string;
+    action?: string;
     id?: string;
+    draftId?: string;
     name: string;
     value: string | null;
     onChange: (value: string) => void;
 }
 
-const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) => {
+type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
 
-    const editor = useMemo(() => withHistory(withReact(createEditor())), []);
+const withImages = (editor: CustomEditor): CustomEditor => {
+    const { isVoid } = editor;
+
+    editor.isVoid = (element) =>
+        element.type === "image" ? true : isVoid(element);
+
+    return editor;
+};
+
+const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, value, onChange}) => {
+
+    const editor = useMemo(
+        () => withImages(
+            withHistory(
+                withReact(
+                    createEditor()
+                )
+            )
+        ) as CustomEditor, []
+    );
+    const [editingImage, setEditingImage] = useState<{url: string;alt?: string; path: any;} | null>(null);
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0});
     const [showModal, setShowModal] = useState<boolean>(false);
     const [linkModal, setLinkModal] = useState<boolean>(false);
     const [linkData, setLinkData] = useState<{url: string; display: string; target: string} | null>(null);
     const [isLink, setIsLink] = useState<boolean | false>(false);
-    const didLoadRef = useRef(false);
     const [editorKey, setEditorKey] = useState(0);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [colorDropdown, setColorDropdown] = useState<boolean>(false);
@@ -949,6 +1058,7 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
         setEditorValue(slateNodes);
     };
 
+
     const renderElement = useCallback((props: RenderElementProps) => {
         const { attributes, children, element } = props;
         switch (element.type) {
@@ -972,12 +1082,7 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                     </a>
                 );
             case 'image':
-                return (
-                    <div {...attributes}>
-                        <img src={element.url} alt="image" className={element.className}/>
-                        {children}
-                    </div>
-                );
+                return <Image {...props} />;
             case 'bold': return <strong>{children}</strong>;
             case 'italic' : return <em>{children}</em>;
             case 'underline': return <u>{children}</u>;
@@ -1272,9 +1377,7 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
         };
         // ✅ 1) แทรก hr "ถัดจาก block ปัจจุบัน" โดยไม่ split ก่อน
         const hrPath = Path.next(currentBlockPath);
-        console.log('Inserting hr at path:', hrPath);
         Transforms.insertNodes(editor, hrElement, { at: hrPath , select: true });
-        console.log('Inserted hr element:', Transforms);
         // ✅ 2) แล้วค่อยแทรก p เปล่าต่อท้าย hr
         const pPath = Path.next(hrPath);
         Transforms.insertNodes(editor, newParagraph, { at: pPath });
@@ -1292,16 +1395,13 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
         if (!entry) return;
         const [tableNode, tablePath] = entry;
         if (!tableNode) {
-            console.log("Selection is not inside a table.");
             return; // ไม่มีการดำเนินการใดๆ หากไม่อยู่ในตาราง
         }
         const rowNode = tableNode.children[0];
         if (!rowNode || rowNode.type !== 'table-row' || rowNode.children.length === 0) {
-            console.log("Table does not have a valid first row/cell.");
             return;
         }
         const cellPath = tablePath.concat([0, 0]);
-        console.log('cellPath >>> ', cellPath);
         try {
             const range = Editor.range(editor, cellPath);
             Transforms.select(editor, range);
@@ -1322,17 +1422,44 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
         }));
         return !!tableEntry;
     };
+    const getSelectedImageEntry = (editor:Editor) => {
+        const { selection } = editor;
+        if (!selection) return null;
+
+        const [match] = Editor.nodes(editor, {
+            match: (n) => !Editor.isEditor(n) && Element.isElement(n) && n.type === "image",
+        });
+
+        return match ?? null; // [node, path]
+    };
+    const handleInsertOrUpdateImage = ( url: string, alt: string, path?: Path) => {
+        const entry = getSelectedImageEntry(editor);
+        // console.log("Selected image entry:", entry);
+        if (entry) {
+            // const [node, path] = entry;
+            console.log("Updating image at path:", path, "with URL:", url, "and ALT:", alt);
+            Transforms.setNodes(editor, { url, alt }, { at: path });
+        } else {
+            const imageNode = {
+                type: 'image',
+                url,
+                alt: alt,
+                className: 'max-w-full h-auto',
+                children: [{ text: '' }],
+            };
+            Transforms.insertNodes(editor, imageNode);
+        }
+    };
 
     useEffect(() => {
-        if (value && !didLoadRef.current) {
-            setEditorKey(prev => prev + 1);
+        if (value) {
+            setEditorKey(prev => prev + 2); // รีเซ็ต editor โดยใช้ key ใหม่เมื่อ id เปลี่ยน
             const newValue = deserialize(value);
             if (JSON.stringify(newValue) !== JSON.stringify(editorValue)) {
                 setEditorValue(newValue);
             }
-            didLoadRef.current = true;
         }
-    }, [value, editorValue, editorKey]);
+    }, [value, editorValue]);
 
     useEffect(() => {
         const closeMenu = () => {
@@ -1352,16 +1479,12 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
         return () => window.removeEventListener('click', closeMenu);
     }, [contextMenu]);
 
+
     useEffect(()=>{
         const closeMenu = () => (colorDropdown) ? setColorDropdown(false) : '' ;
         window.addEventListener('scroll', closeMenu, true);
         return () => window.removeEventListener('scroll', closeMenu);
     },[])
-    useEffect(() => {
-        const closeMenu = () =>  (colorDropdown) ? setColorDropdown(false) : '';
-        window.addEventListener('click', closeMenu);
-        return () => window.removeEventListener('click', closeMenu);
-    },[]);
 
     const currentHTML = value ?? "";
     
@@ -1405,7 +1528,7 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                                         <Button format="numbered-list" action="block" title="Ordered list"  label={<RiListOrdered2 />} />
                                         <TableDropdown isOpen={tableDropdown} setOpen={setTableDropdown}/>
                                         {/* <Button format="table" action="block" title="Insert table" label={<LuTable />} /> */}
-                                        <Button format="image" setModal={setShowModal} title="Image" label={<IoImage />} />
+                                        <Button action="image" setModal={setShowModal} title="Image" label={<IoImage /> } onImageEdit={(data) => { setEditingImage(data) }}/>
                                     </div>
                                     
                                     <div className="flex px-1">
@@ -1461,21 +1584,26 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                 </div>
             </div>
             {showModal && (
-                <ImageModal 
+                <ImageModal
                     type={type}
                     id={id}
+                    action={action}
+                    draftId={draftId}
                     onClose={() => setShowModal(false)} 
-                    onInsert={(urls: string[]) => {
-                        urls.forEach(url => {
-                            const imageNode = {
-                                type: 'image',
-                                url,
-                                className: 'max-w-full h-auto',
-                                children: [{ text: '' }],
-                            };
-                            Transforms.insertNodes(editor, imageNode);
-                        });
-                    }} 
+                    defaultUrl={editingImage?.url || ""}
+                    defaultAlt={editingImage?.alt || ""}
+                    onInsert={(url: string, alt: string, path: Array<number>) => {
+                        handleInsertOrUpdateImage(url, alt, path);
+                        // console.log("Inserting image with URL:", url, "and alt text:", alt);
+                        // const imageNode = {
+                        //     type: 'image',
+                        //     url,
+                        //     alt: alt,
+                        //     className: 'max-w-full h-auto',
+                        //     children: [{ text: '' }],
+                        // };
+                        // Transforms.insertNodes(editor, imageNode);
+                    }}
                 />
             )}
             {linkModal && (
@@ -1483,7 +1611,6 @@ const TextEditor: React.FC<EditorProps> = ({type, id, name, value, onChange}) =>
                     linkData={linkData || undefined}
                     onClose={() => setLinkModal(false)}
                     onInsert={(url:string, display:string, target:string) => {
-                        console.log('Inserting link:', { url, display, target });
                         const { selection } = editor;
                         if (!selection) return;
                         // 1) เคสไม่มีข้อความที่ถูก select → insert link ใหม่พร้อม text

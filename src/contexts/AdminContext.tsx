@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 // import { UserType } from "@/types/UserType";
 import { setAccessToken } from "@/services/Api";
 import { getUser } from "@/services/Auth";
+import useFullUrl from "@/hooks/useFullUrl";
 
 interface UserType {
     id: number;
@@ -43,6 +44,7 @@ export default function AdminContextProvider({ children }: { children: ReactNode
 {
     const router = useRouter();
     const pathname = usePathname();
+    const fullUrl = useFullUrl();
     const [isSidebarOpen, setSidebarOpen] = useState(true);
     const [user, setUser] = useState<UserType|null>(null);
     const [menuActive, setMenuActive] = useState<string>('');
@@ -78,10 +80,11 @@ export default function AdminContextProvider({ children }: { children: ReactNode
         fetchUser()
     }, []);
     useEffect(() => {
+
         const isAdminPath = pathname.startsWith("/admin");
         const isSigninPage = pathname === "/admin/signin";
-        if (!loading && isAdminPath && !isSigninPage && !user) {
-            router.replace(`/admin/signin?redirect=${pathname}`);
+        if (fullUrl && !loading && isAdminPath && !isSigninPage && !user) {
+            router.replace(`/admin/signin?redirect=${fullUrl}`);
         }
     }, [loading, pathname, user, router]);
 
