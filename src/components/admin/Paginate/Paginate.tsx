@@ -1,3 +1,4 @@
+"use client";
 import { useSearchParams } from 'next/navigation';
 import { PaginationType } from '@/types/PaginationType';
 import { GoChevronLeft, GoChevronRight } from "react-icons/go";

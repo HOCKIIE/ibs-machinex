@@ -30,7 +30,7 @@ const EditCategory = ({ params }: { params: { id: string } }) => {
         published_at:""
     });
     const handleSubmit = async (data: CategoryFormProps) => {
-        await updateData(id, data, router);
+        await updateData(id, data);
     };
 
     const fetchData = async () => await fetchDataById(id);

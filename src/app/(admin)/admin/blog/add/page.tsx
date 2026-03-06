@@ -36,9 +36,7 @@ export default function Page(){
     } = useBlogDraftState({ userId: user?.id ? String(user.id) : "", draftId: draftId });
     
     const handleSubmit = async (data: BlogFormProps) => {
-        console.log('data: ',data)
         const req = await createData(data);
-        console.log('response from request: ', req);
         if(req.status === true && req.data){
             deleteDraft()
             const path = decodeURIComponent(`/admin/blog/${req.data.id}?redirect=/admin/blog`);

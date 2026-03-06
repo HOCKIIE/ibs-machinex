@@ -1,4 +1,3 @@
-import { useRouter } from "next/navigation";
 import { BrandType } from "./BrandType";
 
 export interface CategoryType {
@@ -55,11 +54,8 @@ export interface CategoryState {
 
     fetchData: (page: number) => Promise<void>;
     fetchDataById: (id: string) => Promise<void>;
-    createData: (
-        newData: CategoryFormProps, 
-        router: ReturnType<typeof useRouter>
-    ) => Promise<void>;
-    updateData: (id: string, data: CategoryFormProps, router: ReturnType<typeof useRouter>) => Promise<void>;
+    createData: ( newData: CategoryFormProps ) => Promise<void>;
+    updateData: (id: string, data: CategoryFormProps ) => Promise<void>;
     deleteData: (id: Array<number>) => Promise<void>;
 
 }

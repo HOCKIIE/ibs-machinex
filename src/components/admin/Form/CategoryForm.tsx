@@ -1,3 +1,4 @@
+"use client";
 
 import React, {useEffect } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
@@ -30,6 +31,7 @@ const CategoryForm = ({
         handleSubmit: handleSubmitForm,
         formState: { errors },
         setValue,
+        control,
         watch,
         reset
     } = useForm<CategoryFormProps>({
@@ -64,7 +66,7 @@ return (
         <form onSubmit={handleSubmitForm(type === "create" ? onCreate : onEdit)}>
             <div className="grid grid-cols-12">
                 <div className="col-span-12">
-                    <CoverImageUpload<CategoryFormProps> register={register} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
+                    <CoverImageUpload<CategoryFormProps> control={control} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
                 </div>
             </div>
             <div className="grid grid-cols-12 gap-4">

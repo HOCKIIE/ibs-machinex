@@ -4,13 +4,12 @@ import React from 'react';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import CategoryForm from '@/components/admin/Form/CategoryForm';
-import { useRouter } from 'next/navigation';
 import useCategoryStore from '@/store/useCategoryStore';
 import { CategoryFormProps } from '@/types/CategoryType';
 
 
 const Page = () => {
-    const router = useRouter();
+
     const { createData } = useCategoryStore();
     const categoryState : CategoryFormProps = {
         id: "",
@@ -27,7 +26,7 @@ const Page = () => {
         updated_at: "",
         published_at: null
     };
-    const handleSubmit = async (data: CategoryFormProps) => await createData(data,router);
+    const handleSubmit = async (data: CategoryFormProps) => await createData(data);
 
     return (
         <DefaultLayout>

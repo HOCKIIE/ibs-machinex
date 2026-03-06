@@ -8,6 +8,7 @@ import { Outfit } from "next/font/google";
 import { Toaster } from "react-hot-toast";
 import Loader from "@/components/admin/Loader";
 import Api from "@/services/Api";
+import { Suspense } from "react";
 
 
 const outfit = Outfit({
@@ -26,17 +27,19 @@ export default function RootLayout({children}:{children: React.ReactNode})
     }, []);
 
     return (
-        <html lang="en" suppressHydrationWarning={true}>
-            <AdminContext>
-                <body className={`${outfit.className} bg-slate-50`} >
-                <ThemeProvider attribute="class" defaultTheme="system">
-                    <div className="dark:bg-boxdark-2 dark:text-bodydark">
-                        <Toaster position="top-right" reverseOrder={false} />
-                        {loading ? <Loader/> : children}
-                    </div>
-                </ThemeProvider>
-                </body>
-            </AdminContext>
-        </html>
+        <Suspense fallback={null}>
+            <html lang="en" suppressHydrationWarning={true}>
+                <AdminContext>
+                    <body className={`${outfit.className} bg-slate-50`} >
+                    <ThemeProvider attribute="class" defaultTheme="system">
+                        <div className="dark:bg-boxdark-2 dark:text-bodydark">
+                            <Toaster position="top-right" reverseOrder={false} />
+                            {loading ? <Loader/> : children}
+                        </div>
+                    </ThemeProvider>
+                    </body>
+                </AdminContext>
+            </html>
+        </Suspense>
     );
 }

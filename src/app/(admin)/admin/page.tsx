@@ -1,5 +1,3 @@
-"use client";
-
 import AdminLayout from "@/components/admin/layout/DefaultLayout";
 import Dashboard from '@/components/admin/Dashboard/Dashboard';
 

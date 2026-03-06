@@ -617,9 +617,10 @@ const ImageModal = ({
     action?: string;
     draftId?: string;
     onClose: () => void;
-    onInsert: (url: string, alt:string) => void;
+    onInsert: (url: string, alt:string, path?: number[]) => void;
     defaultUrl: string | "";
     defaultAlt: string | "";
+
 }) => {
     const [tab, setTab] = useState<"selection"|"upload"|"gallery">("selection");
     const [file, setFile] = useState<File[] | null>([]);
@@ -1434,10 +1435,7 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
     };
     const handleInsertOrUpdateImage = ( url: string, alt: string, path?: Path) => {
         const entry = getSelectedImageEntry(editor);
-        // console.log("Selected image entry:", entry);
-        if (entry) {
-            // const [node, path] = entry;
-            console.log("Updating image at path:", path, "with URL:", url, "and ALT:", alt);
+        if (entry && path) {
             Transforms.setNodes(editor, { url, alt }, { at: path });
         } else {
             const imageNode = {
@@ -1592,7 +1590,7 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
                     onClose={() => setShowModal(false)} 
                     defaultUrl={editingImage?.url || ""}
                     defaultAlt={editingImage?.alt || ""}
-                    onInsert={(url: string, alt: string, path: Array<number>) => {
+                    onInsert={(url: string, alt: string, path?: number[]) => {
                         handleInsertOrUpdateImage(url, alt, path);
                         // console.log("Inserting image with URL:", url, "and alt text:", alt);
                         // const imageNode = {
