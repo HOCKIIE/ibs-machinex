@@ -15,7 +15,7 @@ export interface BlogType {
     detail_en: string;
     detail_ja: string;
     status: boolean;
-    category?: Array<string>;
+    category?: string[];
     categories: Array<CategoryType>;
     pathName: string;
     recommend: string;

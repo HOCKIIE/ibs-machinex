@@ -55,7 +55,6 @@ const BlogForm = ({
     const hasThaiErrors = Object.keys(errors).some(key => key.endsWith('_th'));
     const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
     const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
-
     const onCreate = async (data: BlogFormProps) => onSubmit(data);
     const onEdit = async (formData: BlogFormProps) => {
         const modifiedData = { ...formData };
@@ -66,9 +65,7 @@ const BlogForm = ({
         const res = await Api.get('/category');
         setCategory(res.data);
     };
-
     const submitHandler = type === "create" ? onCreate : onEdit;
-
     useEffect(()=>{
         if(didFetchData.current) return;
         didFetchData.current = true;
@@ -122,7 +119,7 @@ const BlogForm = ({
                                 render={({field}) => (
                                     <>
                                     {category?.map((v: CategoryType, k: number) => {
-                                        const isChecked = field.value?.includes(String(v.id));
+                                        const isChecked = String(field.value)?.includes(String(v.id));
                                         return (
                                             <label key={k} className="inline-flex items-center gap-2 cursor-pointer space-y-2">
                                                 <input
