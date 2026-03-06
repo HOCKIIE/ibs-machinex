@@ -154,7 +154,7 @@ return (
                         <div className="col-span-12">
                             <div className="grid grid-cols-12 gap-6">
                                 <div className="col-span-6">
-                                    <CoverImageUpload<BrandFormProps> register={register} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
+                                    <CoverImageUpload<BrandFormProps> control={control} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
                                 </div>
                                 <div className="col-span-6">
                                     <div className="space-y-3">

@@ -29,6 +29,7 @@ export function useBlogDraftState({
     const loadDraft = async () => {
         setLoading(true)
         const db = await BlogDraftDB
+        if (!db) return;
         let data = await db.get("drafts", `${userId}:${draftId}`)
 
         // ✅ ถ้ายังไม่มี draft ให้สร้างใหม่
@@ -68,6 +69,7 @@ export function useBlogDraftState({
         saveTimerRef.current = setTimeout(async () => {
             try{
                 const db = await BlogDraftDB;
+                if (!db) return;
                 await db.put(
                     "drafts",
                     { ...nextDraft, updatedAt: Date.now() },
@@ -87,6 +89,7 @@ export function useBlogDraftState({
         saveTimerRef.current = setTimeout(async () => {
             try {
                 const db = await BlogDraftDB;
+                if (!db) return;
                 await db.delete("drafts",`${userId}:${draftId}`);
             } catch (err) {
                 console.error("Delete draft error:", err);

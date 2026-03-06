@@ -1,3 +1,5 @@
+"use client";
+
 import Api from '@/services/Api';
 import React, { useState, useRef, useEffect } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
@@ -264,7 +266,7 @@ const BlogForm = ({
                         }
                         <div className="grid grid-cols-12">
                             <div className="col-span-12">
-                                <CoverImageUpload<BlogFormProps> control={control} register={register}  watch={watch} setValue={setValue} defaultValue={item.image} errors={errors}/>
+                                <CoverImageUpload<BlogFormProps> control={control}  watch={watch} setValue={setValue} defaultValue={item.image} errors={errors}/>
                             </div>
                             <div className="col-span-12 mt-4">
                                 <div className="space-y-3">

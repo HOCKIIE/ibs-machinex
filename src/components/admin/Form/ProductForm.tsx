@@ -1,3 +1,5 @@
+"use client";
+
 import Api from "@/services/Api";
 import React, { useState, useRef, useEffect } from 'react';
 import { CancelButton, SaveButton } from '@/components/main/button/Buttons';
@@ -196,7 +198,7 @@ const ProductForm = ({
                         <div className="w-full">
                             <div className="grid grid-cols-12 gap-4">
                                 <div className="col-span-6">
-                                    <CoverImageUpload<ProductFormProps> register={register} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
+                                    <CoverImageUpload<ProductFormProps> control={control} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
                                 </div>
                                 <div className="col-span-6">
                                     <div className="space-y-3">

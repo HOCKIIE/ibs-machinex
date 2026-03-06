@@ -1,6 +1,6 @@
 import React, { useEffect,useState } from 'react';
 import { LiaTimesSolid } from "react-icons/lia";
-import { UseFormRegister, UseFormSetValue, UseFormStateReturn, UseFormWatch, Controller, Path, FieldValues, UseControllerProps,UseFormReturn } from 'react-hook-form';
+import { UseFormSetValue, UseFormStateReturn, UseFormWatch, Controller, Path, FieldValues,UseFormReturn } from 'react-hook-form';
 import { ErrorMessage } from '@/components/admin/Form/Validation';
 
 interface CoverImageUploadFormValues {
@@ -9,14 +9,13 @@ interface CoverImageUploadFormValues {
 
 interface CoverImageUploadProps<T extends FieldValues> {
     control: UseFormReturn<T>["control"];
-    register: UseFormRegister<T>;
     watch: UseFormWatch<T>;
     setValue: UseFormSetValue<T>;
     defaultValue: CoverImageUploadFormValues["image"];
     errors: UseFormStateReturn<T>["errors"];
 }
 
-const CoverImageUpload =  <T extends FieldValues>({ control, register, setValue, defaultValue, errors }: CoverImageUploadProps<T>) => {
+const CoverImageUpload =  <T extends FieldValues>({ control, setValue, defaultValue, errors }: CoverImageUploadProps<T>) => {
 
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [dragActive, setDragActive] = useState(false);

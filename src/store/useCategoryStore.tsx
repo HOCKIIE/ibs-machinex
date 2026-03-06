@@ -41,7 +41,7 @@ const useCategoryStore = create<CategoryState>((set) => ({
     },
     
 
-    createData: async (newData, router) => {
+    createData: async (newData) => {
         try {
             set({ response: { status: null, statusCode: null, message: null } })
             ProcessToast.show('Creating category...');
@@ -60,7 +60,6 @@ const useCategoryStore = create<CategoryState>((set) => ({
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
                 await ProcessToast.success(message);
-                router.push(`${prefix}`); 
             } else { 
                 await ProcessToast.error(message);
             }

@@ -41,7 +41,7 @@ const useProductStore = create<ProductState>((set) => ({
     },
 
 
-    createData: async (newData, router) => {
+    createData: async (newData) => {
         try {
             const formData = new FormData();
             Object.entries(newData).forEach(([key, value]) => {
@@ -61,9 +61,6 @@ const useProductStore = create<ProductState>((set) => ({
             const { status, message } = response.data as { status: boolean; message: string };
             if (status) { 
                 ProcessToast.success(message);
-                setTimeout(() => { 
-                    router.push(`${prefix}`); 
-                }, 1000);
             } else { 
                 ProcessToast.error(message);
             }
