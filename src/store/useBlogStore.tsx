@@ -50,7 +50,6 @@ const useBlogStore = create<BlogState>((set) => ({
                 if (key === "category" && Array.isArray(value)) {
                     value.forEach((val) => formData.append("category[]", val));
                 } else if (key === "image" && value instanceof File) {
-                    console.log("Appending image file:", value);
                     formData.append("image", value);
                 } else {
                     formData.append(key, value as string);
