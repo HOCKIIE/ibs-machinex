@@ -123,7 +123,7 @@ export default function Page(){
                 }
             }
             if (!isEqual(current, prev)) {
-                setBlogChanged(changed, key, current);
+                setBlogChanged(changed, key, current as BlogFormProps[typeof key]);
             }
         });
         if (Object.keys(changed).length > 0) {

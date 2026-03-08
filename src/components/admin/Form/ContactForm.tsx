@@ -14,7 +14,7 @@ const ContactForm = () =>
     const [map, setMap] = useState<string|''>('');
     const [tab, setTab] = useState<string>('th')
     const [contactData, setContactData] = useState<ContactType>({
-        id: "",
+        id: 0,
         title_th: "",
         title_en: "",
         title_ja: "",
@@ -88,7 +88,7 @@ const ContactForm = () =>
         });
         EditContact()
     }
-    const saveChange = async(data: ContactType) => await updateData(data);
+    const saveChange = async(data: ContactType) => await updateData(items[0].id, data);
 
     useEffect(() => { 
         if(didFetchData.current) return;

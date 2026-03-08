@@ -55,7 +55,7 @@ const Page = ({ params }: { params: { id: string } }) =>
     useEffect(() => {
         if (items.length > 0) {
             form.reset({
-                id: items[0].id ?? "",
+                id: items[0].id ?? 0,
                 image: items[0].image ?? null,
                 categories: items[0].categories ?? [],
                 category: items[0].category ?? [],

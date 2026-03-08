@@ -1,3 +1,5 @@
+import { ResponseDefaultType,ResponseDataType } from "./ResponseType";
+
 export interface UserType {
     id:number;
     role:string;
@@ -8,7 +10,7 @@ export interface UserType {
     contact_sale:string;
     email:string;
     phone:string;
-    status:string;
+    status:boolean;
     created_at:string;
     updated_at:string;
 }
@@ -19,7 +21,7 @@ export interface ApiResponse {
     rows: UserType[];
 }
 export interface UsersFormProps {
-    id: string;
+    id: number;
     title_th: string;
     title_en: string;
     title_ja: string;
@@ -27,7 +29,7 @@ export interface UsersFormProps {
     role: string;
     name: string;
     phone: string;
-    status: string;
+    status: boolean;
     email: string;
     password?: string;
     password_confirmation?: string;
@@ -45,8 +47,8 @@ export interface UserState {
     response: { status: boolean | null; statusCode:number | null; message: string | null };
     fetchUserById: (id: string) => Promise<void>;
     fetchUsers: () => Promise<void>;
-    createUser: ( newUser: UsersFormProps ) => Promise<void>;
-    updateUser: (id:string, data: UsersFormProps) => Promise<void>;
-    onChangeStatus: (id: string, status: boolean) => Promise<void>;
-    deleteUser: (id: string) => Promise<void>;
+    createUser: ( newUser: UsersFormProps ) => Promise<ResponseDataType<UsersFormProps>>;
+    updateUser: (id:string, data: UsersFormProps) => Promise<ResponseDataType<UsersFormProps>>;
+    onChangeStatus: (id: string, status: boolean) => Promise<ResponseDefaultType>;
+    deleteUser: (id: number[]) => Promise<ResponseDefaultType>;
 }

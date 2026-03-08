@@ -52,7 +52,7 @@ export interface BlogFormProps {
     detail_ja: string;
     status: boolean;
     category?: Array<string>;
-    categories?: Array<{id?: string;}>;
+    categories?: Array<CategoryType>;
     pathName: string;
     recommend: string;
     published_at: string | null;
@@ -78,7 +78,7 @@ export interface BlogState {
     fetchDataById: (id: number) => Promise<void>;
     createData: ( data: BlogFormProps) => Promise<ResponseDataType<BlogFormProps>>;
     updateData: (id: number, data: BlogFormProps) => Promise<ResponseDataType<BlogFormProps>>;
-    onChangeStatus: (id: number, status: boolean) => Promise<ResponseDefaultType>;
+    onChangeStatus: (id: number, changeTo: boolean) => Promise<ResponseDefaultType>;
     deleteData: (id: number[]) => Promise<ResponseDefaultType>;
 
 }

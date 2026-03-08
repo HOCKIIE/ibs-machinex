@@ -9,6 +9,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { UsersFormProps } from '@/types/UserType';
 import { getUser } from '@/services/Auth';
 import { HiExclamation } from "react-icons/hi";
+import { ResponseDataType } from '@/types/ResponseType';
 
 
 const UserForm = ({
@@ -23,7 +24,7 @@ const UserForm = ({
     setTab: (tab: string) => void;
     itemState: UsersFormProps;
     setItemState: (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
-    handleSubmit: (data: UsersFormProps) => Promise<void>
+    handleSubmit: (data: UsersFormProps) => Promise<ResponseDataType<UsersFormProps>>
     type: string;
 }) => {
 
@@ -41,7 +42,7 @@ const UserForm = ({
         watch
     } = useForm<UsersFormProps>({
         defaultValues: {
-            id: itemState.id || "",
+            id: itemState.id || 0,
             role: itemState.role || "",
             contact_sale: itemState.contact_sale || "0",
             title_th: itemState.title_th || "",
@@ -50,7 +51,7 @@ const UserForm = ({
             name: itemState.name || "",
             phone: itemState.phone || "",
             email: itemState.email || "",
-            status: itemState.status || "0",
+            status: itemState.status || false,
             password: "",
             password_confirmation: ""
         },
@@ -150,7 +151,7 @@ const UserForm = ({
                                         <input
                                             type="checkbox"
                                             className="peer absolute opacity-0 w-0 h-0"
-                                            checked={field.value == "1" ? true : false}
+                                            checked={field.value === true ? true : false}
                                             onChange={(e) => field.onChange(e.target.checked?"1":"0")}
                                             ref={field.ref}
                                         />

@@ -10,7 +10,6 @@ import { BiTrash } from "react-icons/bi";
 import ActionModal from '@/components/admin/Modal/ActionModal';
 import useContactStore from '@/store/useContactStore';
 import { DeleteButton } from '@/components/admin/ui/ActionButton';
-import { CategoryType } from '@/types/CategoryType';
 
 const show = [10, 25, 50, 100];
 interface ContactUcType {
@@ -20,6 +19,7 @@ interface ContactUcType {
     email: string;
     message: string;
     source: string;
+    status: boolean;
     createdAt: string;
 }
 
@@ -38,7 +38,7 @@ const Contact = () =>
         handleSearch, 
         handlePageChange,
         handlerOrderBy
-    } = usePagination({ 
+    } = usePagination<ContactUcType>({ 
         initialLimit: show[0],
         endpoint: '/admin/contact-us'
     });
@@ -55,7 +55,7 @@ const Contact = () =>
             setSelectedIds([]);
         }else{
             if(data && data.length>0){
-                setSelectedIds(data.map((item:CategoryType) => Number(item.id)));
+                setSelectedIds(data.map((item:ContactUcType) => Number(item.id)));
             }
         }
     };
@@ -67,15 +67,23 @@ const Contact = () =>
 
 
     const deleteRecord = useCallback(async() => {
-        try {
-            const ids = id?.join(',');
-            if (ids !== null) {
-                await deleteData(`${ids}`);
+        setProgress(true);
+        try{
+            if (id && id.length > 0) {
+                const { status, statusCode, message } = await deleteData(id);
+                return { status, statusCode, message };
             }
+            return {
+                status: false,
+                statusCode: 400,
+                message: "Invalid id"
+            };
         } catch (err) {
-            console.error(err);
-        } finally {
-            setProgress(false);
+            return {
+                status: false,
+                statusCode: 500,
+                message: err instanceof Error ? err.message : "Unknown error"
+            }
         }
     },[id, deleteData]);
 
@@ -211,10 +219,10 @@ const Contact = () =>
                     confirm: deleteRecord,
                     progress: progress,
                     successProgress: fetchData,
-                    response: { 
-                        status: typeof response.status === 'boolean' ? response.status : null, 
-                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,
-                        message: response.message 
+                    response: {
+                        status: typeof response.status == 'boolean' ? response.status : null,
+                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null, 
+                        message: typeof response.message == 'string' ? response.message : null 
                     }
                 }}
             />

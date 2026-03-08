@@ -1,5 +1,6 @@
+import { ResponseDataType, ResponseDefaultType } from "./ResponseType";
 export interface ContactType {
-    id: string;
+    id: number;
     title_th: string;
     title_en: string;
     title_ja: string;
@@ -10,10 +11,12 @@ export interface ContactType {
     mobile: string;
     email: string;
     gmap: string;
+    [key: `title_${string}`]: string;
+    [key: `address_${string}`]: string;
 }
 
 export interface contactUsType {
-    id: string;
+    id: number;
     first_name: string;
     last_name: string;
     email: string;
@@ -28,7 +31,7 @@ export type ResponseType = {
 };
 
 export interface ContactUsProps {
-    id: string;
+    id: number;
     first_name: string;
     last_name: string;
     message: string;
@@ -43,13 +46,13 @@ export interface ApiResponse {
 }
 export interface ContactState {
     items: ContactType[];
-    id: string;
+    id: number;
     total: number;
     lastPage: number;
     currentPage: number;
     response: { status: boolean | null; statusCode: number | null; message: string | null };
 
     fetchData: (page?: number) => Promise<void>;
-    updateData: (data: ContactType) => Promise<void>;
-    deleteData: (id: string) => Promise<void>;
+    updateData: (id:number, data: ContactType) => Promise<ResponseDataType<ContactType>>;
+    deleteData: (id: number[] ) => Promise<ResponseDefaultType>;
 }

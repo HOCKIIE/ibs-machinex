@@ -14,6 +14,7 @@ import { LiaLanguageSolid } from "react-icons/lia";
 import { HiExclamation } from "react-icons/hi";
 import TextEditor from '../Editor/TextEditor';
 import { CategoryType } from '@/types/CategoryType';
+import { ResponseDataType } from '@/types/ResponseType';
 
 const BrandForm = ({
     itemState,
@@ -21,7 +22,7 @@ const BrandForm = ({
     type
 } : {
     itemState: BrandFormProps;
-    onSubmit: (data: BrandFormProps) => Promise<void>;
+    onSubmit: (data: BrandFormProps) => Promise<ResponseDataType<BrandFormProps>>;
     type: string;
 }) => {
     const didFetch = useRef(false);

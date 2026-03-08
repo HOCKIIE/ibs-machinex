@@ -66,5 +66,5 @@ export interface BrandState {
     createData: ( newData: BrandFormProps ) => Promise<ResponseDataType<BrandType>>;
     updateData: (id: number, data: BrandFormProps ) => Promise<ResponseDataType<BrandType>>;
     onChangeStatus: (id: number, changeTo: boolean ) => Promise<ResponseDataType<BrandType>>;
-    deleteData: (id: umber[]) => Promise<ResponseDefaultType>;
+    deleteData: (id: number[]) => Promise<ResponseDefaultType>;
 }

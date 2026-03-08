@@ -88,7 +88,7 @@ const ContactSection = () => {
                 <div className="h-full bg-white text-gray-800 rounded-2xl shadow-[0_0px_1px_2px_rgba(0,0,0,0.05)] p-4">
                     <span className="font-semibold">{t('office')}</span>
                     <p className="mt-1">
-                        {address.split(/\r?\n/).map((line, idx) => (
+                        {typeof address === 'string' && address.split(/\r?\n/).map((line, idx) => (
                             <React.Fragment key={idx}>
                                 {line}
                                 <br />

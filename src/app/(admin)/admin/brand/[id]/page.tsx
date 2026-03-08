@@ -32,7 +32,7 @@ const Page = ({ params }:{ params: {id:number} }) => {
         updated_at: "",
         published_at: null
     });
-    const handleSubmit = async (data: BrandFormProps) => { await updateData(id, data); }
+    const handleSubmit = async (data: BrandFormProps) => await updateData(id, data);
     const fetchData = async () => { await fetchDataById(id); }
     useEffect(() => {
         if (didFetchData.current) return;
