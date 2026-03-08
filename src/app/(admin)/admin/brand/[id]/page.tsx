@@ -7,12 +7,12 @@ import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import { BrandFormProps } from '@/types/BrandType';
 import useBrandStore from '@/store/useBrandStore';
 
-const Page = ({ params }:{ params: {id:string} }) => {
+const Page = ({ params }:{ params: {id:number} }) => {
     const { id } = params;
     const { items, fetchDataById, updateData } = useBrandStore();
     const didFetchData = useRef(false);
     const [ itemState, setItemState ] = useState<BrandFormProps>({
-        id: "",
+        id: 0,
         image: null,
         title_th: "",
         title_en: "",
@@ -32,8 +32,8 @@ const Page = ({ params }:{ params: {id:string} }) => {
         updated_at: "",
         published_at: null
     });
-    const handleSubmit = async (data: BrandFormProps) => await updateData(id, data);
-    const fetchData = async () => await fetchDataById(id);
+    const handleSubmit = async (data: BrandFormProps) => { await updateData(id, data); }
+    const fetchData = async () => { await fetchDataById(id); }
     useEffect(() => {
         if (didFetchData.current) return;
         didFetchData.current = true;

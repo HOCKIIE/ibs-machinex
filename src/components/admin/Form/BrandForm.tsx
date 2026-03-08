@@ -85,13 +85,10 @@ const BrandForm = ({
                 website: itemState.website,
                 apiName: itemState.apiName,
                 categories: itemState.categories,
+                category: itemState.category,
                 status: itemState.status ?? false,
                 published_at: itemState.published_at ?? null
             });
-            if (itemState?.categories) {
-                const categoryIds = itemState.categories.map((c) => c.id);
-                setValue("category", categoryIds);
-            }
         }
     }, [itemState, reset, setValue]);
     

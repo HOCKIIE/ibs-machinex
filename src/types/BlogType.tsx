@@ -1,7 +1,8 @@
 import { CategoryType } from "./CategoryType";
+import { ResponseDefaultType,ResponseDataType } from "./ResponseType";
 
 export interface BlogType {
-    id: string;
+    id: number;
     draftId?: string;
     userId?: string;
     image: string;
@@ -36,7 +37,7 @@ export interface ApiResponse {
 }
 
 export interface BlogFormProps {
-    id: string;
+    id: number;
     draftId?: string;
     userId?: string;
     image: File | string | null;
@@ -63,27 +64,21 @@ export interface BlogFormProps {
     [key: `detail_${string}`]: string;
 }
 
-type ResponseData<T> = {
-    status: boolean;
-    message: string;
-    data: T | null;
-}
-
 
 export interface BlogState {
     items: BlogType[];
 
-    id: string;
+    id: number;
     total: number;
     lastPage: number;
     currentPage: number;
     response: { status?: boolean | null; statusCode?: number | null; message?: string | null };
 
     fetchData: (page: number) => Promise<void>;
-    fetchDataById: (id: string) => Promise<void>;
-    createData: ( data: BlogFormProps) => Promise<ResponseData<BlogFormProps>>;
-    updateData: (id: string, data: BlogFormProps) => Promise<ResponseData<BlogFormProps>>;
-    onChangeStatus: (id: string, status: boolean) => Promise<void>;
-    deleteData: (id: string[]) => Promise<void>;
+    fetchDataById: (id: number) => Promise<void>;
+    createData: ( data: BlogFormProps) => Promise<ResponseDataType<BlogFormProps>>;
+    updateData: (id: number, data: BlogFormProps) => Promise<ResponseDataType<BlogFormProps>>;
+    onChangeStatus: (id: number, status: boolean) => Promise<ResponseDefaultType>;
+    deleteData: (id: number[]) => Promise<ResponseDefaultType>;
 
 }

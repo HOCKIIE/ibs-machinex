@@ -20,7 +20,7 @@ const Page = ({ params }: { params: { id: string } }) =>
             mode: "onChange",
             criteriaMode: "all",
             defaultValues: {
-                id: "",
+                id: 0,
                 draftId: "",
                 userId: "",
                 image: null,
@@ -44,13 +44,13 @@ const Page = ({ params }: { params: { id: string } }) =>
             },
         });
     const handleSubmit = async (data: BlogFormProps) => {
-        const req = await updateData(id, data);
+        const req = await updateData(Number(id), data);
         if(req && req.data){
             router.push(`/admin/blog`);
         }
     }
     const formValues = form.watch()
-    const fetchData = async () => await fetchDataById(id);
+    const fetchData = async () => await fetchDataById(Number(id));
     useEffect(() => { if(didFetchData.current) return; didFetchData.current = true; fetchData(); });
     useEffect(() => {
         if (items.length > 0) {

@@ -1,6 +1,8 @@
 import { CategoryType } from "./CategoryType";
+import { ResponseDefaultType, ResponseDataType } from "./ResponseType";
+
 export interface BrandType {
-    id: string;
+    id: number;
     title_th: string;
     title_en: string;
     title_ja: string;
@@ -22,7 +24,7 @@ export interface BrandType {
 }
 
 export interface BrandFormProps {
-    id: string;
+    id: number;
     image: File | string| null;
     title_th: string;
     title_en: string;
@@ -38,7 +40,7 @@ export interface BrandFormProps {
     status: boolean;
     brands?: BrandType[] | [];
     category?: Array<string> | [];
-    categories: Array<{id: string;}> | [];
+    categories: Array<{id: number;}> | [];
     published_at: string | null;
     created_at: string;
     updated_at: string;
@@ -52,19 +54,17 @@ export interface ApiResponse {
 }
 
 export interface BrandState {
-    items: BrandType[] | null;
-    isLoading: boolean;
-    error: string | null;
-    token: string | null;
-
-    id: string;
+    items: BrandType[];
+    id: number;
     total: number;
     lastPage: number;
     currentPage: number;
-    response: { status: boolean | null; statusCode:number | null; message: string | null };
+    response: { status?: boolean | null; statusCode?: number | null; message?: string | null };
+    
     fetchData: (page: number) => Promise<void>;
-    fetchDataById: (id: string) => Promise<void>;
-    createData: (newData: BrandFormProps) => Promise<void>;
-    updateData: (id: string, data: BrandFormProps) => Promise<void>;
-    deleteData: (id: string) => Promise<void>;
+    fetchDataById: (id: number) => Promise<void>;
+    createData: ( newData: BrandFormProps ) => Promise<ResponseDataType<BrandType>>;
+    updateData: (id: number, data: BrandFormProps ) => Promise<ResponseDataType<BrandType>>;
+    onChangeStatus: (id: number, changeTo: boolean ) => Promise<ResponseDataType<BrandType>>;
+    deleteData: (id: number) => Promise<ResponseDefaultType>;
 }

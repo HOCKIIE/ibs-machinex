@@ -5,17 +5,15 @@ import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import CategoryForm from '@/components/admin/Form/CategoryForm';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import useCategoryStore from '@/store/useCategoryStore';
-import { useRouter } from 'next/navigation';
 import { CategoryFormProps } from '@/types/CategoryType';
 
-const EditCategory = ({ params }: { params: { id: string } }) => {
+const EditCategory = ({ params }: { params: { id: number } }) => {
 
-    const  { id } = params;
-    const router = useRouter();
+    const { id } = params;
     const didFetchData = useRef(false);
     const { items, fetchDataById, updateData } = useCategoryStore();
     const [ itemState, setItemState ] = useState<CategoryFormProps>({
-        id: id,
+        id: Number(id),
         image: null,
         title_th: "",
         title_en: "",

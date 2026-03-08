@@ -7,7 +7,7 @@ import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import AddButton from '@/components/admin/Button/AddButton';
 import { IoSearchOutline } from "react-icons/io5";
-import useProductStore from '@/store/useProductStore';
+import useBrandStore from '@/store/useBrandStore';
 import usePagination from '@/hooks/usePagination';
 import Format from '@/utils/Format';
 import { Paginate, LimitPerPage, SearchBar } from '@/components/admin/Paginate/Paginate';
@@ -38,12 +38,13 @@ const Brand = () =>
         StatusTab, 
         fetchData,
         handleSearch, 
-        handlePageChange
-    } = usePagination({ 
+        handlePageChange,
+        updateStatusField
+    } = usePagination<BrandType>({ 
         initialLimit: show[0],
         endpoint: '/admin/brand'
     });
-    const { deleteData, response } = useProductStore();
+    const { deleteData, response, onChangeStatus } = useBrandStore();
     const [id, setId] = useState<number[] | null>(null);
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [progress, setProgress] = useState(false);
@@ -76,19 +77,37 @@ const Brand = () =>
     },[]);
 
     const deleteRecord = useCallback(async() => {
-        if (!id) return;
         setProgress(true);
         try{
-            const ids = id?.join(',');
-            if (ids !== null) {
-                await deleteData(`${ids}`);
+            if (id && id.length > 0) {
+                const { status, statusCode, message } = await deleteData(id);
+                return { status, statusCode, message };
             }
+            return {
+                status: false,
+                statusCode: 400,
+                message: "Invalid id"
+            };
         } catch (err) {
-            console.error(err);
-        } finally {
-            setProgress(false);
+            return {
+                status: false,
+                statusCode: 500,
+                message: err instanceof Error ? err.message : "Unknown error"
+            }
         }
     },[id, deleteData]);
+
+    const handlerChangeStatus = async( id: number, changeTo: boolean ) => {
+        try{
+            const req = await onChangeStatus(id, changeTo);
+            const { status, statusCode, message } = req;
+            if(status) updateStatusField(id, changeTo)
+            console.log(status);
+            
+        } catch (err) {
+
+        }
+    }
 
     const openModal = useCallback((id: number) => {
         setId([id]);
@@ -98,9 +117,6 @@ const Brand = () =>
 
     const closeModal = useCallback(() => {
         setModalOpen(false);
-        useProductStore.setState({ 
-            response: { status: null, message: null, statusCode: null }
-        });
         fetchData();
     }, [fetchData]);
 
@@ -201,7 +217,15 @@ const Brand = () =>
                                         </div>
                                     }
                                 </td>
-                                <td className='px-6 py-4'>{v.status === true ? `On`:`Off`}</td>
+                                <td className='px-6 py-4'>
+                                    <label className="inline-flex items-center me-5 cursor-pointer">
+                                        <input type="checkbox" className="sr-only peer" checked={!!v.status} onChange={(e)=>{
+                                            const checked = e.target.checked;
+                                            handlerChangeStatus(v.id, checked)
+                                        }}/>
+                                        <div className="relative w-9 h-5 bg-neutral-quaternary rounded-full peer bg-slate-200 dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600 dark:peer-checked:bg-indigo-600"></div>
+                                    </label>
+                                </td>
                                 <td className="px-6 py-4">
                                     { !loading ?
                                         <div className="text-sm text-gray-900 dark:text-gray-200">{Format.date(new Date(v.created_at))}</div>
@@ -245,17 +269,17 @@ const Brand = () =>
             <ActionModal 
                 isOpen={isOpen} 
                 action={isAction}
-                onClose={() => setModalOpen(false)}
+                onClose={()=>setModalOpen(false)}
                 onAfterClose={fetchData}
                 closeModal={closeModal}
                 data={{
                     confirm: deleteRecord,
-                    successProgress: fetchData,
                     progress: progress,
-                    response: { 
-                        status: typeof response.status === 'boolean' ? response.status : null, 
-                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,
-                        message: response.message 
+                    successProgress: fetchData,
+                    response: {
+                        status: typeof response.status == 'boolean' ? response.status : null,
+                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null, 
+                        message: typeof response.message == 'string' ? response.message : null 
                     }
                 }}
             />

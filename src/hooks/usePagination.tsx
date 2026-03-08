@@ -8,13 +8,17 @@ interface UsePaginationProps {
     initialLimit?: number;
     endpoint: string;
 }
-const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) => 
+type BaseRecord = {
+    id: number
+    status: boolean
+}
+const usePagination = <T extends BaseRecord>({ initialLimit = 10, endpoint }: UsePaginationProps) => 
 {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
     
-    const [data, setData] = useState([]);
+    const [data, setData] = useState<T[]>([]);
     const [limit, setLimit] = useState(initialLimit);
     const [meta, setMeta] = useState<Meta | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
@@ -40,13 +44,22 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
     const fetchData = useCallback(async () => {
         try {
             const res = await Api.get(`${endpoint}?${queryString}`);
-            setData(res.data.data);
-            setMeta(res.data.meta);
+            const { data, meta } = res.data;
+            setData(data);
+            setMeta(meta);
         } catch {
             console.log('Failed to fetch data.');
         }
 
     },[queryString]);
+
+    const updateStatusField = (id: number, status: boolean) => {
+        setData((prev) =>
+            prev.map((item) =>
+                Number(item.id) === Number(id) ? { ...item, status } : item
+            )
+        );
+    };
 
     const handleClickPage = useCallback((action:string) => 
     {
@@ -188,6 +201,7 @@ const usePagination = ({ initialLimit = 10, endpoint }: UsePaginationProps) =>
     return {
         keyword,
         data,
+        updateStatusField,
         meta,
         loading,
         limit,
