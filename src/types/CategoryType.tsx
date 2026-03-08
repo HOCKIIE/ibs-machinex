@@ -58,6 +58,6 @@ export interface CategoryState {
     createData: ( newData: CategoryFormProps ) => Promise<ResponseDataType<CategoryType>>;
     updateData: (id: number, data: CategoryFormProps ) => Promise<ResponseDataType<CategoryType>>;
     onChangeStatus: (id: number, changeTo: boolean ) => Promise<ResponseDataType<CategoryType>>;
-    deleteData: (id: Array<number>) => Promise<ResponseDefaultType>;
+    deleteData: (id: number[]) => Promise<ResponseDefaultType>;
 
 }
