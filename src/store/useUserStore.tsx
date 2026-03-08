@@ -58,72 +58,64 @@ const useUserStore = create<UserState>((set) => ({
         set({ users: [] });
         try {
             ProcessToast.show('Creating data...')
-            const response = await Api.post(`${prefix}/store`, newUser);
-            set({ users: [response.data] });
-            const { status, message } = response.data as { status: boolean; message: string };
-            if (status) { 
-                ProcessToast.success(message,2000);
-            } else { 
-                ProcessToast.error(message,2000);
-            }
+            const req = await Api.post(`${prefix}/store`, newUser);
+            set({ users: [req.data] });
+            const { status, statusCode, message, data } = req.data;
+            if (status) await ProcessToast.success(message);
+            else await ProcessToast.error(message);
+            return { status, statusCode, message, data }
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
             ProcessToast.error(errorMessage,2000);
+            return { status: false, statusCode: 500, message: errorMessage, data: null }
         }
     },
     
-    updateUser: async (id, data) => {
+    updateUser: async (id, newData) => {
         set({ users: [] });
         ProcessToast.show('Saving data...')
         try {
-            const response = await Api.put(`${prefix}/update/${id}`,data);
+            const response = await Api.put(`${prefix}/update/${id}`,newData);
             set((state) => ({
                 users: state.users.map((item) => item.id === Number(id) ? response.data : item  ),
             }));
-            ProcessToast.success(response.data.message,2000)
-        } catch (error: unknown) {
-            const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
-            const errorMessage = response?.data?.message || "An unknown error occurred";
-            ProcessToast.error(errorMessage,2000);
-        }
-    },
-
-    onChangeStatus: async (id, status) => {
-        set({ users: [] });
-        ProcessToast.show('Saving data...');
-        try {
-            const response = await Api.put(`${prefix}/status/${id}`,{ status });
-            set((state) => ({ users: state.users.map((item) => item.id === Number(id) ? response.data : item ) }));
-            ProcessToast.success("The User status change successfully!",2000);
+            const { status, statusCode, message, data } = response.data;
+            if (status) ProcessToast.success(message); 
+            else ProcessToast.error(message);
+            return { status, statusCode, message, data };
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
             ProcessToast.error(errorMessage);
+            return { status: false, statusCode: 500, message: errorMessage, data: null }
+        }
+    },
+
+    onChangeStatus: async (id, changeTo) => {
+        try{
+            const req = await Api.put(`${prefix}/status/${id}`,{ changeTo });
+            const {status, statusCode, message, data} = req.data;
+            set((state) => ({
+                users: state.users.map((item) => String(item.id) === String(id) ? data : item )
+            }));
+            if (status === true && statusCode === 200) ProcessToast.success(message);
+            else ProcessToast.error(message);
+            return { status, statusCode, message, data }
+        } catch(error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+            return { status: true, statusCode: 500, message: errorMessage, data: null }
         }
     },
     
     deleteUser: async (id) => {
         try {
-            const callout = await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
-            set((state) => ({
-                users: state.users.filter((item) => item.id !== Number(id)),
-                isLoading: false,
-                response:{
-                    status: true,
-                    statusCode: callout.data.statusCode,
-                    message: "The user was deleted successfully!"
-                }
-            }));
+            const req = await Api.delete(`${prefix}/destroy/${id}`,{ data: { id:id } });
+            const {status, statusCode, message} = req.data
+            return { status, statusCode, message};
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-            set({
-                response : {
-                    status: false,
-                    statusCode: 500,
-                    message: errorMessage
-                }
-            });
+            return { status: false, statusCode: 500, message: errorMessage };
         }
     }
 

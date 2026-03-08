@@ -9,7 +9,7 @@ const prefix = '/admin/contact';
 const useContactStore = create<ContactState>((set) => ({
     items: [],
     
-    id: "",
+    id: 0,
     total: 1,
     lastPage: 1,
     currentPage: 1,
@@ -33,40 +33,44 @@ const useContactStore = create<ContactState>((set) => ({
         }
     },
 
-    updateData: async (data) => {
-        set({ response: { status: null, statusCode: null, message: null } })
+    updateData: async (id, ContactData) => {
         try {
-            const response = await Api.put(`${prefix}/update`,data);
-            set({
-                response: {
-                    status : response.data.status,
-                    statusCode : response.data.statusCode,
-                    message : response.data.message,
+            const formData = new FormData();
+            Object.entries(ContactData).forEach(([key, value]) => {
+                if (key === "image" && value instanceof File) {
+                    formData.append("image", value);
+                } else 
+                if(key === 'status'){
+                    formData.append("status", value == 'true' ? '1' : '0');
+                }else{
+                    formData.append(key, value as string);
                 }
             });
+            formData.append("_method", "PUT");
+            const response = await Api.post(`${prefix}/update/${id}`,formData, {
+                headers: { "X-Requested-With": "XMLHttpRequest" },
+            });
+            const { status, statusCode, message, data } = response.data;
+            if (status) ProcessToast.success(message); 
+            else ProcessToast.error(message);
+            return { status, statusCode, message, data };
             
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
             ProcessToast.error(errorMessage);
+            return { status: false, statusCode: 500, message: errorMessage, data: null };
         }
     },
 
     deleteData: async (id) => {
-        set({ response: { status: null, statusCode: null, message: null } })
         try {
-            const response = await Api.delete(`${prefix}/delete/${id}`);
-            set({
-                response: {
-                    status : response.data.status,
-                    statusCode : response.data.statusCode,
-                    message : response.data.message,
-                }
-            });
+            const req = await Api.delete(`${prefix}/destroy/${id}`,{ data: { id:id } });
+            const {status, statusCode, message} = req.data
+            return { status, statusCode, message};
         } catch (error: unknown) {
-            const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
-            const errorMessage = response?.data?.message || "An unknown error occurred";
-            ProcessToast.error(errorMessage);
+            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+            return { status: false, statusCode: 500, message: errorMessage };
         }
     }
 

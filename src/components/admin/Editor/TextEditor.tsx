@@ -612,7 +612,7 @@ const ImageModal = ({
     defaultUrl,
     defaultAlt
 }: {
-    id?: string;
+    id?: number;
     type?: string;
     action?: string;
     draftId?: string;
@@ -630,7 +630,7 @@ const ImageModal = ({
     const [selection, setSelection] = useState<{url: string; alt: string}>({url:defaultUrl||"",alt:defaultAlt||""});
     const [selected, setSelected] = useState<string[] | null>([]);
     const [message, setMessage] = useState<{status: string; message: string} | null>(null);
-    const [thisId] = useState<string | null>(id || "");
+    const [thisId] = useState<number | null>(id || 0);
     const [thisType] = useState<string | null>(type || "");
     const thisDraftId = action === "create" ? draftId || "" : "";
     const didFetchGallery = useRef(false);
@@ -671,7 +671,9 @@ const ImageModal = ({
         });
         formData.append("_method", "PUT");
         formData.append("type", thisType ?? "");
-        formData.append("id", action == "edit" ? thisId ?? "" :"");
+        if (action === "edit" && thisId !== null) {
+            formData.append("id", String(thisId));
+        }
         formData.append("draftId", action === "create" ? draftId ?? "" :"");
 
         try {
@@ -997,7 +999,7 @@ const getFontSize = (editor: Editor): string | null => {
 interface EditorProps {
     type?: string;
     action?: string;
-    id?: string;
+    id?: number;
     draftId?: string;
     name: string;
     value: string | null;

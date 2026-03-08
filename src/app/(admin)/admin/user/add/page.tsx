@@ -10,7 +10,7 @@ const FormAdd = () => {
     const { createUser } = useUserStore();
     const [tab, setTab] = useState<string>('th');
     const [userState, setUserState] = useState<UsersFormProps>({
-        id: "",
+        id: 0,
         role: "",
         title_th: "",
         title_en: "",
@@ -19,7 +19,7 @@ const FormAdd = () => {
         name: "",
         phone: "",
         email: "",
-        status: ""
+        status: false
     });
 
     const handleChange = (event: React.ChangeEvent<HTMLSelectElement | HTMLInputElement>) => 

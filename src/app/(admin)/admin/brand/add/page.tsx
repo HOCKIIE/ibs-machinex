@@ -49,11 +49,7 @@ const Page = () => {
                     <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Add a new brand</h3>
                 </div>
                 <hr />
-                <BrandForm 
-                    itemState={categoryState}
-                    onSubmit={handleSubmit}
-                    type="create"
-                />
+                <BrandForm itemState={categoryState} onSubmit={handleSubmit} type="create" />
             </div>
         </div>
     </DefaultLayout>

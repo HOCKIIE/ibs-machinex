@@ -37,7 +37,7 @@ const Users = () =>
         handleSearch, 
         handlePageChange, 
         StatusTab
-    } = usePagination({ 
+    } = usePagination<UserType>({ 
         initialLimit: show[0],
         endpoint: '/admin/user'
     });
@@ -72,15 +72,26 @@ const Users = () =>
     },[]);
 
     const deleteRecord = useCallback(async() => {
-        try {
-            const ids = id?.join(',');
-            if (ids !== null) await deleteUser(`${ids}`);
+        setProgress(true);
+        try{
+            if (id && id.length > 0) {
+                const { status, statusCode, message } = await deleteUser(id);
+                return { status, statusCode, message };
+            }
+            return {
+                status: false,
+                statusCode: 400,
+                message: "Invalid id"
+            };
         } catch (err) {
-            console.error(err);
-        } finally {
-            setProgress(false);
+            return {
+                status: false,
+                statusCode: 500,
+                message: err instanceof Error ? err.message : "Unknown error"
+            }
         }
     },[id, deleteUser]);
+    
 
     const openModal = useCallback((id: number) => {
         setId([id]);
@@ -174,7 +185,7 @@ const Users = () =>
                                     <td className="px-6 py-4">
                                         {loading 
                                             ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
-                                            :(v.status == "1" ? 'Active':'Not Active')
+                                            :(v.status == true ? 'Active':'Not Active')
                                         }
                                     </td>
                                     <td className="px-6 py-4">
@@ -220,10 +231,10 @@ const Users = () =>
                     confirm: deleteRecord,
                     successProgress: closeModal,
                     progress: progress,
-                    response: { 
-                        status: typeof response.status === 'boolean' ? response.status : null, 
-                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,
-                        message: response.message 
+                    response: {
+                        status: typeof response.status == 'boolean' ? response.status : null,
+                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null, 
+                        message: typeof response.message == 'string' ? response.message : null 
                     }
                 }}
             />

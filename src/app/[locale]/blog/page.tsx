@@ -23,7 +23,7 @@ const Blog = () =>
         prevPage, 
         nextPage,
         handlerPageChangeFromBtn
-    } = usePagination({ 
+    } = usePagination<BlogType>({ 
         initialLimit: 6, 
         endpoint: '/blog' 
     });

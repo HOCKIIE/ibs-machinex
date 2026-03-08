@@ -14,7 +14,7 @@ const EditUser = ({ params }: { params:  { id: string } }) =>
     const [tab, setTab] = useState<string>('th')
     const { fetchUserById, updateUser, users } = useUserStore();
     const [userState, setUserState] = useState<UsersFormProps>({
-        id: "",
+        id: 0,
         role: "",
         title_th: "",
         title_en: "",
@@ -23,7 +23,7 @@ const EditUser = ({ params }: { params:  { id: string } }) =>
         name: "",
         phone: "",
         email: "",
-        status: ""
+        status: false
     });
     
     const handleChange = (
@@ -59,7 +59,7 @@ const EditUser = ({ params }: { params:  { id: string } }) =>
     useEffect(() => {
         if (users?.length > 0) {
             setUserState({
-                id: String(users[0]?.id),
+                id: Number(users[0]?.id),
                 title_th: users[0]?.title_th,
                 title_en: users[0]?.title_en,
                 title_ja: users[0]?.title_ja,
