@@ -1,3 +1,4 @@
+import { ResponseDefaultType } from "./ResponseType";
 export interface ConfirmModalProps {
     isOpen? : boolean;
     action? : string;
@@ -6,7 +7,7 @@ export interface ConfirmModalProps {
     closeModal: () => void;
     toggleModal?: () => void;
     data : {
-        confirm: () => Promise<void>;
+        confirm: () => Promise<ResponseDefaultType>;
         progress?:  boolean;
         successProgress?: () => void;
         response: { status: boolean | null, statusCode: number | null, message: string | null };

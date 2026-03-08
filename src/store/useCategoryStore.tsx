@@ -9,7 +9,7 @@ const prefix = '/admin/category';
 
 const useCategoryStore = create<CategoryState>((set) => ({
     items: [],
-    id: "",
+    id: 0,
     total: 1,
     lastPage: 1,
     currentPage: 1,
@@ -29,7 +29,6 @@ const useCategoryStore = create<CategoryState>((set) => ({
     },
 
     fetchDataById: async (id) => {
-        set({ response: { status: null, statusCode: null, message: null} })
         try {
             const response = await Api.get(`${prefix}/show/${id}`);
             set({items: response.data});
@@ -43,7 +42,6 @@ const useCategoryStore = create<CategoryState>((set) => ({
 
     createData: async (newData) => {
         try {
-            set({ response: { status: null, statusCode: null, message: null } })
             ProcessToast.show('Creating category...');
             const formData = new FormData();
             Object.entries(newData).forEach(([key, value]) => {
@@ -55,27 +53,29 @@ const useCategoryStore = create<CategoryState>((set) => ({
                     formData.append(key, value as string);
                 }
             });
-            const response = await Api.post(`${prefix}/store`, formData);
-            set({ items: [response.data] });
-            const { status, message } = response.data as { status: boolean; message: string };
-            if (status) { 
-                await ProcessToast.success(message);
-            } else { 
-                await ProcessToast.error(message);
-            }
+            const req = await Api.post(`${prefix}/store`, formData);
+            const { status, statusCode, message, data } = req.data;
+            if (status) await ProcessToast.success(message);
+            else await ProcessToast.error(message);
+            return { status, statusCode, message, data }
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
             ProcessToast.error(errorMessage);
+            return {
+                status: false,
+                statusCode: 500,
+                message: errorMessage,
+                data: null
+            }
         }
     },
 
-    updateData: async (id, data) => {
+    updateData: async (id, categoryData) => {
         try {
-            set({ response: { status: null, statusCode: null, message: null } })
             ProcessToast.show('Updating category...');
             const formData = new FormData();
-            Object.entries(data).forEach(([key, value]) => {
+            Object.entries(categoryData).forEach(([key, value]) => {
                 if (key === "image" && value instanceof File) {
                     formData.append("image", value);
                 } else {
@@ -83,44 +83,48 @@ const useCategoryStore = create<CategoryState>((set) => ({
                 }
             });
             formData.append("_method", "PUT");
-            const response = await Api.post(`${prefix}/update/${id}`, formData, { headers: {"X-Requested-With": "XMLHttpRequest"} });
-            set((state) => ({
-                items: state.items.map((item) => String(item.id) === String(id) ? response.data.data : item  )
-            }));
-            const { status, message } = response.data as { status: boolean; message: string };
-            if (status) { 
-                await ProcessToast.success(message);
-            } else { 
-                await ProcessToast.error(message);
-            }
+            const response = await Api.post(`${prefix}/update/${id}`, formData, { 
+                headers: {"X-Requested-With": "XMLHttpRequest"} 
+            });
+            const { status, statusCode, message, data } = response.data;
+            if (status) ProcessToast.success(message); 
+            else ProcessToast.error(message);
+            return { status, statusCode, message, data };
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
             await ProcessToast.error(errorMessage);
+            return { status: false, statusCode: 500, message: errorMessage, data: null };
+        }
+    },
+
+    onChangeStatus: async (id, changeTo) => {
+        try{
+            const req = await Api.put(`${prefix}/status/${id}`,{ changeTo });
+            const {status, statusCode, message, data} = req.data;
+            set((state) => ({
+                items: state.items.map((item) => String(item.id) === String(id) ? data : item )
+            }));
+            if (status === true && statusCode === 200) {
+                ProcessToast.success(message);
+            } else {
+                ProcessToast.error(message)
+            }
+            return { status, statusCode, message, data }
+        } catch(error: unknown) {
+            const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
+            return { status: true, statusCode: 500, message: errorMessage, data: null }
         }
     },
 
     deleteData: async (id) => {
-        set({ items:[], response: { status: null, statusCode: null, message: null } });
         try {
-            const callout = await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
-            set((state) => ({
-                items: state.items.filter((item) => item.id !== String(id)),
-                response:{
-                    status: true,
-                    statusCode: callout.data.statusCode,
-                    message: "The user was deleted successfully!"
-                }
-            }));
+            const req = await Api.delete(`${prefix}/destroy/${id}`,{ data: { id:id } });
+            const {status, statusCode, message} = req.data
+            return { status, statusCode, message};
         } catch (error: unknown) {
             const errorMessage = error instanceof Error ? error.message : "An unknown error occurred";
-            set({
-                response : {
-                    status: false,
-                    statusCode: 500,
-                    message: errorMessage
-                }
-            });
+            return { status: false, statusCode: 500, message: errorMessage };
         }
     }
 

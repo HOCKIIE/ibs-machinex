@@ -1,7 +1,8 @@
 import { BrandType } from "./BrandType";
+import { ResponseDefaultType, ResponseDataType } from "./ResponseType";
 
 export interface CategoryType {
-    id: string;
+    id: number;
     image: string;
     title_th: string;
     title_en: string;
@@ -20,7 +21,7 @@ export interface CategoryType {
 }
 
 export interface CategoryFormProps {
-    id: string;
+    id: number;
     image: File | string | null;
     title_th: string;
     title_en: string;
@@ -46,16 +47,17 @@ export interface ApiResponse {
 
 export interface CategoryState {
     items: CategoryType[];
-    id: string;
+    id: number;
     total: number;
     lastPage: number;
     currentPage: number;
-    response: { status: boolean | null; statusCode: number | null; message: string | null };
+    response: { status?: boolean | null; statusCode?: number | null; message?: string | null };
 
     fetchData: (page: number) => Promise<void>;
-    fetchDataById: (id: string) => Promise<void>;
-    createData: ( newData: CategoryFormProps ) => Promise<void>;
-    updateData: (id: string, data: CategoryFormProps ) => Promise<void>;
-    deleteData: (id: Array<number>) => Promise<void>;
+    fetchDataById: (id: number) => Promise<void>;
+    createData: ( newData: CategoryFormProps ) => Promise<ResponseDataType<CategoryType>>;
+    updateData: (id: number, data: CategoryFormProps ) => Promise<ResponseDataType<CategoryType>>;
+    onChangeStatus: (id: number, changeTo: boolean ) => Promise<ResponseDataType<CategoryType>>;
+    deleteData: (id: Array<number>) => Promise<ResponseDefaultType>;
 
 }

@@ -11,10 +11,12 @@ import ActionModal from '@/components/admin/Modal/ActionModal';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
+import { ResponseDefaultType } from '@/types/ResponseType';
 import { CategoryType } from '@/types/CategoryType';
 import { useCurrentUrl } from '@/utils/useCurrentUrl';
 import { EditButton, DeleteButton } from '@/components/admin/ui/ActionButton';
 import Badge from '@/components/admin/ui/Badge';
+import { log } from 'console';
 
 const show = [10, 25, 50, 100];
 const recordStatus = [
@@ -37,14 +39,15 @@ const Category = () =>
         updateLimit,
         StatusTab, 
         fetchData,
-        handleSearch, 
-        handlePageChange
-    } = usePagination({ 
+        handleSearch,
+        handlePageChange,
+        updateStatusField
+    } = usePagination<CategoryType>({ 
         initialLimit: show[0],
         endpoint: '/admin/category'
     });
     const currentUrl = useCurrentUrl();
-    const { deleteData, response } = useCategoryStore();
+    const { deleteData, response, onChangeStatus } = useCategoryStore();
     const [id, setId] = useState<number[] | null>(null);
     const [progress, setProgress] = useState(false);
     const [isOpen, setModalOpen] = useState<boolean>(false);
@@ -74,12 +77,20 @@ const Category = () =>
         setProgress(true);
         try{
             if (id && id.length > 0) {
-                await deleteData(id);
+                const { status, statusCode, message } = await deleteData(id);
+                return { status, statusCode, message };
             }
+            return {
+                status: false,
+                statusCode: 400,
+                message: "Invalid id"
+            };
         } catch (err) {
-            console.error(err);
-        } finally {
-            setProgress(false);
+            return {
+                status: false,
+                statusCode: 500,
+                message: err instanceof Error ? err.message : "Unknown error"
+            }
         }
     },[id, deleteData]);
 
@@ -87,7 +98,7 @@ const Category = () =>
         setId([id]);
         setAction("delete");
         setModalOpen(true);
-    }, []);
+    }, [id]);
     
     const closeModal = useCallback(() => {
         setModalOpen(false);
@@ -99,6 +110,17 @@ const Category = () =>
         //@ts-ignore
         openModal(selectedIds);
     }, [selectedIds, openModal]);
+    const handlerChangeStatus = async( id: number, changeTo: boolean ) => {
+        try{
+            const req = await onChangeStatus(id, changeTo);
+            const { status, statusCode, message } = req;
+            if(status) updateStatusField(id, changeTo)
+            console.log(status);
+            
+        } catch (err) {
+
+        }
+    }
 
     return (
         <DefaultLayout>
@@ -190,7 +212,15 @@ const Category = () =>
                                             </div>
                                         }
                                     </td>
-                                    <td className="px-6 py-4">{v.status}</td>
+                                    <td className="px-6 py-4">
+                                        <label className="inline-flex items-center me-5 cursor-pointer">
+                                            <input type="checkbox" className="sr-only peer" checked={!!v.status} onChange={(e)=>{
+                                                const checked = e.target.checked;
+                                                handlerChangeStatus(v.id, checked)
+                                            }}/>
+                                            <div className="relative w-9 h-5 bg-neutral-quaternary rounded-full peer bg-slate-200 dark:bg-gray-700 peer-focus:ring-4 peer-focus:ring-indigo-300 dark:peer-focus:ring-indigo-800 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:start-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-indigo-600 dark:peer-checked:bg-indigo-600"></div>
+                                        </label>
+                                    </td>
                                     <td className="px-6 py-4">{v.created_at}</td>
                                     <td className="px-6 py-4">
                                         {!loading
@@ -229,10 +259,10 @@ const Category = () =>
                     confirm: deleteRecord,
                     progress: progress,
                     successProgress: fetchData,
-                    response: { 
-                        status: typeof response.status === 'boolean' ? response.status : null, 
-                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null,
-                        message: response.message 
+                    response: {
+                        status: typeof response.status == 'boolean' ? response.status : null,
+                        statusCode: typeof response.statusCode == 'number' ? response.statusCode : null, 
+                        message: typeof response.message == 'string' ? response.message : null 
                     }
                 }}
             />

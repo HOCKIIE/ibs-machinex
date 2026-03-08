@@ -103,11 +103,19 @@ const useProductStore = create<ProductState>((set) => ({
         }
     },
 
-    onChangeStatus: async (id, status) => {
+    onChangeStatus: async (id, changeTo) => {
         set({ items:[] })
         try {
-            const response = await Api.put<ProductType>(`${prefix}/status/${id}`,{ status });
-            set((state) => ({ items: state.items.map((item) => String(item.id) === String(id) ? response.data : item ) }));
+            const req = await Api.put(`${prefix}/status/${id}`,{ changeTo });
+            const {status, statusCode, message, data} = req.data;
+            set((state) => ({
+                items: state.items.map((item) => String(item.id) === String(id) ? data : item )
+            }));
+            if (status === true && statusCode === 200) {
+                ProcessToast.success(message);
+            } else {
+                ProcessToast.error(message)
+            }
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";

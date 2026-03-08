@@ -12,7 +12,7 @@ const Page = () => {
 
     const { createData } = useCategoryStore();
     const categoryState : CategoryFormProps = {
-        id: "",
+        id: 0,
         image:null,
         title_th: "",
         title_en: "",
@@ -26,7 +26,9 @@ const Page = () => {
         updated_at: "",
         published_at: null
     };
-    const handleSubmit = async (data: CategoryFormProps) => await createData(data);
+    const handleSubmit = async (data: CategoryFormProps) => {
+        const req = await createData(data);
+    }
 
     return (
         <DefaultLayout>

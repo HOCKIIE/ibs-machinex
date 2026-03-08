@@ -48,7 +48,7 @@ export default function Page(){
         mode: "onChange",
         criteriaMode: "all",
         defaultValues: {
-            id: "",
+            id: 0,
             draftId: "",
             userId: "",
             image: null,

@@ -37,7 +37,7 @@ const Spinner = () => <div className="h-4 w-4 animate-spin rounded-full border-2
 
 const ActionModal: React.FC<ConfirmModalProps> = ({isOpen, onAfterClose, closeModal, action, data}) => 
 {
-    const { confirm, progress, successProgress, response } = data ?? {};
+    const { confirm, successProgress, response } = data ?? {};
     const [message, setMessage] = useState<string>('Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.');
     const [title, setTitle] = useState<string>('Warning Alert!');
     const [spinner, setSpinner] = useState<boolean>(false);
@@ -55,8 +55,10 @@ const ActionModal: React.FC<ConfirmModalProps> = ({isOpen, onAfterClose, closeMo
     const btnSuccess = 'bg-emerald-500 dark:bg-emerald-700 shadow-theme-xs hover:bg-emerald-600 dark:hover:bg-emerald-600';
     const [btnClassName, setBtnClassName] = useState<string>(btnWarning);
     const [deleteSuccess, setDeleteSuccess] = useState<boolean>(false);
+    const [progress, setProgress] = useState<boolean>(false)
 
     const closeModalHandler = useCallback(() => {
+        setProgress(false);
         setMessage('Are you sure you want to deactivate your account? All of your data will be permanently removed. This action cannot be undone.');
         setBtnTitle('Okay, Got It');
         setBtnClassName(btnWarning);
@@ -65,6 +67,7 @@ const ActionModal: React.FC<ConfirmModalProps> = ({isOpen, onAfterClose, closeMo
         setTitle('Warning Alert!');
         setSpinner(false);
         closeModal();
+        setDeleteSuccess(false);
     },[]);
     const ProcessingHandler = async () => {
         setMessage('Processing your request. Please wait...');
@@ -73,7 +76,24 @@ const ActionModal: React.FC<ConfirmModalProps> = ({isOpen, onAfterClose, closeMo
         setClassName(defaultClass);
         setIcon(DefaultIcon);
         setSpinner(true);
-        if(confirm) await confirm();
+        if(typeof confirm === 'function') {
+            setProgress(true);
+            const req = await confirm();
+            const {status,statusCode,message} = req;
+            if(status){
+                setTimeout(()=>{
+                    setDeleteSuccess(true);
+                    setMessage(message);
+                    setBtnTitle('OK');
+                    setBtnClassName(btnSuccess);
+                    setClassName(successClass);
+                    setIcon(SuccessIcon);
+                    setSpinner(false);
+                    setProgress(false);
+                },1000);
+            }
+            return {status,statusCode,message}
+        }
     }
     const ErrorHandler = () => {
         setMessage(`Error ${response.statusCode}: ${response.message || 'Something went wrong! Please try again.'}`);
@@ -93,9 +113,6 @@ const ActionModal: React.FC<ConfirmModalProps> = ({isOpen, onAfterClose, closeMo
         setTitle('Success!');
         setDeleteSuccess(true);
         if(successProgress) successProgress();
-    }
-    const CloseModal = () => {
-        closeModal();
     }
     useEffect(() => {
         if (response.statusCode != null && response.statusCode !== 200) {
@@ -160,7 +177,7 @@ const ActionModal: React.FC<ConfirmModalProps> = ({isOpen, onAfterClose, closeMo
                                 <button 
                                     title="Okay"
                                     type="button" 
-                                    onClick={!deleteSuccess?ProcessingHandler:CloseModal}
+                                    onClick={!deleteSuccess?ProcessingHandler:closeModalHandler}
                                     disabled={progress?true:false} 
                                     className={`flex justify-center w-full px-4 py-3 text-sm font-medium text-white rounded-lg ${btnClassName} sm:w-auto`}
                                 >

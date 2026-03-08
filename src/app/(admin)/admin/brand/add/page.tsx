@@ -11,7 +11,7 @@ const Page = () => {
 
     const { createData } = useBrandStore();
     const categoryState: BrandFormProps = {
-        id: "",
+        id: 0,
         image:null,
         title_th: "",
         title_en: "",

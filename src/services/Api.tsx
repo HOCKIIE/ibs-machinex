@@ -49,18 +49,14 @@ Api.interceptors.response.use((response) =>
     response,
     async (error) => {
         const pathName = usePathname();
-        console.log('path pathName',pathName);
         const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
           // กรณีไม่มี response (network error)
         if (!error.response) {
-            console.error("Network Error:", error);
             return Promise.reject(error);
         }
         if (error.response.status === 401) {
             // && !originalRequest._retry
-            console.log('debug step 1');
             if (isRefreshing) {
-                console.log('debug is refreshing');
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
                 }).then((token) => {
@@ -79,7 +75,6 @@ Api.interceptors.response.use((response) =>
                 const newToken = await refreshToken();
                 const pathName = usePathname();
                 const router = useRouter();
-                console.log('debug refreshToken',newToken);
                 if (newToken === null) {
                     const redirectTo = pathName === "/admin/signin" ? "/" : pathName;
                     router.push(redirectTo);

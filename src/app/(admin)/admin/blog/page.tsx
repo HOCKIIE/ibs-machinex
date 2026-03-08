@@ -38,7 +38,7 @@ const Blog = () => {
         fetchData,
         handleSearch, 
         handlePageChange
-    } = usePagination({ 
+    } = usePagination<BlogType>({ 
         initialLimit: show[0], 
         endpoint: '/admin/blog' 
     });
@@ -76,15 +76,24 @@ const Blog = () => {
     },[]);
     
     const deleteRecord = useCallback(async() => {
-        if (!id) return;
         setProgress(true);
         try {
-            const ids = id?.join(',');
-            if (ids !== null) {
-                await deleteData(ids?.split(',') || []);
+            const ids = id?.map((v)=> Number(v));
+            if (ids && ids.length > 0) {
+                const { status, statusCode, message } = await deleteData(ids || []);
+                return { status, statusCode, message };
             }
+            return {
+                status: false,
+                statusCode: 400, 
+                message: 'Invalid id.'
+            };
         } catch (err) {
-            console.error(err);
+            return {
+                status: false, 
+                statusCode: 500, 
+                message: err instanceof Error ? err.message : "Unknown error"
+            };
         } finally {
             setProgress(false);
         }
@@ -94,7 +103,7 @@ const Blog = () => {
         setId([id]);
         setAction("delete");
         setModalOpen(true);
-    }, []);
+    }, [id]);
     
     const closeModal = useCallback(() => {
         setModalOpen(false);
@@ -161,7 +170,7 @@ const Blog = () => {
                             </thead>
                             <tbody>
                                 {data.length > 0 && data.map((v:BlogType, index) => (
-                                    <tr key={index} className="bg-white dark:bg-gray-800">
+                                    <tr key={index} className="bg-white dark:bg-gray-800 hover:bg-slate-50 ease-in-out">
                                         <td className="px-6 py-4">
                                             {loading
                                                 ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
@@ -191,8 +200,8 @@ const Blog = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4">
-                                            <div className="text-sm text-gray-900 dark:text-gray-200">{v.category}</div>
+                                        <td className="px-6 py-4 flex flex-wrap gap-1">
+                                            {v.categories.map((v,k:number)=> <button type="button" className='bg-indigo-100 text-indigo-500 px-1 rounded-md focus:ring-4 focus:ring-indigo-400/50 focus:outline-none text-left'>{(k == 0) ? v.title_en : v.title_en }</button>)}
                                         </td>
                                         <td className="px-6 py-4">
                                         {!loading?
