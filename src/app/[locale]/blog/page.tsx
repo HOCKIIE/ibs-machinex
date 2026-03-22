@@ -7,6 +7,7 @@ import { useLocale, useTranslations } from 'next-intl';
 import Api from '@/services/Api';
 import Pagination from '@/components/main/pagination/Pagination';
 import usePagination from '@/hooks/usePagination';
+import { getImageSrc } from '@/utils/utils';
 
 
 const Blog = () => 
@@ -93,7 +94,7 @@ const Blog = () =>
                                 <div className="grid gap-5 overflow-hidden bg-white rounded-2xl h-full">
                                     <Link href={'/blog/' + firstBlog.pathName} className="group">
                                         <div className="overflow-hidden rounded-t-2xl max-h-[280px] xl:max-h-[380px]">
-                                            <img src={firstBlog.image} title={firstBlog[`title_${locale}`]} alt="" className="w-full object-cover"/>
+                                            <img src={getImageSrc(firstBlog[`image_${locale}`])} title={firstBlog[`title_${locale}`]} alt="" className="w-full object-cover"/>
                                         </div>
                                         <div className="p-6">
                                             <p className="text-black">{firstBlog['updated_at']}</p>
@@ -112,7 +113,7 @@ const Blog = () =>
                                             <div key={index} className="grid xl:flex bg-white rounded-2xl group">
                                                 <div className="xl:w-1/2">
                                                     <Link href={'/blog/' + item.pathName} className="block rounded-l-2xl max-h-[280px] overflow-hidden group">
-                                                        <img src={item.image} alt={item[`title_${locale}`]} className="h-full object-cover"/>
+                                                        <img src={getImageSrc(item[`image_${locale}`])} alt={item[`title_${locale}`]} className="h-full object-cover"/>
                                                     </Link>
                                                 </div>
                                                 <div className="xl:w-1/2 p-4 overflow-hidden">
@@ -131,7 +132,7 @@ const Blog = () =>
                                     <div className="grid gap-5 overflow-hidden">
                                         <Link href={'/blog/' + item.pathName} className="group">
                                             <div className="overflow-hidden rounded-t-2xl max-h-[260px] xl:max-h-[360px]">
-                                                <img src={item.image} title={item[`title_${locale}`]} alt={item[`title_${locale}`]} className="w-full object-cover"/>
+                                                <img src={getImageSrc(item[`image_${locale}`])} title={item[`title_${locale}`]} alt={item[`title_${locale}`]} className="w-full object-cover"/>
                                             </div>
                                             <div className="p-4">
                                                 <p className="text-black">{item.updated_at}</p>
@@ -157,7 +158,7 @@ const Blog = () =>
                                 <Link href={'/blog/' + item.pathName} className="group block">
                                     <div className="grid overflow-hidden ">
                                         <div className="h-[280px]">
-                                            <img src={item.image} title={item[`title_${locale}`]} alt={item[`title_${locale}`]} className="h-full w-full object-cover"/>
+                                            <img src={getImageSrc(item[`image_${locale}`])} title={item[`title_${locale}`]} alt={item[`title_${locale}`]} className="h-full w-full object-cover"/>
                                         </div>
                                         <div className="px-5 py-6 min-h-[300px]">
                                             <p className="text-black mb-2">{item.updated_at}</p>

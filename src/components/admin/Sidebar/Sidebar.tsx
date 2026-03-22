@@ -31,7 +31,7 @@ const menuItem: { name: menuName, path: string }[] = [
     { name:"Dashboard", path:"/admin" },
     { name:"Category", path:"/admin/category" },
     { name:"Brand", path:"/admin/brand" },
-    { name:"Product", path:"/admin/product" },
+    // { name:"Product", path:"/admin/product" },
     { name:"Blog", path:"/admin/blog" },
     { name:"About", path:"/admin/about" },
     { name:"Contact", path:"/admin/contact" },

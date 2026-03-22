@@ -59,3 +59,10 @@ export function isEqual(a: any, b: any) {
 
     return false;
 }
+
+export function getImageSrc(value: string | File | null | undefined): string {
+    if (!value) return "/placeholder.png";
+    if (typeof value === "string") return value;
+    if (value instanceof File) return URL.createObjectURL(value);
+    return "/placeholder.png";
+}

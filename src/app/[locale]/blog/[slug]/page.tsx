@@ -6,6 +6,7 @@ import Api from '@/services/Api';
 import { useLocale } from 'next-intl';
 import { Link } from '@/i18n/routing';
 import { BlogType, BlogFormProps } from '@/types/BlogType';
+import { getImageSrc } from '@/utils/utils';
 
 const BlogDetail = ({ params }:{ params: {slug:string} }) => {
     const locale = useLocale();
@@ -26,6 +27,7 @@ const BlogDetail = ({ params }:{ params: {slug:string} }) => {
         didFetchData.current = true;
         fetchBlog();
     }); 
+
     return (
         <div>
             <div className="container py-20 px-2 lg:px-0">
@@ -37,13 +39,7 @@ const BlogDetail = ({ params }:{ params: {slug:string} }) => {
                             <div className="grid grid-cols-12 mt-10">
                                 <div className="col-span-2"></div>
                                 <div className="col-span-8">
-                                    <img src={
-                                            typeof itemState.image === "string"
-                                            ? itemState.image
-                                            : itemState.image instanceof File
-                                            ? URL.createObjectURL(itemState.image)
-                                            : "/placeholder.png" // fallback
-                                        } 
+                                    <img src={getImageSrc(itemState?.[`image_${locale}`])} 
                                         alt={itemState[`title_${locale}`]} 
                                         height={180} className="object-cover"
                                     />
@@ -92,7 +88,7 @@ const BlogDetail = ({ params }:{ params: {slug:string} }) => {
                                 <div key={k} className="col-span-12 md:col-span-6 lg:col-span-4 bg-white rounded-2xl overflow-hidden">
                                     <Link href={`/blog/${item.pathName}`}>
                                         <div className="h-[180px] overflow-hidden">
-                                            <img src={item.image} alt={item[`title_${locale}`]} height={180} className="object-cover"/>
+                                            <img src={getImageSrc(itemState?.[`image_${locale}`])} alt={item[`title_${locale}`]} height={180} className="object-cover"/>
                                         </div>
                                         <div className="min-h-[260px] p-4">
                                             <span className="text-gray-500">{item.published_at}</span>

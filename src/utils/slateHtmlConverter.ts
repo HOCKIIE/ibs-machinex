@@ -3,6 +3,23 @@ import { mergeClassNames, removeDuplicateClasses } from "./utils";
 // import { boolean } from "zod";
 // import { htmlToSlate, slateToHtml } from "slate-serializers";
 
+const normalizeRoot = (nodes: Descendant[]): Descendant[] => {
+    // ถ้ามี grid อยู่แล้ว → return เลย
+    if (
+        nodes.length === 1 &&
+        (nodes[0] as any).type === "grid"
+    ) {
+        return nodes;
+    }
+    return [];
+};
+
+export const NormalizeHTML = (html: string): string => {
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(html, "text/html")
+    return doc.body.innerHTML
+}
+
 export const deserialize = (html: string): Descendant[] => {
     try {
         const parser = new DOMParser();
@@ -13,7 +30,14 @@ export const deserialize = (html: string): Descendant[] => {
             .map((node) => innerDeserialize(node))
             .flat()
             .filter(Boolean);
-        return nodes.length ? nodes : [{ type: "paragraph", children: [{ text: "" }] }];
+
+        const finalNodes = normalizeRoot(nodes);
+
+        return finalNodes.length
+            ? finalNodes
+            : [{ type: "paragraph", children: [{ text: "" }] }];
+
+        // return nodes.length ? nodes : [{ type: "paragraph", children: [{ text: "" }] }];
     } catch {
         return [{ type: "paragraph", children: [{ text: "" }] }];
     }
@@ -104,6 +128,23 @@ export function serializeNode(node: CustomText): string {
 
 const ensureText = (arr: Descendant[]) => arr.length > 0 ? arr : [{ text: "" }];
 
+export const enforceGridSchema = (nodes: Descendant[]): Descendant[] => {
+    return nodes.map((node: any) => {
+        if (node.type === "grid") {
+            node.children = node.children.map((col: any) => {
+                if (col.type === "grid") {
+                    return {
+                        type: "grid-column",
+                        children: col.children,
+                    };
+                }
+                return col;
+            });
+        }
+        return node;
+    });
+};
+
 function innerDeserialize(node: ChildNode): Descendant | Descendant[] {
     if (node.nodeType === Node.TEXT_NODE) {
         return { text: node.textContent || "" };
@@ -112,7 +153,6 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[] {
     if (node.nodeType !== Node.ELEMENT_NODE) {
         return { text: "" };
     }
-
     const el = node as HTMLElement;
     const nodeName = el.tagName.toLowerCase();
     const classList = el.className.split(" ");
@@ -124,23 +164,6 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[] {
     const styleObj = parseStyle(el.getAttribute("style") || "");
     const className = removeDuplicateClasses(el.className || "");
 
-
-    // if (["span", "strong", "em", "u"].includes(nodeName)) {
-    //     return children.map((child) => {
-    //         if (!("text" in child)) return child;
-    //         return {
-    //             ...child,
-    //             bold: nodeName === "strong" || styleObj.fontWeight === "bold" || child.bold,
-    //             italic: nodeName === "em" || styleObj.fontStyle === "italic" || child.italic,
-    //             underline: nodeName === "u" || styleObj.textDecoration === "underline" || child.underline,
-    //             color: styleObj.color || child.color,
-    //             style: {
-    //                 ...child.style,
-    //                 ...styleObj,
-    //             },
-    //         };
-    //     });
-    // }
     switch (nodeName) {
         case "p":
             return {
@@ -243,27 +266,35 @@ function innerDeserialize(node: ChildNode): Descendant | Descendant[] {
                 children: ensureText(children),
             };
         case "div":
-            if (classList.includes("grid")) {
-                const cols = parseInt(classList.find((c) => c.startsWith("grid-cols-"))?.split("-")[2] || "12", 10);
+            const isGrid = classList.includes("grid");
+            const colSpanClass = classList.find((c) => c.startsWith("col-span-"));
+
+            // ✅ FIX: ถ้าเป็น grid และลูกก็เป็น grid → flatten
+            if (isGrid) {
+                const flatChildren = children.flatMap((child: any) => {
+                    if (child.type === "grid") {
+                        return child.children; // 🔥 ดึงขึ้นมาเลย
+                    }
+                    return child;
+                });
+
                 return {
                     type: "grid",
-                    columns: cols,
                     style: styleObj,
                     className,
-                    children: children.length ? children : [{ text: "" }],
+                    children: flatChildren.length ? flatChildren : [{ text: "" }],
                 };
             }
-            const colSpanClass = classList.find((c) => c.startsWith("col-span-"));
+
             if (colSpanClass) {
-                const span = parseInt(colSpanClass.split("-")[2] || "12", 10);
                 return {
                     type: "grid-column",
-                    span,
                     style: styleObj,
                     className,
                     children: children.length ? children : [{ text: "" }],
                 };
             }
+
             return {
                 type: "division",
                 style: styleObj,
