@@ -7,6 +7,7 @@ import type { Swiper as SwiperType } from "swiper";
 import { Navigation, Autoplay, A11y } from 'swiper/modules';
 import { BlogType } from '@/types/BlogType';
 import { Link } from '@/i18n/routing';
+import { getImageSrc } from '@/utils/utils';
 
 const RecommendBlog = () => {
     const t = useTranslations('blog');
@@ -62,7 +63,7 @@ const RecommendBlog = () => {
                                 <div className="bg-white rounded-2xl overflow-hidden">
                                     <Link href={`/blog/${item.pathName}`}>
                                         <div className="h-[275px] overflow-hidden p-5">
-                                            <img src={item.image} alt={item[`title_${locale}`]} className="object-cover rounded-xl"/>
+                                            <img src={getImageSrc(item[`image_${locale}`])} alt={item[`title_${locale}`]} className="object-cover rounded-xl"/>
                                         </div>
                                         <div className="min-h-[200px] p-4">
                                             <h3 className="text-black font-bold line-clamp-2 text-xl mt-1">{item[`title_${locale}`]}</h3>

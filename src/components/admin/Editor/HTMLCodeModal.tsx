@@ -18,11 +18,11 @@ export default function HTMLCodeModal({
     onClose,
     onSave,
 }: HTMLCodeModalProps) {
+    
     const [html, setHtml] = useState(initialHTML);
-
     useEffect(() => {
-        if (open) setHtml(initialHTML);
-    }, [open, initialHTML]);
+        setHtml(initialHTML);
+    }, [initialHTML]);
     
     const handleSave = () => {
         onSave(html);
@@ -36,9 +36,9 @@ export default function HTMLCodeModal({
                     <DialogTitle>Edit HTML Code</DialogTitle>
                 </DialogHeader>
                 <Textarea
-                    value={html ?? ''}
+                    value={initialHTML ?? ''}
                     onChange={(e) => setHtml(e.target.value)}
-                    className="min-h-[500px] font-mono text-sm w-full focus:ring focus:ring-indigo-300 border border-gray-400 rounded-sm outline-none"
+                    className="min-h-[500px] font-mono text-sm w-full focus:ring focus:ring-indigo-300 border border-gray-400 rounded-sm outline-none p-1"
                 />
                 <DialogFooter>
                     <Button variant="outline" onClick={onClose}>

@@ -2,8 +2,6 @@
 
 import { ReactNode, createContext, useContext, useState, useEffect, useRef } from "react";
 import { useRouter, usePathname } from "next/navigation";
-// import { UserType } from "@/types/UserType";
-import { setAccessToken } from "@/services/Api";
 import { getUser } from "@/services/Auth";
 import useFullUrl from "@/hooks/useFullUrl";
 
@@ -64,7 +62,6 @@ export default function AdminContextProvider({ children }: { children: ReactNode
                 email: res.user.email,
                 status: res.user.status,
             });
-            setAccessToken(res.accessToken);
         } catch (error) {
             console.log(error);
         }

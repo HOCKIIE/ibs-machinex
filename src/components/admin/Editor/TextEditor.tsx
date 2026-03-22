@@ -19,7 +19,7 @@ import { Slate, Editable, withReact, useSlate, RenderElementProps, RenderLeafPro
 import { Range } from 'slate';
 import { TableEditor } from "slate-table";
 import { HistoryEditor, withHistory } from 'slate-history';
-import { serialize, deserialize  } from '@/utils/slateHtmlConverter';
+import { serialize, deserialize, enforceGridSchema  } from '@/utils/slateHtmlConverter';
 import { 
     RiBold, RiItalic, RiUnderline, 
     RiAlignLeft, RiAlignCenter, RiAlignRight,
@@ -38,7 +38,7 @@ import CancelButton from "../Button/CancelBotton";
 import CreateButton from "../Button/CreateButton";
 import { TableElement, TableRowElement, TableCellElement } from "../Table/Table";
 import Image from "./render.elements/Image";
-import { url } from "inspector";
+import { NormalizeHTML } from "@/utils/slateHtmlConverter";
 
 type MyElement = Element & { type: string, className?: string; };
 const paddingOptions = [
@@ -70,15 +70,7 @@ const isBlockActive = (editor: Editor, format: string) => {
 
 const toggleBlock = (editor: Editor, format: string) => {
     const isActive = isBlockActive(editor, format);
-    Transforms.setNodes(
-        editor,
-        { type: isActive ? 'paragraph' : format },
-        { match: n => Element.isElement(n), split: true }
-    );
-    if (isActive) {
-        Transforms.setNodes(editor, { type: 'paragraph' });
-    }
-    else if(format == 'grid-template') {
+    if(format == 'grid-template') {
         const block = {
             type: 'grid',
             children: [
@@ -92,7 +84,8 @@ const toggleBlock = (editor: Editor, format: string) => {
                 }
             ],
         };
-        Transforms.insertNodes(editor, block);
+        if (editor.selection) Transforms.insertNodes(editor, block, { at: editor.selection });
+        return;
     }
     else {
         if (format === 'bulleted-list' || format === 'numbered-list') {
@@ -104,11 +97,19 @@ const toggleBlock = (editor: Editor, format: string) => {
                     children: [{ text: '' }],
                 }],
             };
-            Transforms.insertNodes(editor, block);
-        } else {
+            if (editor.selection) Transforms.insertNodes(editor, block, { at: editor.selection });
+            return;
+        } 
+        else {
             Transforms.setNodes(editor, { type: format });
         }
     }
+    Transforms.setNodes(
+        editor,
+        { type: isActive ? 'paragraph' : format },
+        { match: n => Editor.isBlock(editor, n) }
+    );
+    Transforms.move(editor);
 };
 
 const toggleAlign = (
@@ -145,6 +146,7 @@ const toggleAlign = (
             { className: merged },
             { at: path }
         );
+        Transforms.move(editor);
     }
 };
 
@@ -232,8 +234,6 @@ const DropdownButton: React.FC<{ action?: 'mark' | 'block'; label: React.ReactNo
 
         const [node , path] = entry;
         const innerText = node.children[0].children[0].text;
-        // const parentEntry = Editor.parent(editor, path);
-        // const [, parentPath] = parentEntry;
         const newChild = Array.from({ length: select }, () => ({
             type: 'grid-column',
             className: className?.className,
@@ -481,8 +481,6 @@ const TableDropdown = ({
                         </div>
                         ))}
                     </div>
-
-                    {/* แสดงขนาดที่เลือก */}
                     <div className="text-xs text-gray-600 mt-2 text-center">
                         {hoverX > 0 && hoverY > 0
                         ? `${hoverX} × ${hoverY}`
@@ -504,7 +502,7 @@ const Paragraph: React.FC = () => {
     return (
         <select 
             value={currentType}
-            onChange={handleChange} 
+            onChange={(e)=>{ e.preventDefault(); handleChange(e)}} 
             title="Paragraph Style"
             className="text-sm px-2 py-[6px] rounded-md bg-transparent hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
         >
@@ -570,7 +568,7 @@ const TextIndent = (editor:Editor, direction: 'in' | 'out') => {
         mode: 'lowest',
     });
     if (match) {
-        const [node, path] = match as [MyElement, Path];
+        const [node] = match as [MyElement, Path];
         const raw = typeof node.className === 'string' ? node.className : '';
         const existing = filterClasses(raw); // remove undefined and null
         const currentIndent = existing.find(c => indentOption.includes(c)) || 'indent-0';
@@ -912,11 +910,6 @@ const LinkModal = ({
         }
     }, [linkData]);
     const handlerInsert = () => {
-        console.log("Inserting link with data:", {
-            url: url.current?.value,
-            display: display.current?.value,
-            target: target.current?.value
-        });
         onInsert(
             url.current?.value || '',
             display.current?.value || '',
@@ -1001,43 +994,36 @@ interface EditorProps {
     action?: string;
     id?: number;
     draftId?: string;
-    name: string;
-    value: string | null;
-    onChange: (value: string) => void;
+    name?: string;
+    value: Descendant[] | null;
+    onChange: (value: Descendant[]) => void;
 }
 
 type CustomEditor = BaseEditor & ReactEditor & HistoryEditor;
 
 const withImages = (editor: CustomEditor): CustomEditor => {
     const { isVoid } = editor;
-
-    editor.isVoid = (element) =>
-        element.type === "image" ? true : isVoid(element);
-
+    editor.isVoid = (element) => element.type === "image" ? true : isVoid(element);
     return editor;
 };
 
-const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, value, onChange}) => {
-
-    const editor = useMemo(
-        () => withImages(
-            withHistory(
-                withReact(
-                    createEditor()
-                )
-            )
-        ) as CustomEditor, []
-    );
+const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, value, onChange}) => 
+{
+    const editor = useMemo(() => withImages(withHistory(withReact(createEditor()))) as CustomEditor, []);
+    const savedSelection = useRef<Range | null>(null);
     const [editingImage, setEditingImage] = useState<{url: string;alt?: string; path: any;} | null>(null);
     const [contextMenu, setContextMenu] = useState({ visible: false, x: 0, y: 0});
     const [showModal, setShowModal] = useState<boolean>(false);
     const [linkModal, setLinkModal] = useState<boolean>(false);
     const [linkData, setLinkData] = useState<{url: string; display: string; target: string} | null>(null);
     const [isLink, setIsLink] = useState<boolean | false>(false);
-    const [editorKey, setEditorKey] = useState(0);
     const [isOpen, setIsOpen] = useState<boolean>(false);
     const [colorDropdown, setColorDropdown] = useState<boolean>(false);
     const [tableDropdown, setTableDropdown] = useState<boolean>(false);
+    const lastValueRef = useRef<Descendant[] | null>(null)
+    const isApplyingRemote = useRef<boolean>(false);
+    const currentHTML = useRef<string>("");
+    const [HTML, setHTML] = useState<string | "">("")    
     const defaultEditorValue: Descendant[] =
     [
         {
@@ -1049,6 +1035,9 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
         }
     ];
     const [editorValue, setEditorValue] = useState<Descendant[]>(()=>defaultEditorValue);
+
+    const initialValue = useMemo(() => { return editorValue && editorValue.length ? editorValue : defaultEditorValue }, []);
+    
     const handleOpen = () => setIsOpen(true);
     const columnsOptions = [
         'col-span-1','col-span-2','col-span-3','col-span-4','col-span-5','col-span-6',
@@ -1056,9 +1045,17 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
     ];
 
     const handleSaveHTML = (html: string) => {
-        // 🟢 HTML → Slate JSON
-        const slateNodes = deserialize(html);
-        setEditorValue(slateNodes);
+        // HTML -> Safe HTML
+        const safeHTML = NormalizeHTML(html);
+        console.log('safe HTML: ',safeHTML);
+        setHTML(safeHTML)
+        // 🟢 HTML -> Slate JSON
+        const slateNodes = deserialize(safeHTML);
+        const normalized = enforceGridSchema(slateNodes);
+        Editor.withoutNormalizing(editor, () => {
+            editor.children = normalized;
+            editor.onChange()
+        });
     };
 
 
@@ -1240,9 +1237,13 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
     const resizeHandler = () => { }
 
     const handleChange = (newValue: Descendant[]) => {
-        setEditorValue(newValue);
+        if (isApplyingRemote.current) return
+        lastValueRef.current = newValue
+        onChange(newValue);
         const html = serialize(newValue);
-        onChange(html); // 🔁 ส่งกลับให้ react-hook-form
+        const safeHTML = NormalizeHTML(html);
+        currentHTML.current = safeHTML;
+        setHTML(safeHTML);
     };
 
     const handleContextMenu = (e: React.MouseEvent) => {
@@ -1345,6 +1346,7 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
         }
         setLinkModal(true);
     };
+
     const isLinkActive = (editor: Editor) => {
         const [match] = Editor.nodes(editor, {
         match: (n) => !Editor.isEditor(n) && Element.isElement(n) && n.type === 'link' });
@@ -1436,6 +1438,10 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
         return match ?? null; // [node, path]
     };
     const handleInsertOrUpdateImage = ( url: string, alt: string, path?: Path) => {
+
+        if (savedSelection.current) {
+            Transforms.select(editor, savedSelection.current);
+        }
         const entry = getSelectedImageEntry(editor);
         if (entry && path) {
             Transforms.setNodes(editor, { url, alt }, { at: path });
@@ -1452,14 +1458,38 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
     };
 
     useEffect(() => {
-        if (value) {
-            setEditorKey(prev => prev + 2); // รีเซ็ต editor โดยใช้ key ใหม่เมื่อ id เปลี่ยน
-            const newValue = deserialize(value);
-            if (JSON.stringify(newValue) !== JSON.stringify(editorValue)) {
-                setEditorValue(newValue);
-            }
+
+        if (value === undefined) return;
+
+        const newValue = Array.isArray(value) && value.length > 0
+            ? value
+            : defaultEditorValue
+        if (JSON.stringify(newValue) === JSON.stringify(lastValueRef.current)) return;
+
+        lastValueRef.current = newValue;
+        isApplyingRemote.current = true;
+
+        Editor.withoutNormalizing(editor, () => {
+            const normalized = enforceGridSchema(newValue);
+            editor.children = normalized;
+            editor.onChange();
+        });
+
+        const html = serialize(newValue);
+        const safeHTML = NormalizeHTML(html);
+        setHTML(safeHTML);
+
+        setTimeout(() => {
+            isApplyingRemote.current = false
+        }, 0)
+
+    }, [value]);
+    useEffect(()=>{
+        if(HTML !== currentHTML.current){
+            setHTML(currentHTML.current);
         }
-    }, [value, editorValue]);
+    },[HTML])
+
 
     useEffect(() => {
         const closeMenu = () => {
@@ -1484,9 +1514,7 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
         const closeMenu = () => (colorDropdown) ? setColorDropdown(false) : '' ;
         window.addEventListener('scroll', closeMenu, true);
         return () => window.removeEventListener('scroll', closeMenu);
-    },[])
-
-    const currentHTML = value ?? "";
+    },[]);
     
 
     return (
@@ -1494,9 +1522,8 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
             <div className="border border-gray-200 dark:border-gray-600 rounded-xl">
                 <div className="editor">
                     <Slate 
-                        key={editorKey}
                         editor={editor}
-                        initialValue={editorValue}
+                        initialValue={initialValue}
                         onChange={handleChange}
                     >
                         <div className="grid editor-tools p-2 inset-20 h-12 w-full shadow-[rgba(0,0,15,0.1)_0px_1px_5px_0px] dark:shadow-[rgba(255,255,255,0.3)_0px_1px_5px_0px]">
@@ -1579,7 +1606,6 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
                                 </div>
                             </div>
                         </div>
-                        <input type="hidden" name={name} value={value || ''} readOnly />
                     </Slate>
                 </div>
             </div>
@@ -1594,15 +1620,6 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
                     defaultAlt={editingImage?.alt || ""}
                     onInsert={(url: string, alt: string, path?: number[]) => {
                         handleInsertOrUpdateImage(url, alt, path);
-                        // console.log("Inserting image with URL:", url, "and alt text:", alt);
-                        // const imageNode = {
-                        //     type: 'image',
-                        //     url,
-                        //     alt: alt,
-                        //     className: 'max-w-full h-auto',
-                        //     children: [{ text: '' }],
-                        // };
-                        // Transforms.insertNodes(editor, imageNode);
                     }}
                 />
             )}
@@ -1649,7 +1666,7 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, name, val
             )}
             <HTMLCodeModal 
                 open={isOpen}
-                initialHTML={currentHTML}
+                initialHTML={HTML}
                 onClose={() => setIsOpen(false)}
                 onSave={handleSaveHTML}
             />

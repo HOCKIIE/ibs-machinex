@@ -14,7 +14,7 @@ const useBlogStore = create<BlogState>((set) => ({
     total: 1,
     lastPage: 1,
     currentPage: 1,
-    response: { status: null, statusCode: null, message: null },
+    response: { status: null, statusCode: null, message: null, errors: null },
 
     fetchData: async (page: number) => {
         set({ items:[], total:1, lastPage: 1, currentPage: 1});
@@ -49,25 +49,28 @@ const useBlogStore = create<BlogState>((set) => ({
             Object.entries(blogData).forEach(([key, value]) => {
                 if (key === "category" && Array.isArray(value)) {
                     value.forEach((val) => formData.append("category[]", val));
-                } else if (key === "image" && value instanceof File) {
-                    formData.append("image", value);
-                } else {
+                } else if (key === "image_th" || key === "image_en" || key === "image_ja" && value instanceof File) {
+                    formData.append(key, value);
+                } else if(key === "detail_th_json" || key === "detail_en_json" || key === "detail_ja_json"){
+                    formData.append(key, JSON.stringify(value));
+                }  else {
                     formData.append(key, value as string);
                 }
             });
             const response = await Api.post(`${prefix}/store`, formData);
-            const { status, statusCode, message, data } = response.data;
+            const { status, statusCode, message, data, errors } = response.data;
             if (status) { 
                 await ProcessToast.success(message);
             } else {
                 await ProcessToast.error(message);
             }
-            return { status, statusCode, message, data };
+            if (data) return { status, statusCode, message, data};
+            return { status, statusCode, message, errors};
         } catch (error) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
             const errorMessage = response?.data?.message || "An unknown error occurred";
             ProcessToast.error(errorMessage);
-            return { status: false, statusCode: 500, message: errorMessage, data: null  };
+            return { status: false, statusCode: 500, message: errorMessage, data: null };
         }
     },
 
@@ -79,8 +82,10 @@ const useBlogStore = create<BlogState>((set) => ({
             Object.entries(blogData).forEach(([key, value]) => {
                 if (key === "category" && Array.isArray(value)) {
                     value.forEach((val) => formData.append("category[]", val));
-                } else if (key === "image" && value instanceof File) {
-                    formData.append("image", value);
+                } else if(key === "detail_th_json" || key === "detail_en_json" || key === "detail_ja_json"){
+                    formData.append(key, JSON.stringify(value));
+                } else if (key === "image_th" || key === "image_en" || key === "image_ja" && value instanceof File) {
+                    formData.append(key, value);
                 } else {
                     formData.append(key, value as string);
                 }
@@ -111,7 +116,7 @@ const useBlogStore = create<BlogState>((set) => ({
             set((state) => ({
                 items: state.items.map((item) => String(item.id) === String(id) ? data : item )
             }));
-            ProcessToast.success('Status has been changed.')
+            ProcessToast.success('Status has been changed.',500)
             return { status, statusCode, message, data}
         } catch (error: unknown) {
             const response = (error as { response?: { data?: { errors?: Record<string, string[]>; message?: string } } })?.response;
@@ -123,7 +128,7 @@ const useBlogStore = create<BlogState>((set) => ({
     
     deleteData: async (id) => {
         try {
-            const req = await Api.delete(`${prefix}/destroy/${id}`,{ data: { id:id } });
+            const req = await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             const {status, statusCode, message} = req.data
             return { status, statusCode, message};
         } catch (error: unknown) {

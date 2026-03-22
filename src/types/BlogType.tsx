@@ -1,20 +1,11 @@
+import { Descendant } from "slate"
 import { CategoryType } from "./CategoryType";
-import { ResponseDefaultType,ResponseDataType } from "./ResponseType";
+import { ResponseDefaultType, ResponseDataType } from "./ResponseType";
 
 export interface BlogType {
     id: number;
     draftId?: string;
     userId?: string;
-    image: string;
-    title_th: string;
-    title_en: string;
-    title_ja: string;
-    description_th: string;
-    description_en: string;
-    description_ja: string;
-    detail_th: string;
-    detail_en: string;
-    detail_ja: string;
     status: boolean;
     category?: string[];
     categories: Array<CategoryType>;
@@ -23,10 +14,13 @@ export interface BlogType {
     published_at: string | null;
     created_at: string;
     updated_at: string | null;
-    
+
+    [key: `image_${string}`]: File | string | null;
     [key: `title_${string}`]: string;
-    [key: `description_${string}`]: string;
     [key: `detail_${string}`]: string;
+    [key: `descendant_${string}`]: Descendant[];
+    [key: `description_${string}`]: string;
+    
 }
 
 export interface ApiResponse {
@@ -36,20 +30,16 @@ export interface ApiResponse {
     rows: BlogType[];
 }
 
+type Locale = 'th' | 'en' | 'ja';
 export interface BlogFormProps {
     id: number;
     draftId?: string;
     userId?: string;
-    image: File | string | null;
-    title_th: string;
-    title_en: string;
-    title_ja: string;
-    description_th: string;
-    description_en: string;
-    description_ja: string;
-    detail_th: string;
-    detail_en: string;
-    detail_ja: string;
+    [key: `image_${string}`]: File | string | null;
+    [key: `title_${string}`]: string;
+    [key: `detail_${string}`]: string;
+    [key: `descendant_${string}`]: Descendant[];
+    [key: `description_${string}`]: string;
     status: boolean;
     category?: Array<string>;
     categories?: Array<CategoryType>;
@@ -59,11 +49,8 @@ export interface BlogFormProps {
     created_at: string;
     updated_at: string | null;
 
-    [key: `title_${string}`]: string;
-    [key: `description_${string}`]: string;
-    [key: `detail_${string}`]: string;
-}
 
+}
 
 export interface BlogState {
     items: BlogType[];

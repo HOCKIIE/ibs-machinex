@@ -15,6 +15,11 @@ import { BlogType } from '@/types/BlogType';
 import { useCurrentUrl } from '@/utils/useCurrentUrl';
 import { EditButton, DeleteButton } from '@/components/admin/ui/ActionButton';
 import Badge from '@/components/admin/ui/Badge';
+import { useAuth } from '@/contexts/AdminContext';
+import { useBlogDraftState } from '@/store/useBlogDraftState';
+import { Switch } from '@/components/admin/Checkbox/Switch';
+import { usePathname, useRouter } from 'next/navigation';
+import { IoChevronDown } from "react-icons/io5";
 
 const show = [10, 25, 50, 100];
 const recordStatus = [
@@ -25,6 +30,7 @@ const recordStatus = [
 
 const Blog = () => {
 
+    const router = useRouter();
     const { 
         keyword,
         data,
@@ -37,13 +43,21 @@ const Blog = () => {
         StatusTab, 
         fetchData,
         handleSearch, 
-        handlePageChange
+        handlePageChange,
+        updateStatusField
     } = usePagination<BlogType>({ 
         initialLimit: show[0], 
         endpoint: '/admin/blog' 
     });
 
-    const { deleteData, response } = useBlogStore();
+    const { user } = useAuth();
+
+    const {
+        getAll,
+        deleteDraft,
+    } = useBlogDraftState({userId: user?.id ? String(user.id) : "" })
+
+    const { deleteData, onChangeStatus, response } = useBlogStore();
     const [progress, setProgress] = useState(false);
     const currentUrl = useCurrentUrl();
     const [redirect, setRedirect] = useState<string|null>(null);
@@ -51,8 +65,13 @@ const Blog = () => {
     const [isOpen, setModalOpen] = useState<boolean>(false);
     const [selectedIds, setSelectedIds] = useState<number[]>([]);
     const didFetchData = useRef(false);
+    const didfectDrafts = useRef(false);
     const [id, setId] = useState<number[] | null>(null);
+    const [items, setItems] = useState<BlogType[]>([])
+    const [showDraft, setShowDraft] = useState<boolean>(false);
+    const draftRef = useRef<HTMLDivElement>(null);
     const isAllSelected = selectedIds.length > 0;
+    const pathname = usePathname();
     
     useEffect(() => { setRedirect(currentUrl) },[currentUrl]);
     useEffect(() => {
@@ -99,8 +118,8 @@ const Blog = () => {
         }
     },[id, deleteData]);
 
-    const openModal = useCallback((id: number) => {
-        setId([id]);
+    const openModal = useCallback((id: number[]) => {
+        setId(id);
         setAction("delete");
         setModalOpen(true);
     }, [id]);
@@ -112,9 +131,47 @@ const Blog = () => {
     
     const handleBulkDelete = useCallback(() => {
         if (!selectedIds.length) return;
-        //@ts-ignore
         openModal(selectedIds);
     }, [selectedIds, openModal]);
+
+    const handlerChangeStatus = async( id: number, changeTo: boolean ) => {
+        try{
+            const req = await onChangeStatus(id, changeTo);
+            const { status, statusCode, message } = req;
+            if(status) updateStatusField(id, changeTo)
+            console.log(status);
+            
+        } catch (err) {
+            console.log('error: ',err)
+        }
+    }
+
+    const getAllDraft = async() => {
+        const req = await getAll();
+        if(req) setItems(req)
+    }
+    const handlerClickDraft = (draftId:string) => {
+        router.push(`/admin/blog/add?draftId=${draftId}&redirect=${pathname}`);
+    }
+    useEffect(() => {
+        if(didfectDrafts.current) return;
+        getAllDraft()
+        didfectDrafts.current = true;
+    });
+
+    useEffect(()=>{
+        const closeMenu = (e: MouseEvent) => {
+            if(draftRef.current  && !draftRef.current.contains(e.target as Node)) setShowDraft(false);
+        }
+        document.addEventListener('mousedown', closeMenu);
+        return () => document.removeEventListener('mousedown',closeMenu)
+    },[showDraft]);
+
+    useEffect(()=>{
+        const closeMenu = () => setShowDraft(false);
+        window.addEventListener('scroll', closeMenu, true);
+        return () => window.removeEventListener('scroll',closeMenu,true)
+    },[])
 
 
     return (
@@ -126,6 +183,33 @@ const Blog = () => {
                         <div className="flex gap-3 right">
                             <StatusTab status={recordStatus}/>
                             <AddButton title="Add Blog" href={`/admin/blog/add?redirect=${redirect}`}/>
+                            {items.length > 0 && 
+                            <div className='relative'>
+                                <button 
+                                    type="button" 
+                                    className='relative flex items-center bg-yellow-500 text-yellow-800 px-2 rounded-lg h-full gap-1'
+                                    onClick={()=>setShowDraft(!showDraft)}
+                                >
+                                        <span>Drafts <div className='absolute right-[-4px] top-[-4px] bg-yellow-100 text-[9px] w-4 h-4 rounded-full shadow-2 border border-yellow-600'>{items.length}</div></span>
+                                        <IoChevronDown />
+                                </button>
+                                {items && showDraft &&
+                                    <div id="dropdown" className="absolute z-10 bg-slate-50 border rounded-lg shadow-lg w-28 right-0" ref={draftRef}>
+                                        <ul className="p-2 text-sm text-body">
+                                        {items.map((v:BlogType,k:number)=>
+                                            <li key={k}>
+                                                <a 
+                                                    href='' 
+                                                    onClick={(e)=>{ e.preventDefault(); v.draftId && handlerClickDraft(v.draftId)}} 
+                                                    className="inline-flex items-center w-full p-2 hover:bg-slate-200 hover:text-black rounded-lg"
+                                                >Draft {k+1}</a>
+                                            </li>
+                                        )}
+                                        </ul>
+                                    </div>
+                                }
+                            </div>
+                            }
                         </div>
                         
                     </div>
@@ -140,7 +224,7 @@ const Blog = () => {
                                         onClick={handleBulkDelete}
                                         title="Remove from select"
                                         type="button"
-                                        className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 transition-colors hover:bg-gray-100 hover:text-error-700 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"
+                                        className="flex h-10 w-full px-2 max-w-10 items-center justify-center rounded-lg border disabled:border-gray-100 disabled:text-gray-200 disabled:hover:bg-white border-gray-200 text-gray-500 hover:border-red-100 transition-colors hover:bg-red-200 hover:text-red-500 dark:border-gray-800 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-error-500"
                                     ><BiTrash fontSize={24}/></button>
                                 </div>
                                 <div className='flex'>
@@ -156,14 +240,17 @@ const Blog = () => {
                         <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                             <thead className="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
                                 <tr>
-                                    <th scope="col" className="px-6 py-3"><AnimatedCheckbox checked={isAllSelected} onChange={toggleSelectAll}/></th>
-                                    <th scope="col" className="px-6 py-3" style={{width:'65%'}}>
+                                    <th scope="col" className="p-4"><AnimatedCheckbox checked={isAllSelected} onChange={toggleSelectAll}/></th>
+                                    <th scope="col" className="p-4" style={{width:'65%'}}>
                                         TItle
                                     </th>
-                                    <th scope="col" className="px-6 py-3" style={{width:'20%'}}>
+                                    <th scope="col" className="p-4" style={{width:'8%'}}>
+                                        Status
+                                    </th>
+                                    <th scope="col" className="p-4" style={{width:'20%'}}>
                                         Category
                                     </th>
-                                    <th scope="col" className="px-6 py-3">
+                                    <th scope="col" className="p-4">
                                         Action
                                     </th>
                                 </tr>
@@ -171,17 +258,18 @@ const Blog = () => {
                             <tbody>
                                 {data.length > 0 && data.map((v:BlogType, index) => (
                                     <tr key={index} className="bg-white dark:bg-gray-800 hover:bg-slate-50 ease-in-out">
-                                        <td className="px-6 py-4">
+                                        <td className="p-4">
                                             {loading
                                                 ?<div className="h-2 bg-gray-300 dark:bg-slate-700 rounded"></div>
                                                 :<AnimatedCheckbox className="select" checked={selectedIds.includes(Number(v.id))} onChange={()=>toggleSelect(Number(v.id))}/>
                                             }
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="p-4">
                                             <div className="flex items-center">
                                                 <div className="flex-shrink-0 w-10 h-10">
                                                     <img className="w-10 h-10 rounded-full" 
-                                                        src={`${v.image}` || '/storage/fallback-image.jpg'}
+                                                        src={`${v.image_th}` || '/storage/fallback-image.jpg'} 
+                                                        alt={v.title_en}
                                                     />
                                                 </div>
                                                 <div className="ml-4 space-y-1">
@@ -200,13 +288,18 @@ const Blog = () => {
                                                 </div>
                                             </div>
                                         </td>
-                                        <td className="px-6 py-4 flex flex-wrap gap-1">
-                                            {v.categories.map((v,k:number)=> <button type="button" className='bg-indigo-100 text-indigo-500 px-1 rounded-md focus:ring-4 focus:ring-indigo-400/50 focus:outline-none text-left'>{(k == 0) ? v.title_en : v.title_en }</button>)}
+                                        <td className="p-4">
+                                            <Switch key={`checkbox-${index}`} id={v.id} checked={!!v.status} handlerChangeStatus={handlerChangeStatus}/>
                                         </td>
-                                        <td className="px-6 py-4">
+                                        <td className="p-4">
+                                            <div className='flex items-center'>
+                                                {v.categories.map((v,k:number)=>  v.title_en )}
+                                            </div>
+                                        </td>
+                                        <td className="p-4">
                                         {!loading?
                                             <div className="flex gap-2">
-                                                <DeleteButton onClick={() => openModal(Number(v.id))} />
+                                                <DeleteButton onClick={() => openModal([Number(v.id)])} />
                                                 <EditButton href={`blog/${v.id}?redirect=${redirect}`}/>                                            
                                             </div>
                                             :

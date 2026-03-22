@@ -1,24 +1,21 @@
-"use client"
 
-import { refreshToken } from "./Auth";
-import axios, { AxiosRequestConfig, AxiosError } from "axios";
-import { useRouter, usePathname } from "next/navigation";
+import axios, { AxiosError } from "axios";
 
-interface FailedRequest<T> {
-    resolve: (value: T | PromiseLike<T>) => void;
-    reject: (reason?: string) => void;
+// interface FailedRequest<T> {
+//     resolve: (value: T | PromiseLike<T>) => void;
+//     reject: (reason?: string) => void;
+// }
+interface FailedRequest {
+    resolve: (value?: unknown) => void;
+    reject: (reason?: any) => void;
 }
-let accessToken: string | null = null;
+
 let isRefreshing = false;
-let failedQueue: FailedRequest<string>[] = [];
 
-
-export const setAccessToken = (token: string | null) => {
-    accessToken = token;
-};
+let failedQueue: FailedRequest[] = [];
 
 const API_URL = process.env.NODE_ENV === "development" ? process.env.NEXT_PUBLIC_API_URL_DEV : process.env.NEXT_PUBLIC_API_URL_PROD;
-const Api = axios.create({baseURL:`${API_URL}/api`});
+const Api = axios.create({baseURL:`${API_URL}/api`, withCredentials: true});
 const publicRoutes = [
     "/categories/*",
     "/products/*", 
@@ -36,76 +33,49 @@ const isPublicRoute = (url: string | undefined): boolean => {
     });
 };
 
-Api.interceptors.request.use((config) => {
-    if (!isPublicRoute(config.url) && accessToken) {
-        config.headers.Authorization = `Bearer ${accessToken}`;
-    }
-    return config;
-},(error) => {
-    return Promise.reject(error);
+const processQueue = () => {
+    failedQueue.forEach((p) => p.resolve());
+    failedQueue = [];
+};
+
+Api.interceptors.request.use((config) => { 
+    if (!isPublicRoute(config.url)) {
+    } 
+    return config; 
+},(error) => { 
+    return Promise.reject(error); 
 });
 
-Api.interceptors.response.use((response) => 
-    response,
+Api.interceptors.response.use(
+    (response) => response,
     async (error) => {
-        const pathName = usePathname();
-        const originalRequest = error.config as AxiosRequestConfig & { _retry?: boolean };
-          // กรณีไม่มี response (network error)
-        if (!error.response) {
+        const { status } = error;
+        const originalRequest = error.config;
+        if (status !== 401 || originalRequest._retry) {
             return Promise.reject(error);
         }
-        if (error.response.status === 401) {
-            // && !originalRequest._retry
-            if (isRefreshing) {
-                return new Promise((resolve, reject) => {
-                    failedQueue.push({ resolve, reject });
-                }).then((token) => {
-                    if (originalRequest.headers) {
-                        originalRequest.headers.Authorization = `Bearer ${token}`;
-                    }
-                    return Api(originalRequest);
-                });
-            }
-
-            originalRequest._retry = true;
-            isRefreshing = true;
-
-            try {
-
-                const newToken = await refreshToken();
-                const pathName = usePathname();
-                const router = useRouter();
-                if (newToken === null) {
-                    const redirectTo = pathName === "/admin/signin" ? "/" : pathName;
-                    router.push(redirectTo);
-                    return;
-                }
-                setAccessToken(newToken);
-                failedQueue.forEach((p) => p.resolve(newToken));
-                failedQueue = [];
-
-                if (originalRequest.headers) {
-                    originalRequest.headers.Authorization = `Bearer ${newToken}`;
-                }
-
-                return Api(originalRequest);
-            } catch (refreshError) {
-                // isRefreshing = false;
-                // const redirectTo = pathName === "/admin/signin" ? "/" : pathName;
-                // router.push(redirectTo);
-                
-                const errorMessage = refreshError instanceof Error ? refreshError.message : String(refreshError);
-                failedQueue.forEach((p) => p.reject(errorMessage));
-                failedQueue = [];
-                return Promise.reject(errorMessage);
-            } finally {
-                console.log('finally');
-                isRefreshing = false;
-            }
+        if (isRefreshing) {
+            return new Promise((resolve, reject) => {
+                failedQueue.push({ resolve, reject });
+            }).then(() => {
+                Api(originalRequest);
+            });
         }
-        return Promise.reject(error);
+        originalRequest._retry = true;
+        isRefreshing = true;
+        try {
+            await Api.put("/refresh");
+            processQueue();
+            return Api(originalRequest);
+        } catch (err) {
+            window.location.href = "/admin/signin";
+            return Promise.reject(err);
+        } finally {
+            isRefreshing = false;
+        }
     }
-);
+)
+
 interface ApiError {
     status: number | null;
     message: string;
@@ -114,26 +84,22 @@ interface ApiError {
 export const getApiError = (error: unknown): ApiError => {
     if (error instanceof AxiosError) {
         if (error.response) {
-        // Server ตอบกลับ
         return {
             status: error.response.status,
             message: error.response.data?.message || error.message,
         };
         } else if (error.request) {
-            // ส่ง request ไปแล้วแต่ไม่ได้ response
             return {
                 status: 0,
                 message: "No response from server",
             };
         } else {
-            // Error ในการ setup request
             return {
                 status: 0,
                 message: error.message,
             };
         }
     } else if (error instanceof Error) {
-        // general JS error
         return {
             status: 0,
             message: error.message,

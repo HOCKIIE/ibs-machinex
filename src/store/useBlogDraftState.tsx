@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { BlogDraftDB } from "@/services/BlogDraftDB"
+import { BlogType } from "@/types/BlogType"
 
 interface BlogDraft {
     [key: string]: any
@@ -13,10 +14,10 @@ export function useBlogDraftState({
     draftId,
 }: {
     userId: string
-    draftId: string
+    draftId?: string
 }) {
 
-    const [draft, setDraft] = useState<BlogDraft | null>(null)
+    const [draft, setDraft] = useState<BlogDraft | null>(null);
     const [loading, setLoading] = useState(true)
     const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -24,39 +25,59 @@ export function useBlogDraftState({
         LOAD (ครั้งเดียว)
     ======================= */
     useEffect(() => {
-    let mounted = true
+        let mounted = true
 
-    const loadDraft = async () => {
-        setLoading(true)
-        const db = await BlogDraftDB
-        if (!db) return;
-        let data = await db.get("drafts", `${userId}:${draftId}`)
+        const loadDraft = async () => {
+            setLoading(true)
+            const db = await BlogDraftDB
+            if (!db) return;
+            let data = await db.get("drafts", `${userId}:${draftId}`)
 
-        // ✅ ถ้ายังไม่มี draft ให้สร้างใหม่
-        if (!data) {
-            data = {
-                id: null,
-                userId,
-                draftId,
-                createdAt: Date.now(),
+            // ✅ ถ้ายังไม่มี draft ให้สร้างใหม่
+            if (!data) {
+                data = {
+                    id: null,
+                    userId,
+                    draftId,
+                    createdAt: Date.now(),
+                }
             }
+
+            if (mounted) {
+                setDraft(data)
+            }
+
+            setLoading(false)
         }
 
-        if (mounted) {
-            setDraft(data)
+        if (userId && draftId) {
+            loadDraft()
         }
 
-        setLoading(false)
-    }
+        return () => {
+            mounted = false
+        }
+    }, [userId, draftId])
 
-    if (userId && draftId) {
-        loadDraft()
-    }
+    const getAll = async(): Promise<BlogType[]> => {
+        const db = await BlogDraftDB
+        if (!db) return [];
+        const tx = db.transaction(["drafts"], "readonly")
+        const store = tx.objectStore("drafts")
 
-    return () => {
-        mounted = false
+        const drafts: BlogType[] = []
+        let cursor = await store.openCursor()
+
+        while (cursor) {
+
+            if ((cursor.key as string).startsWith(`${userId}:`)) {
+                drafts.push(cursor.value);
+            }
+
+            cursor = await cursor.continue()
+        }
+        return drafts;
     }
-}, [userId, draftId])
 
     /* =======================
         SAVE (debounce)
@@ -97,5 +118,5 @@ export function useBlogDraftState({
         },600);
     }
 
-    return { draft, saveDraft, deleteDraft, loading }
+    return { draft, getAll, saveDraft, deleteDraft, loading }
 }

@@ -76,13 +76,13 @@ const useBrandStore = create<BrandState>((set) => ({
                     formData.append("image", value);
                 } else 
                 if(key === 'status'){
-                    formData.append("status", value == 'true' ? '1' : '0');
+                    formData.append("status", value === true ? '1' : '0');
                 }else{
                     formData.append(key, value as string);
                 }
             });
             formData.append("_method", "PUT");
-            const response = await Api.post(`${prefix}/update/${id}`,formData, {
+            const response = await Api.post(`${prefix}/update/${id}`, formData, {
                 headers: { "X-Requested-With": "XMLHttpRequest" },
             });
             const { status, statusCode, message, data } = response.data;

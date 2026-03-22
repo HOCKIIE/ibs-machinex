@@ -85,7 +85,6 @@ const OwnerForm = () =>
         fetchData();
     });
     useEffect(() => {
-        console.log('item',item);
         if (item && item.title_th) {
             const data = {
                 id: item.id,

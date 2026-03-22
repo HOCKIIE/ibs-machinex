@@ -1,13 +1,7 @@
 import AxiosInstance from "@/utils/AxiosInstance";
 import axios from "axios";
 import toast from "react-hot-toast";
-import { getCookie, setCookie, removeCookie } from 'typescript-cookie';
 
-export const getToken = () => getCookie('accessToken');
-export const setToken = (token: string) =>  setCookie('accessToken', token, { expires: 1 });
-export const getRefreshToken = () => getCookie("refreshToken");
-export const setRefreshToken = (refreshToken: string) => setCookie('accessToken', refreshToken, { expires: 1 });
-export const removeToken = () => { removeCookie('accessToken'); removeCookie('refreshToken'); };
 export const loginUser = async (email: string, password: string) => {
     try {
         const response = await AxiosInstance.put("/login",{ email, password });
@@ -38,41 +32,11 @@ export const logout = (pathName?:string) => {
     }, 1000);
 };
 
-export const refreshToken = async (): Promise<string | null> => 
-{
-    try {
-        const res = await AxiosInstance.put(`/refresh`);
-        if (res.data?.accessToken) {
-            setToken(res.data.accessToken);
-            return res.data.accessToken;
-        }
-        return null;
-    } catch {
-        return null;
-    }
-}
-
 export const getUser = async () => {
     try {
         const res = await AxiosInstance.get('/me');
         return res.data;
     } catch (error) {
-        if (axios.isAxiosError(error) && error?.status === 401) {
-            const newToken = await refreshToken();
-            if (newToken) {
-                try {
-                    const res = await AxiosInstance.get('/me');
-                    return res.data.user;
-                } catch (err) {
-                    console.log("Failed to fetch user after token refresh", err);
-                    return null;
-                }
-            } else {
-                console.log("No refresh token available or refresh failed");
-                return null;
-            }
-        }
-        console.error("Error fetching user", error);
         return null;
     }
 }

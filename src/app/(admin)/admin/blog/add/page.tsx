@@ -11,8 +11,10 @@ import { useBlogDraftState } from '@/store/useBlogDraftState';
 import { useAuth } from '@/contexts/AdminContext';
 import { v4 as uuidv4 } from 'uuid';
 import { usePathname, useSearchParams } from 'next/navigation';
-import { useForm, useWatch } from 'react-hook-form';
+import { useForm, useWatch,Path } from 'react-hook-form';
 import { setBlogChanged, isEqual } from '@/utils/utils';
+import { deserialize } from '@/utils/slateHtmlConverter';
+import { BackButton } from '@/components/admin/Button/BackButton';
 import debounce from 'debounce';
 
 export default function Page(){
@@ -26,23 +28,14 @@ export default function Page(){
     const router = useRouter();
     const { user } = useAuth();
     const { createData } = useBlogStore();
-    const [draftState, setDraftState] = useState<Partial<BlogFormProps>>({});
-
-    // Provide a default value for draft to avoid 'never' type
+    const [ draftState, setDraftState ] = useState<Partial<BlogFormProps>>({});
+    const didFetchDreaft = useRef<boolean>(false);
     const { 
         draft,
         saveDraft,
         deleteDraft,
     } = useBlogDraftState({ userId: user?.id ? String(user.id) : "", draftId: draftId });
     
-    const handleSubmit = async (data: BlogFormProps) => {
-        const req = await createData(data);
-        if(req.status === true && req.data){
-            deleteDraft()
-            const path = decodeURIComponent(`/admin/blog/${req.data.id}?redirect=/admin/blog`);
-            router.push(path);
-        }
-    }
 
     const form = useForm<BlogFormProps>({
         mode: "onChange",
@@ -51,7 +44,9 @@ export default function Page(){
             id: 0,
             draftId: "",
             userId: "",
-            image: null,
+            image_th: null,
+            image_en: null,
+            image_ja: null,
             title_th:  "",
             title_en: "",
             title_ja: "",
@@ -61,6 +56,9 @@ export default function Page(){
             detail_th: "",
             detail_en: "",
             detail_ja: "",
+            descendant_th: [],
+            descendant_en: [],
+            descendant_ja: [],
             status: false,
             pathName: "",
             recommend: "",
@@ -71,13 +69,48 @@ export default function Page(){
             updated_at: ""
         },
     });
+    const { setError } = form;
+
+    const handleSubmit = async (data: BlogFormProps) => {
+        const req = await createData(data);
+        const {status, statusCode, message, errors } = req;
+        if(status && req.data ){
+            deleteDraft()
+            const path = decodeURIComponent(`/admin/blog/${req.data.id}?redirect=/admin/blog`);
+            router.push(path);
+        }
+        if (!status && errors) {
+            Object.entries(errors).forEach(([field, message]) => {
+                const msg = Array.isArray(message) ? message[0] : message;
+                setError(field as Path<BlogFormProps>, { type: "server", message: msg});
+            });
+        }
+    }
     useEffect(() => {
-        if (!draft) return;
+        if(!draft) return;
+        if(didFetchDreaft.current) return;
+        let descendant_th:string[] = [];
+        let descendant_en:string[] = [];
+        let descendant_ja:string[] = [];
+        if(draft.detail_th !== "" && draft.descendant_th === null) {
+            descendant_th = deserialize(draft.detail_th);
+        } 
+        if(draft.descendant_th) descendant_th = draft.descendant_th;
+        if(draft.detail_en !== "" && draft.descendant_en === null) {
+            descendant_en = deserialize(draft.detail_en);
+        } 
+        if(draft.descendant_en) descendant_en = draft.descendant_en;
+        if(draft.detail_ja !== "" && draft.descendant_ja === null) {
+            descendant_ja = deserialize(draft.detail_ja);
+        }
+        if(draft.descendant_ja) descendant_ja = draft.descendant_ja;
         form.reset({
             id: draft.id,
             draftId: draftId,
             userId: user?.id ? String(user.id) : "",
-            image: draft.image instanceof File || typeof draft.image === "string" ? draft.image : null,
+            image_th: draft.image_th instanceof File || typeof draft.image_th === "string" ? draft.image_th : null,
+            image_en: draft.image_en instanceof File || typeof draft.image_en === "string" ? draft.image_en : null,
+            image_ja: draft.image_ja instanceof File || typeof draft.image_ja === "string" ? draft.image_ja : null,
             title_th: draft.title_th,
             title_en: draft.title_en,
             title_ja: draft.title_ja,
@@ -87,16 +120,20 @@ export default function Page(){
             detail_th: draft.detail_th,
             detail_en: draft.detail_en,
             detail_ja: draft.detail_ja,
+            descendant_th: descendant_th,
+            descendant_en: descendant_en,
+            descendant_ja: descendant_ja,
             status: draft.status,
             pathName: draft.pathName,
             recommend: draft.recommend,
             category: draft.category,
             categories: draft.categories,
             published_at: draft.published_at,
-        }) 
+        });
+        didFetchDreaft.current = true;
     }, [draft]);
 
-    useEffect(()=>{
+    useEffect(() => {
         if(draft && !params.get("draftId")) {
             const newPath = pathname.replace(pathname,`${pathname}?draftId=${draftId}`);
             router.push(newPath)
@@ -117,7 +154,7 @@ export default function Page(){
         (Object.keys(watched) as (keyof BlogFormProps)[]).forEach((key) => {
             let current = watched[key];
             const prev = prevRef.current[key];
-            if (key === "image") {
+            if (key === "image_th" || key === "image_en" || key === "image_ja") {
                 if (current instanceof FileList) {
                     current = current[0] ?? null;
                 }
@@ -152,8 +189,9 @@ export default function Page(){
                     </div>
                 </div>
                 <div className="rounded-2xl border border-gray-200 bg-white dark:border-gray-800 dark:bg-white/[0.03]">
-                    <div className="px-5 py-4 sm:px-6 sm:py-5">
-                        <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Add a new blog</h3>
+                    <div className="flex p-4">
+                        <BackButton />
+                        {/* <h3 className="text-base font-medium text-gray-800 dark:text-white/90">Add a new blog</h3> */}
                     </div>
                     <hr />
                     <BlogForm 
