@@ -115,7 +115,7 @@ const useBrandStore = create<BrandState>((set) => ({
 
     deleteData: async (id) => {
         try {
-            const req = await Api.delete(`${prefix}/destroy/${id}`,{ data: { id:id } });
+            const req = await Api.delete(`${prefix}/destroy`,{ data: { id:id } });
             const {status, statusCode, message} = req.data
             return { status, statusCode, message};
         } catch (error: unknown) {
