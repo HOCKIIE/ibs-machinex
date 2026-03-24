@@ -18,6 +18,7 @@ import Format from '@/utils/Format';
 import { IoMdPricetag } from "react-icons/io";
 import { HiExclamation } from "react-icons/hi";
 import { IoChevronBack } from "react-icons/io5";
+import { serialize } from '@/utils/slateHtmlConverter';
 
 const BlogForm = ({
     form,
@@ -66,8 +67,22 @@ const BlogForm = ({
     const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
     const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
 
-    const onCreate = async (data: BlogFormProps) => { onSubmit(data) }
-    const onEdit = async (formData: BlogFormProps) => { onSubmit({ ...formData }); };
+    const onCreate = async (data: BlogFormProps) => { 
+        onSubmit({
+            ...data,
+            detail_th: serialize(data.descendant_th),
+            detail_en: serialize(data.descendant_en),
+            detail_ja: serialize(data.descendant_ja),
+        }) 
+    }
+    const onEdit = async (formData: BlogFormProps) => { 
+        onSubmit({ 
+            ...formData,
+            detail_th: serialize(formData.descendant_th),
+            detail_en: serialize(formData.descendant_en),
+            detail_ja: serialize(formData.descendant_ja),
+        }); 
+    };
     const cancelAdd = () => router.back();
 
     const fetchCategory = async() => {

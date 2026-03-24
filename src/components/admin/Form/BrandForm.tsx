@@ -14,6 +14,7 @@ import { LiaLanguageSolid } from "react-icons/lia";
 import { HiExclamation } from "react-icons/hi";
 import TextEditor from '../Editor/TextEditor';
 import { IoChevronBack } from "react-icons/io5";
+import { serialize } from '@/utils/slateHtmlConverter';
 
 const BrandForm = ({
     form,
@@ -60,8 +61,18 @@ const BrandForm = ({
     const hasEnglishErrors = Object.keys(errors).some(key => key.endsWith('_en'));
     const hasJapaneseErrors = Object.keys(errors).some(key => key.endsWith('_ja'));
 
-    const onCreate = async (data: BrandFormProps) =>  onSubmit(data);
-    const onEdit = async (formData: BrandFormProps) => onSubmit({ ...formData });
+    const onCreate = async (data: BrandFormProps) =>  onSubmit({
+        ...data,
+        detail_th: serialize(data.descendant_th),
+        detail_en: serialize(data.descendant_en),
+        detail_ja: serialize(data.descendant_ja), 
+    });
+    const onEdit = async (formData: BrandFormProps) => onSubmit({ 
+        ...formData,
+        detail_th: serialize(formData.descendant_th),
+        detail_en: serialize(formData.descendant_en),
+        detail_ja: serialize(formData.descendant_ja), 
+    });
     const cancelAction = () => router.back();
 
     const fetchCategory = async()=>{
