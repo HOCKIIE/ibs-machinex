@@ -249,22 +249,74 @@ const DropdownButton: React.FC<{ action?: 'mark' | 'block'; label: React.ReactNo
     }, [editor]);
 
     const AddGridTemplate = () => {
-        const block = {
+        const column = {
             type: 'grid-column',
             className: 'col-span-12 p-2',
-            children: [{ type: 'paragraph', children: [{ text: 'Column 1' }] }],
+            children: [
+                { type: 'paragraph', children: [{ text: 'Column' }] }
+            ],
         };
-        if (editor.selection) {
-            const [match] = Editor.nodes(editor, {
-                match: (n) => n.type === "grid-column",
-            });
-            if (match) {
-                const [, path] = match;
-                const insertPath: Path = Path.next(path);
-                Transforms.insertNodes(editor, block, { at: insertPath });
-            }
+
+        const grid = {
+            type: 'grid',
+            className: 'grid grid-cols-12 gap-4',
+            children: [column],
+        };
+
+        // 🟢 case 1: editor ว่าง → สร้าง grid เลย
+        if (editor.children.length === 0) {
+            Transforms.insertNodes(editor, grid);
+            return;
         }
-    }
+
+        // 🟢 หา grid parent
+        const [gridMatch] = Editor.nodes(editor, {
+            match: (n: any) => n.type === 'grid',
+        });
+
+        // 🟢 case 2: ไม่มี selection → append ท้าย
+        if (!editor.selection) {
+            if (gridMatch) {
+                const [, gridPath] = gridMatch;
+                const insertPath = [...gridPath, editor.children[gridPath[0]].children.length];
+                Transforms.insertNodes(editor, column, { at: insertPath });
+            } else {
+                Transforms.insertNodes(editor, grid);
+            }
+            return;
+        }
+
+        if (gridMatch) {
+            // 🟢 case 3: มี grid → insert column เข้าไปใน grid
+            const [, gridPath] = gridMatch;
+
+            const gridNode: any = Node.get(editor, gridPath);
+            const insertPath = [...gridPath, gridNode.children.length];
+
+            Transforms.insertNodes(editor, column, { at: insertPath });
+        } else {
+            // 🟢 case 4: ไม่มี grid → wrap หรือ insert ใหม่
+            Transforms.insertNodes(editor, grid);
+        }
+    };
+
+    // const AddGridTemplate = () => {
+    //     const block = {
+    //         type: 'grid-column',
+    //         className: 'col-span-12 p-2',
+    //         children: [{ type: 'paragraph', children: [{ text: 'Column 1' }] }],
+    //     };
+    //     if (editor.selection) {
+    //         const [match] = Editor.nodes(editor, {
+    //             match: (n) => n.type === "grid-column",
+    //         });
+    //         if (match) {
+    //             const [, path] = match;
+    //             const insertPath: Path = Path.next(path);
+    //             Transforms.insertNodes(editor, block, { at: insertPath });
+    //         }
+    //     }
+    // }
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -498,10 +550,11 @@ const Paragraph: React.FC = () => {
         const value = e.target.value;
         toggleBlock(editor, value);
     };
-    const currentType = getCurrentElementType(editor) ?? 'paragraph';
+    const currentType = getCurrentElementType(editor);
+    const value = currentType !== null ? currentType : 'paragraph';
     return (
         <select 
-            value={currentType}
+            value={value}
             onChange={(e)=>{ e.preventDefault(); handleChange(e)}} 
             title="Paragraph Style"
             className="text-sm px-2 py-[6px] rounded-md bg-transparent hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -962,32 +1015,42 @@ declare module 'slate' {
     }
 }
 const getCurrentElementType = (editor: Editor): string | null => {
-    const [match] = Editor.nodes(editor, {
-        match: n => !Editor.isEditor(n) && Element.isElement(n) && !!n.type,
-        mode: 'lowest', // ตรวจสอบ block ต่ำสุดใน path
-    });
-    if (match) {
-        const [node] = match;
-        return (node as Element).type as string;
+    try{
+        const [match] = Editor.nodes(editor, {
+            match: n => !Editor.isEditor(n) && Element.isElement(n) && !!n.type,
+            mode: 'lowest', // ตรวจสอบ block ต่ำสุดใน path
+        });
+        if (match) {
+            const [node] = match;
+            return (node as Element).type as string;
+        }
+        return null;
+    } catch (err) {
+        console.log(err)
+        return null;
     }
-    return null;
 };
 const getFontSize = (editor: Editor): string | null => {
-    const [match] = Editor.nodes(editor, {
-        match: n => !Editor.isEditor(n) && Element.isElement(n) && !!n.className,
-        mode: 'lowest', // ตรวจสอบ block ต่ำสุดใน path
-    });
-    if (match) {
-        const [node] = match;
-        const raw = typeof (node as MyElement).className === 'string' ? (node as MyElement).className : '';
-        const classes = raw.split(/\s+/).map((c:string) => c.trim());
-        const fontSizeClass = classes.find((c:string) => c.startsWith('text-[') && c.endsWith('px]'));
-        if (fontSizeClass) {
-            const size = fontSizeClass.slice(6, -3); // ดึงขนาดตัวเลขออกมา
-            return size;
+    try{
+        const [match] = Editor.nodes(editor, {
+            match: n => !Editor.isEditor(n) && Element.isElement(n) && !!n.className,
+            mode: 'lowest', // ตรวจสอบ block ต่ำสุดใน path
+        });
+        if (match) {
+            const [node] = match;
+            const raw = typeof (node as MyElement).className === 'string' ? (node as MyElement).className : '';
+            const classes = raw.split(/\s+/).map((c:string) => c.trim());
+            const fontSizeClass = classes.find((c:string) => c.startsWith('text-[') && c.endsWith('px]'));
+            if (fontSizeClass) {
+                const size = fontSizeClass.slice(6, -3); // ดึงขนาดตัวเลขออกมา
+                return size;
+            }
         }
+        return null;
+    } catch (err) {
+        console.log(err)
+        return null;
     }
-    return null;
 }
 interface EditorProps {
     type?: string;
@@ -1045,17 +1108,20 @@ const TextEditor: React.FC<EditorProps> = ({type, action, id, draftId, value, on
     ];
 
     const handleSaveHTML = (html: string) => {
-        // HTML -> Safe HTML
-        const safeHTML = NormalizeHTML(html);
-        console.log('safe HTML: ',safeHTML);
-        setHTML(safeHTML)
-        // 🟢 HTML -> Slate JSON
-        const slateNodes = deserialize(safeHTML);
-        const normalized = enforceGridSchema(slateNodes);
-        Editor.withoutNormalizing(editor, () => {
-            editor.children = normalized;
-            editor.onChange()
-        });
+        try{
+            // HTML -> Safe HTML
+            const safeHTML = NormalizeHTML(html);
+            setHTML(safeHTML)
+            // 🟢 HTML -> Slate JSON
+            const slateNodes = deserialize(safeHTML);
+            const normalized = enforceGridSchema(slateNodes);
+            Editor.withoutNormalizing(editor, () => {
+                editor.children = normalized;
+                editor.onChange()
+            });
+        } catch(err) {
+            console.log(err)
+        }
     };
 
 
