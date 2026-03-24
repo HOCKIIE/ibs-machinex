@@ -51,7 +51,7 @@ const useBlogStore = create<BlogState>((set) => ({
                     value.forEach((val) => formData.append("category[]", val));
                 } else if (key === "image_th" || key === "image_en" || key === "image_ja" && value instanceof File) {
                     formData.append(key, value);
-                } else if(key === "detail_th_json" || key === "detail_en_json" || key === "detail_ja_json"){
+                } else if(key === "descendant_th" || key === "descendant_en" || key === "descendant_ja"){
                     formData.append(key, JSON.stringify(value));
                 }  else {
                     formData.append(key, value as string);
@@ -82,7 +82,7 @@ const useBlogStore = create<BlogState>((set) => ({
             Object.entries(blogData).forEach(([key, value]) => {
                 if (key === "category" && Array.isArray(value)) {
                     value.forEach((val) => formData.append("category[]", val));
-                } else if(key === "detail_th_json" || key === "detail_en_json" || key === "detail_ja_json"){
+                } else if(key === "descendant_th" || key === "descendant_en" || key === "descendant_ja"){
                     formData.append(key, JSON.stringify(value));
                 } else if (key === "image_th" || key === "image_en" || key === "image_ja" && value instanceof File) {
                     formData.append(key, value);

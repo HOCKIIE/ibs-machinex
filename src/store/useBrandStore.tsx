@@ -46,7 +46,9 @@ const useBrandStore = create<BrandState>((set) => ({
             Object.entries(newData).forEach(([key, value]) => {
                 if (key === "category" && Array.isArray(value)) {
                     value.forEach((val) => formData.append("category[]", val));
-                } else if (key === "image" && value instanceof File) {
+                } else if(key === "descendant_th" || key === "descendant_en" || key === "descendant_ja"){
+                    formData.append(key, JSON.stringify(value));
+                }  else if (key === "image" && value instanceof File) {
                     formData.append("image", value);
                 } else if(key === 'status'){
                     formData.append("status", value == 'true' ? '1' : '0');
@@ -74,8 +76,9 @@ const useBrandStore = create<BrandState>((set) => ({
             Object.entries(brandData).forEach(([key, value]) => {
                 if (key === "image" && value instanceof File) {
                     formData.append("image", value);
-                } else 
-                if(key === 'status'){
+                } else if(key === "descendant_th" || key === "descendant_en" || key === "descendant_ja"){
+                    formData.append(key, JSON.stringify(value));
+                } else if(key === 'status'){
                     formData.append("status", value === true ? '1' : '0');
                 }else{
                     formData.append(key, value as string);
