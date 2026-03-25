@@ -1,36 +1,70 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Product & Blog Platform
 
-## Getting Started
+A full-stack web application for managing products, brands, and SEO-focused blog content.
+Designed to support scalable content management and improve search engine visibility.
 
-First, run the development server:
+## 🚀 Features
+
+* Blog management system (SEO-friendly)
+* Brand & category management
+* Rich text editor with custom components (Slate.js)
+* Grid-based content editor (12-column system) for responsive layouts similar to page builders
+* Dynamic content rendering (Next.js SSR/CSR)
+* State management using Zustand
+
+## 🧩 Editor Capabilities
+* Grid-based layout system (12-column)
+* TailwindCSS-compatible grid structure (grid-cols-*, col-span-*)
+* Responsive layout control across breakpoints (sm, md, lg, xl)
+* Dynamic column management (add/remove/reorder)
+* Support nested content blocks within grid layout
+
+## 🧱 Tech Stack
+
+* Frontend: Next.js (React + TypeScript)
+* UI: TailwindCSS v3
+* State Management: Zustand
+* Editor: Slate.js (custom rich text editor)
+* Database: MySQL
+
+## 🏗️ Architecture
+
+* Next.js handles both SSR and CSR for SEO optimization
+* Content is managed via a custom editor (Slate.js) and stored as structured data
+* Zustand is used for lightweight global state management
+* API layer connects frontend with database (MySQL)
+
+## ⚙️ Installation
+
+```bash
+git clone https://github.com/HOCKIIE/ibs-machinex.git
+cd ibs-machinex
+npm install
+```
+
+## ▶️ Run
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🔐 Environment Variables
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `.env` file:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```env
+DB_HOST=localhost
+DB_USER=admin
+DB_PASSWORD=yourpassword
+DB_NAME=yourdatabase
+```
 
-## Learn More
+## 📊 Highlights
 
-To learn more about Next.js, take a look at the following resources:
+* Built a custom rich text editor using Slate.js
+* Optimized for SEO using Next.js SSR
+* Structured content system for blogs, brands, and categories
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 👨‍💻 Author
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Suphawat Kongson (HOCKY)
