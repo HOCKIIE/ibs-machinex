@@ -20,6 +20,24 @@ export const NormalizeHTML = (html: string): string => {
     return doc.body.innerHTML
 }
 
+const ensureValidNode = (node: any): any => {
+    // ถ้าเป็น text node → ปล่อยผ่าน
+    if (Text.isText(node)) return node;
+
+    // ถ้าไม่มี children หรือ children ว่าง
+    if (!node.children || node.children.length === 0) {
+        return {
+            ...node,
+            children: [{ text: '' }],
+        };
+    }
+
+    return {
+        ...node,
+        children: node.children.map(ensureValidNode),
+    };
+};
+
 export const deserialize = (html: string): Descendant[] => {
     try {
         const parser = new DOMParser();
@@ -27,17 +45,17 @@ export const deserialize = (html: string): Descendant[] => {
         const body = doc.body;
 
         const nodes: Descendant[] = Array.from(body.childNodes)
-            .map((node) => innerDeserialize(node))
-            .flat()
-            .filter(Boolean);
+        .map((node) => innerDeserialize(node))
+        .flat()
+        .filter(Boolean);
 
         const finalNodes = normalizeRoot(nodes);
 
-        return finalNodes.length
-            ? finalNodes
-            : [{ type: "paragraph", children: [{ text: "" }] }];
+        const safeNodes = finalNodes.map(ensureValidNode);
 
-        // return nodes.length ? nodes : [{ type: "paragraph", children: [{ text: "" }] }];
+        return safeNodes.length
+        ? safeNodes
+        : [{ type: "paragraph", children: [{ text: "" }] }];
     } catch {
         return [{ type: "paragraph", children: [{ text: "" }] }];
     }
