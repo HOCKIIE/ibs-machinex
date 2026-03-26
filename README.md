@@ -38,8 +38,8 @@ Designed to support scalable content management and improve search engine visibi
 ## ⚙️ Installation
 
 ```bash
-git clone https://github.com/yourname/your-repo.git
-cd your-repo
+git clone https://github.com/HOCKIIE/ibs-machinex.git
+cd ibs-machinex
 npm install
 ```
 
@@ -55,7 +55,7 @@ Create a `.env` file:
 
 ```env
 DB_HOST=localhost
-DB_USER=root
+DB_USER=admin
 DB_PASSWORD=yourpassword
 DB_NAME=yourdatabase
 ```
