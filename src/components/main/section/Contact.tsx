@@ -65,6 +65,7 @@ const ContactSection = () => {
     const address = owner?.[`address_${locale}` as keyof ContactType] || '';
     const keyT = `title_${locale}` as keyof UserType;
 
+
     return (
     <div className='md:container px-2 xl:px-4' id="contact">
         <hr className="my-14" />
@@ -108,15 +109,17 @@ const ContactSection = () => {
             ))}
         </div>
         <div className="relative rounded-3xl overflow-hidden py-10">
-            <iframe 
-                ref={iframeRef} 
-                className="w-full"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3876.0617695789147!2d100.55523204113399!3d13.714708698203433!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e29fd4c61f02af%3A0xe0d19e4fc5356b1e!2sSSP%20Tower%202!5e0!3m2!1sth!2sth!4v1742971953317!5m2!1sth!2sth" 
-                height="280" 
-                width={iframeWidth}
-                loading="lazy" 
-                referrerPolicy="no-referrer-when-downgrade"
-            ></iframe>
+            {owner?.gmap &&
+                <iframe 
+                    ref={iframeRef} 
+                    className="w-full"
+                    src={owner.gmap}
+                    height="280" 
+                    width={iframeWidth}
+                    loading="lazy" 
+                    referrerPolicy="no-referrer-when-downgrade"
+                ></iframe>
+            }
         </div>
     </div>
     )

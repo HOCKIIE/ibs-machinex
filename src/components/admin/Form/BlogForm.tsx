@@ -363,7 +363,7 @@ const BlogForm = ({
                                             control={control}
                                             render={({field}) => <TextEditor name={field.name} value={field.value} type="blog" action={type} id={item.id} draftId={draftId} onChange={field.onChange} /> }
                                         />                        
-                                        {errors?.detail_th_json?.type === "required" && (
+                                        {errors?.descendant_th?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )} 
                                     </div>
@@ -419,7 +419,7 @@ const BlogForm = ({
                                             control={control}
                                             render={({field}) => <TextEditor name={field.name} value={field.value} type="blog" action={type} id={item.id} draftId={draftId} onChange={field.onChange} /> }
                                         />                        
-                                        {errors?.detail_en_json?.type === "required" && (
+                                        {errors?.descendant_en?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )} 
                                     </div>
@@ -474,7 +474,7 @@ const BlogForm = ({
                                             control={control}
                                             render={({field}) => <TextEditor name={field.name} value={field.value} type="blog" action={type} id={item.id} draftId={draftId} onChange={field.onChange} /> }
                                         />                        
-                                        {errors?.detail_ja_json?.type === "required" && (
+                                        {errors?.descendant_ja?.type === "required" && (
                                             <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
                                         )} 
                                     </div>
