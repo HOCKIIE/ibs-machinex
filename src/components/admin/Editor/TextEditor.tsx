@@ -722,6 +722,8 @@ const ImageModal = ({
         });
         formData.append("_method", "PUT");
         formData.append("type", thisType ?? "");
+        console.log("thisId", thisId);
+        console.log("thisId", thisId);
         if (action === "edit" && thisId !== null) {
             formData.append("id", String(thisId));
         }

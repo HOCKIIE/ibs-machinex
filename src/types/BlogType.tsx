@@ -16,6 +16,7 @@ export interface BlogType {
     updated_at: string | null;
 
     [key: `image_${string}`]: File | string | null;
+    [key: `current_${string}`]: string | null;
     [key: `title_${string}`]: string;
     [key: `detail_${string}`]: string;
     [key: `descendant_${string}`]: Descendant[];
@@ -36,6 +37,7 @@ export interface BlogFormProps {
     draftId?: string;
     userId?: string;
     [key: `image_${string}`]: File | string | null;
+    [key: `current_${string}`]: string | null;
     [key: `title_${string}`]: string;
     [key: `detail_${string}`]: string;
     [key: `descendant_${string}`]: Descendant[];

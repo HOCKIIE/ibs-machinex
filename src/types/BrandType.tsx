@@ -19,9 +19,12 @@ export interface BrandType {
     categories: Array<CategoryType>;
     status: boolean;
     image: string;
+    banner: string;
+    is_iframe: boolean;
     created_at: string;
     updated_at: string;
     published_at: string | null;
+    [key: `title_${string}`]: string;
     [key: `detail_${string}`]: string;
     [key: `descendant_${string}`]: Descendant[];
     [key: `description_${string}`]: string;
@@ -30,6 +33,9 @@ export interface BrandType {
 export interface BrandFormProps {
     id: number;
     image: File | string| null;
+    current: string | null;
+    banner: File | string| null;
+    currentBanner: string | null;
     [key: `title_${string}`]: string;
     [key: `detail_${string}`]: string;
     [key: `descendant_${string}`]: Descendant[];
@@ -40,6 +46,7 @@ export interface BrandFormProps {
     brands?: BrandType[] | [];
     category?: Array<string> | [];
     categories: Array<{id: number;}> | [];
+    is_iframe: boolean;
     published_at: string | null;
     created_at: string;
     updated_at: string;

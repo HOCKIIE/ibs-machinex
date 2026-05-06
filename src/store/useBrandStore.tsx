@@ -50,8 +50,8 @@ const useBrandStore = create<BrandState>((set) => ({
                     formData.append(key, JSON.stringify(value));
                 }  else if (key === "image" && value instanceof File) {
                     formData.append("image", value);
-                } else if(key === 'status'){
-                    formData.append("status", value == 'true' ? '1' : '0');
+                } else if(key === 'status' || key === 'is_iframe'){
+                    formData.append(key, value == 'true' ? '1' : '0');
                 } else {
                     formData.append(key, value as string);
                 }
@@ -78,8 +78,8 @@ const useBrandStore = create<BrandState>((set) => ({
                     formData.append("image", value);
                 } else if(key === "descendant_th" || key === "descendant_en" || key === "descendant_ja"){
                     formData.append(key, JSON.stringify(value));
-                } else if(key === 'status'){
-                    formData.append("status", value === true ? '1' : '0');
+                } else if(key === 'status' || key === 'is_iframe'){
+                    formData.append(key, value === true ? '1' : '0');
                 }else{
                     formData.append(key, value as string);
                 }

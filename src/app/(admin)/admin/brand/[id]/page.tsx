@@ -25,6 +25,9 @@ const Page = ({ params }:{ params: {id : number} }) => {
         defaultValues: {
             id: 0,
             image: null,
+            current: null,
+            banner: null,
+            currentBanner: null,
             title_th: "",
             title_en: "",
             title_ja: "",
@@ -43,6 +46,7 @@ const Page = ({ params }:{ params: {id : number} }) => {
             categories: [],
             category: [],
             status: false,
+            is_iframe: false,
             created_at: "", 
             updated_at: "",
             published_at: null
@@ -80,6 +84,9 @@ const Page = ({ params }:{ params: {id : number} }) => {
             form.reset({
                 id: items[0].id ?? "",
                 image: items[0].image ?? "",
+                current: items[0].image ?? "",
+                banner: items[0].banner ?? "",
+                currentBanner: items[0].banner ?? "",
                 title_th: items[0].title_th ?? "",
                 title_en: items[0].title_en ?? "",
                 title_ja: items[0].title_ja ?? "",
@@ -97,6 +104,7 @@ const Page = ({ params }:{ params: {id : number} }) => {
                 categories: items[0].categories ?? [],
                 category: items[0].category ?? [],
                 status: Boolean(items[0]?.status) ?? false,
+                is_iframe: Boolean(items[0]?.is_iframe) ?? false,
                 updated_at: items[0].updated_at ?? null,
                 created_at: items[0].created_at ?? null,
                 published_at: items[0].published_at ?? null

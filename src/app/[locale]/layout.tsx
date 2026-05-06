@@ -119,7 +119,7 @@ export default async function RootLayout({children}:{children: React.ReactNode})
             <Head>
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <body className={`scroll-smooth ${languageClass} antialiased bg-gray-100`}>
+            <body className={`scroll-smooth ${languageClass} antialiased bg-white`}>
                 <PageSettingsContext>
                     <NextIntlClientProvider messages={messages} >
                         <Sidebar />

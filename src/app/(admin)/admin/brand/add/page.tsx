@@ -20,6 +20,9 @@ const Page = () => {
         defaultValues: {
             id: 0,
             image: null,
+            current: null,
+            banner: null,
+            currentBanner: null,
             title_th: "",
             title_en: "",
             title_ja: "",

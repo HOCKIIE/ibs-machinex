@@ -101,9 +101,7 @@ const Brand = () =>
         try{
             const req = await onChangeStatus(id, changeTo);
             const { status, statusCode, message } = req;
-            if(status) updateStatusField(id, changeTo)
-            console.log(status);
-            
+            if (status) updateStatusField(id, changeTo);
         } catch (err) {
 
         }
