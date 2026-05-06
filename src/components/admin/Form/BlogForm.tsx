@@ -319,7 +319,7 @@ const BlogForm = ({
                                 <div className="grid grid-cols-12 gap-4">
                                     <div className="col-span-12 mt-4">
                                         <div className="space-y-3">
-                                            <CoverImageUpload<BlogFormProps> key="image_th" name="image_th" control={control} watch={watch} setValue={setValue} defaultValue={item.image_th} errors={errors} lang="TH"/>
+                                            <CoverImageUpload<BlogFormProps> name="image_th" control={control} watch={watch} current={item.current_th} setValue={setValue} defaultValue={item.image_th} errors={errors} lang="TH"/>
                                         </div>
                                     </div>
                                     <div className="col-span-12">
@@ -374,7 +374,7 @@ const BlogForm = ({
                                 <div className="grid grid-cols-12 gap-4">
                                     <div className="col-span-12 mt-4">
                                         <div className="space-y-3">
-                                            <CoverImageUpload<BlogFormProps> key="image_en" name="image_en" control={control} watch={watch} setValue={setValue} defaultValue={item.image_en} errors={errors} lang="EN"/>
+                                            <CoverImageUpload<BlogFormProps> name="image_en" control={control} watch={watch} current={item.current_en} setValue={setValue} defaultValue={item.image_en} errors={errors} lang="EN"/>
                                         </div>
                                     </div>
                                     <div className="col-span-12">
@@ -429,7 +429,7 @@ const BlogForm = ({
                                 <div className="grid grid-cols-12 gap-4">
                                     <div className="col-span-12 mt-4">
                                         <div className="space-y-3">
-                                            <CoverImageUpload<BlogFormProps> key="image_ja" name="image_ja" control={control} watch={watch} setValue={setValue} defaultValue={item.image_ja} errors={errors} lang="JA"/>
+                                            <CoverImageUpload<BlogFormProps> name="image_ja" control={control} watch={watch} current={item.current_ja} setValue={setValue} defaultValue={item.image_ja} errors={errors} lang="JA"/>
                                         </div>
                                     </div>
                                     <div className="col-span-12">

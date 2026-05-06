@@ -15,6 +15,7 @@ const EditCategory = ({ params }: { params: { id: number } }) => {
     const [ itemState, setItemState ] = useState<CategoryFormProps>({
         id: Number(id),
         image: null,
+        current: null,
         title_th: "",
         title_en: "",
         title_ja: "",
@@ -43,6 +44,7 @@ const EditCategory = ({ params }: { params: { id: number } }) => {
             setItemState({
                 id: id,
                 image: items[0]?.image ?? "",
+                current: items[0]?.image ?? "",
                 title_th: items[0]?.title_th ?? "",
                 title_en: items[0]?.title_en ?? "",
                 title_ja: items[0]?.title_ja ?? "",

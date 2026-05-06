@@ -48,6 +48,7 @@ const CategoryForm = ({
             reset({
                 id: itemState.id,
                 image: itemState.image,
+                current: itemState.current,
                 title_th: itemState.title_th,
                 title_en: itemState.title_en,
                 title_ja: itemState.title_ja,
@@ -66,7 +67,7 @@ return (
         <form onSubmit={handleSubmitForm(type === "create" ? onCreate : onEdit)}>
             <div className="grid grid-cols-12">
                 <div className="col-span-12">
-                    <CoverImageUpload<CategoryFormProps> control={control} watch={watch} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
+                    <CoverImageUpload<CategoryFormProps> control={control} watch={watch} current={itemState.current} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
                 </div>
             </div>
             <div className="grid grid-cols-12 gap-4">

@@ -14,6 +14,7 @@ const Page = () => {
     const categoryState : CategoryFormProps = {
         id: 0,
         image:null,
+        current: null,
         title_th: "",
         title_en: "",
         title_ja: "",

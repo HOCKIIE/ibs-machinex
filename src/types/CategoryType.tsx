@@ -4,6 +4,7 @@ import { ResponseDefaultType, ResponseDataType } from "./ResponseType";
 export interface CategoryType {
     id: number;
     image: string;
+    current: string | null;
     title_th: string;
     title_en: string;
     title_ja: string;
@@ -23,6 +24,7 @@ export interface CategoryType {
 export interface CategoryFormProps {
     id: number;
     image: File | string | null;
+    current: string | null;
     title_th: string;
     title_en: string;
     title_ja: string;
