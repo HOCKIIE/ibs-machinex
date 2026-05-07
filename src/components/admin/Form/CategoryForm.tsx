@@ -74,7 +74,10 @@ return (
                         current={itemState.current} 
                         setValue={setValue} 
                         defaultValue={itemState.image} 
-                        errors={errors}/>
+                        errors={errors}
+                        width="300px"
+                        height="300px"
+                    />
                 </div>
             </div>
             <div className="grid grid-cols-12 gap-4">
