@@ -44,7 +44,7 @@ const CategoryForm = ({
     const cancelAdd = () => rounter.back();
 
     useEffect(() => {
-            if (itemState) {
+        if (itemState) {
             reset({
                 id: itemState.id,
                 image: itemState.image,
@@ -67,7 +67,14 @@ return (
         <form onSubmit={handleSubmitForm(type === "create" ? onCreate : onEdit)}>
             <div className="grid grid-cols-12">
                 <div className="col-span-12">
-                    <CoverImageUpload<CategoryFormProps> control={control} watch={watch} current={itemState.current} setValue={setValue} defaultValue={itemState.image} errors={errors}/>
+                    <CoverImageUpload<CategoryFormProps> 
+                        name="image"
+                        control={control} 
+                        watch={watch} 
+                        current={itemState.current} 
+                        setValue={setValue} 
+                        defaultValue={itemState.image} 
+                        errors={errors}/>
                 </div>
             </div>
             <div className="grid grid-cols-12 gap-4">
