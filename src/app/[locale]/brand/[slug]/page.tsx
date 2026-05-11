@@ -64,10 +64,9 @@ const Brand = ({ params }:{ params: {slug:string} }) => {
                             <h1 className="font-bold text-3xl text-black">{title}</h1>
                         </div>
                     </div>
-                    <div className="mt-40 mb-10">
-                        <p className="text-black px-2">{description}</p>
+                    <div className="mt-40 mb-10 xl:mx-20">
+                        <div dangerouslySetInnerHTML={{ __html: safeHtml }}  />
                     </div>
-                    <div dangerouslySetInnerHTML={{ __html: safeHtml }}  />
                 </>
             }
             <hr className="my-14" />
