@@ -4,6 +4,8 @@ import { ResponseDefaultType, ResponseDataType } from "./ResponseType";
 
 export interface BrandType {
     id: number;
+    draftId: string;
+    userId?: string;
     title_th: string;
     title_en: string;
     title_ja: string;
@@ -32,6 +34,8 @@ export interface BrandType {
 
 export interface BrandFormProps {
     id: number;
+    draftId: string;
+    userId?: string;
     image: File | string| null;
     current: string | null;
     banner: File | string| null;

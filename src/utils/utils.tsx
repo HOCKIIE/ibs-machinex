@@ -36,7 +36,7 @@ export function filterClasses(classString: string) {
 
 }
 
-export function setBlogChanged<K extends keyof BlogFormProps>(
+export function setStateChanged<K extends keyof BlogFormProps>(
     target: Partial<BlogFormProps>,
     key: K,
     value: BlogFormProps[K]

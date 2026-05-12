@@ -1,69 +1,59 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
-import { BlogDraftDB } from "@/services/BlogDraftDB"
+import { DraftDB } from "@/services/DraftDB"
 import { BlogType } from "@/types/BlogType"
+import { FieldValues } from "react-hook-form"
 
-interface BlogDraft {
-    [key: string]: any
-    updatedAt?: number
-}
-
-export function useBlogDraftState({
+export function useDraftState<T extends FieldValues>({
     userId,
     draftId,
+    tableName,
 }: {
     userId: string
     draftId?: string
+    tableName: string;
 }) {
 
-    const [draft, setDraft] = useState<BlogDraft | null>(null);
+    const [draft, setDraft] = useState<T | null>();
     const [loading, setLoading] = useState(true)
     const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-    /* =======================
-        LOAD (ครั้งเดียว)
-    ======================= */
     useEffect(() => {
-        let mounted = true
-
+        let mounted = true;
         const loadDraft = async () => {
             setLoading(true)
-            const db = await BlogDraftDB
-            if (!db) return;
-            let data = await db.get("drafts", `${userId}:${draftId}`)
-
-            // ✅ ถ้ายังไม่มี draft ให้สร้างใหม่
-            if (!data) {
-                data = {
-                    id: null,
-                    userId,
-                    draftId,
-                    createdAt: Date.now(),
+            try {
+                const db = await DraftDB();
+                if (db === null) return;
+                let data = await db.get(tableName, `${userId}:${draftId}`)
+    
+                if (!data) {
+                    data = {
+                        id: null,
+                        userId,
+                        draftId,
+                        createdAt: Date.now(),
+                    }
                 }
+                if (mounted) setDraft(data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                if (mounted) setLoading(false)
             }
-
-            if (mounted) {
-                setDraft(data)
-            }
-
-            setLoading(false)
         }
+        if (userId && draftId) loadDraft();
+        return () => { mounted = false; }
 
-        if (userId && draftId) {
-            loadDraft()
-        }
+    }, [userId, draftId]);
 
-        return () => {
-            mounted = false
-        }
-    }, [userId, draftId])
-
-    const getAll = async(): Promise<BlogType[]> => {
-        const db = await BlogDraftDB
-        if (!db) return [];
-        const tx = db.transaction(["drafts"], "readonly")
-        const store = tx.objectStore("drafts")
+    const getAll = async(): Promise<BlogType[]> => 
+    {
+        const db = await DraftDB();
+        if (db === null) return [];
+        const tx = db.transaction([tableName], "readonly")
+        const store = tx.objectStore(tableName)
 
         const drafts: BlogType[] = []
         let cursor = await store.openCursor()
@@ -82,17 +72,17 @@ export function useBlogDraftState({
     /* =======================
         SAVE (debounce)
     ======================= */
-    const saveDraft = (nextDraft: BlogDraft) => {
+    const saveDraft = (nextDraft: T) => {
         setDraft(nextDraft)
         if (saveTimerRef.current) {
             clearTimeout(saveTimerRef.current)
         }
         saveTimerRef.current = setTimeout(async () => {
             try{
-                const db = await BlogDraftDB;
-                if (!db) return;
+                const db = await DraftDB();
+                if (db === null) return;
                 await db.put(
-                    "drafts",
+                    tableName,
                     { ...nextDraft, updatedAt: Date.now() },
                     `${userId}:${draftId}`
                 )
@@ -103,15 +93,15 @@ export function useBlogDraftState({
     }
 
     const deleteDraft = () => {
-        setDraft(null);
+        setDraft(undefined);
         if (saveTimerRef.current) {
             clearTimeout(saveTimerRef.current)
         }
         saveTimerRef.current = setTimeout(async () => {
             try {
-                const db = await BlogDraftDB;
-                if (!db) return;
-                await db.delete("drafts",`${userId}:${draftId}`);
+                const db = await DraftDB();
+                if (db === null) return;
+                await db.delete(tableName,`${userId}:${draftId}`);
             } catch (err) {
                 console.error("Delete draft error:", err);
             }

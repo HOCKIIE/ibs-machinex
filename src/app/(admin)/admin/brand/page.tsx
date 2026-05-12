@@ -1,6 +1,6 @@
 "use client";
 
-import React,{ useState,useEffect,useCallback } from 'react';
+import React,{ useState, useEffect, useCallback, useRef } from 'react';
 import { BiTrash } from "react-icons/bi";
 import AnimatedCheckbox from '@/components/admin/Checkbox/AdnimatedCheckbox';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
@@ -16,6 +16,10 @@ import { BrandType } from '@/types/BrandType';
 import { useCurrentUrl } from '@/utils/useCurrentUrl';
 import { EditButton, DeleteButton } from '@/components/admin/ui/ActionButton';
 import Badge from '@/components/admin/ui/Badge';
+import { useDraftState } from '@/store/useDraftState';
+import { useAuth } from '@/contexts/AdminContext';
+import { usePathname, useRouter } from 'next/navigation';
+import { IoChevronDown } from "react-icons/io5";
 
 const show = [10, 25, 50, 100];
 const recordStatus = [
@@ -53,6 +57,14 @@ const Brand = () =>
     const isAllSelected = selectedIds.length > 0;
     const currentUrl = useCurrentUrl();
     const [redirect ,setRedirect] = useState<string|null>(null);
+    const [items, setItems] = useState<BrandType[]>([])
+    const [showDraft, setShowDraft] = useState<boolean>(false);
+    const draftRef = useRef<HTMLDivElement>(null);
+    const router = useRouter();
+    const pathname = usePathname();
+    const didfectDrafts = useRef<boolean>(false);
+    const { user } = useAuth();
+    const { getAll } = useDraftState({userId: user?.id ? String(user.id) : "", tableName: "brands"})
     
     useEffect(()=>{
         setRedirect(currentUrl);
@@ -123,6 +135,27 @@ const Brand = () =>
         //@ts-ignore
         openModal(selectedIds);
     }, [selectedIds, openModal]);
+
+    const getAllDraft = async() => {
+        const req = await getAll();
+        if(req) setItems(req as unknown as BrandType[]);
+    }
+    const handlerClickDraft = (draftId:string) => {
+        router.push(`/admin/brand/add?draftId=${draftId}&redirect=${pathname}`);
+    }
+    useEffect(() => {
+        if(didfectDrafts.current) return;
+        getAllDraft()
+        didfectDrafts.current = true;
+    });
+
+    useEffect(()=>{
+        const closeMenu = (e: MouseEvent) => {
+            if(draftRef.current  && !draftRef.current.contains(e.target as Node)) setShowDraft(false);
+        }
+        document.addEventListener('mousedown', closeMenu);
+        return () => document.removeEventListener('mousedown',closeMenu)
+    },[showDraft]);
     
 
     return (
@@ -134,6 +167,33 @@ const Brand = () =>
                         <div className="flex gap-3 right">
                             <StatusTab status={recordStatus}/>
                             <AddButton title="Add Brand" href={`/admin/brand/add?redirect=${redirect}`}/>
+                            {items.length > 0 && 
+                                <div className='relative'>
+                                    <button 
+                                        type="button" 
+                                        className='relative flex items-center bg-yellow-500 text-yellow-800 px-2 rounded-lg h-full gap-1'
+                                        onClick={()=>setShowDraft(!showDraft)}
+                                    >
+                                            <span>Drafts <div className='absolute right-[-4px] top-[-4px] bg-yellow-100 text-[9px] w-4 h-4 rounded-full shadow-2 border border-yellow-600'>{items.length}</div></span>
+                                            <IoChevronDown />
+                                    </button>
+                                    {items && showDraft &&
+                                        <div id="dropdown" className="absolute z-10 bg-slate-50 border rounded-lg shadow-lg w-28 right-0" ref={draftRef}>
+                                            <ul className="p-2 text-sm text-body">
+                                            {items.map((v:BrandType,k:number)=>
+                                                <li key={k}>
+                                                    <a 
+                                                        href='' 
+                                                        onClick={(e)=>{ e.preventDefault(); v.draftId && handlerClickDraft(v.draftId)}} 
+                                                        className="inline-flex items-center w-full p-2 hover:bg-slate-200 hover:text-black rounded-lg"
+                                                    >Draft {k+1}</a>
+                                                </li>
+                                            )}
+                                            </ul>
+                                        </div>
+                                    }
+                                </div>
+                                }
                         </div>
                         
                     </div>

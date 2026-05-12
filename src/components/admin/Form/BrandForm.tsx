@@ -21,11 +21,13 @@ import Checkbox from '../Checkbox/Checkbox';
 const BrandForm = ({
     form,
     onSubmit,
-    type
+    type,
+    draftId,
 } : {
     form: UseFormReturn<BrandFormProps>
     onSubmit: (data: BrandFormProps) => Promise<void>;
     type: string;
+    draftId?: string;
 }) => {
     const didFetch = useRef(false);
     const [category, setCategory] = useState([]);
@@ -96,6 +98,12 @@ return (
                 </div>
                 <div className="col-span-12">
                     <div className="space-y-3">
+                        {type=="create" && 
+                            <div className="col-span-12 mb-4">
+                                <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Draft ID</label>
+                                <input type='text' readOnly {...register('draftId')} className="w-full bg-gray-100 border rounded-md p-2"/>
+                            </div>
+                        }
                         <label className="block text-sm font-medium text-gray-700 dark:text-gray-400">Cateogry <Required/></label>
                         <Controller
                             name="category"
@@ -279,7 +287,7 @@ return (
                                     <Controller
                                         name="descendant_th"
                                         control={control}
-                                        render={({field}) => <TextEditor name={field.name} value={field.value} type="brand" action={type} id={item.id} onChange={field.onChange} /> }
+                                        render={({field}) => <TextEditor name={field.name} value={field.value} type="brand" action={type} id={item.id} draftId={draftId} onChange={field.onChange} /> }
                                     />                        
                                     {errors?.descendant_th?.type === "required" && (
                                         <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
@@ -314,7 +322,7 @@ return (
                                     <Controller
                                         name="descendant_en"
                                         control={control}
-                                        render={({field}) => <TextEditor name={field.name} value={field.value} type="brand" action={type} id={item.id} onChange={field.onChange} /> }
+                                        render={({field}) => <TextEditor name={field.name} value={field.value} type="brand" action={type} id={item.id} draftId={draftId} onChange={field.onChange} /> }
                                     />                        
                                     {errors?.descendant_en?.type === "required" && (
                                         <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>
@@ -349,7 +357,7 @@ return (
                                     <Controller
                                         name="descendant_ja"
                                         control={control}
-                                        render={({field}) => <TextEditor name={field.name} value={field.value} type="brand" action={type} id={item.id} onChange={field.onChange} /> }
+                                        render={({field}) => <TextEditor name={field.name} value={field.value} type="brand" action={type} id={item.id} draftId={draftId} onChange={field.onChange} /> }
                                     />                        
                                     {errors?.descendant_ja?.type === "required" && (
                                         <ErrorMessage>{create ? "This field is required." : "Recheck the field."}</ErrorMessage>

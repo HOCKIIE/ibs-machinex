@@ -1,18 +1,17 @@
 "use client";
 
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useRouter, usePathname, useSearchParams } from 'next/navigation';
 import DefaultLayout from '@/components/admin/layout/DefaultLayout';
 import Breadcrumb from '@/components/admin/Breadcrumb/Breadcrumb';
 import BlogForm from '@/components/admin/Form/BlogForm';
 import { BlogFormProps } from '@/types/BlogType';
 import useBlogStore from '@/store/useBlogStore';
-import { useRouter } from 'next/navigation';
-import { useBlogDraftState } from '@/store/useBlogDraftState';
+import { useDraftState } from '@/store/useDraftState';
 import { useAuth } from '@/contexts/AdminContext';
 import { v4 as uuidv4 } from 'uuid';
-import { usePathname, useSearchParams } from 'next/navigation';
 import { useForm, useWatch,Path } from 'react-hook-form';
-import { setBlogChanged, isEqual } from '@/utils/utils';
+import { setStateChanged, isEqual } from '@/utils/utils';
 import { deserialize } from '@/utils/slateHtmlConverter';
 import { BackButton } from '@/components/admin/Button/BackButton';
 import debounce from 'debounce';
@@ -34,8 +33,7 @@ export default function Page(){
         draft,
         saveDraft,
         deleteDraft,
-    } = useBlogDraftState({ userId: user?.id ? String(user.id) : "", draftId: draftId });
-    
+    } = useDraftState<BlogFormProps>({ userId: user?.id ? String(user.id) : "", draftId: draftId, tableName: "blogs" });
 
     const form = useForm<BlogFormProps>({
         mode: "onChange",
@@ -72,18 +70,22 @@ export default function Page(){
     const { setError } = form;
 
     const handleSubmit = async (data: BlogFormProps) => {
-        const req = await createData(data);
-        const {status, statusCode, message, errors } = req;
-        if(status && req.data ){
-            deleteDraft()
-            const path = decodeURIComponent(`/admin/blog/${req.data.id}?redirect=/admin/blog`);
-            router.push(path);
-        }
-        if (!status && errors) {
-            Object.entries(errors).forEach(([field, message]) => {
-                const msg = Array.isArray(message) ? message[0] : message;
-                setError(field as Path<BlogFormProps>, { type: "server", message: msg});
-            });
+        try{
+            const req = await createData(data);
+            const {status, statusCode, message, errors } = req;
+            if(status && req.data ){
+                deleteDraft()
+                const path = decodeURIComponent(`/admin/blog/${req.data.id}?redirect=/admin/blog`);
+                router.push(path);
+            }
+            if (!status && errors) {
+                Object.entries(errors).forEach(([field, message]) => {
+                    const msg = Array.isArray(message) ? message[0] : message;
+                    setError(field as Path<BlogFormProps>, { type: "server", message: msg});
+                });
+            }
+        } catch (err) {
+            console.error("🛑 Oops : ", err);
         }
     }
     useEffect(() => {
@@ -143,7 +145,7 @@ export default function Page(){
     const watched = useWatch({ control: form.control });
     const prevRef = useRef<Partial<BlogFormProps>>({}); 
     const debouncedSave = useRef(
-        debounce((data: Partial<BlogFormProps>) => { saveDraft(data) }, 500)
+        debounce((data: Partial<BlogFormProps>) => { saveDraft(data as BlogFormProps) }, 500)
     ).current;
     const debouncedSetState = useRef(
         debounce((changed: Partial<BlogFormProps>) => { setDraftState((prev) => ({ ...prev, ...changed })) }, 500)
@@ -160,13 +162,13 @@ export default function Page(){
                 }
             }
             if (!isEqual(current, prev)) {
-                setBlogChanged(changed, key, current as BlogFormProps[typeof key]);
+                setStateChanged(changed, key, current as BlogFormProps[typeof key]);
+            }
+            if (Object.keys(changed).length > 0) {
+                prevRef.current = { ...prevRef.current, ...changed };
+                debouncedSetState(changed);
             }
         });
-        if (Object.keys(changed).length > 0) {
-            prevRef.current = { ...prevRef.current, ...changed };
-            debouncedSetState(changed);
-        }
         return () => {
             debouncedSetState.clear();
             debouncedSave.clear();

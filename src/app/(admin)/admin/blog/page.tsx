@@ -16,7 +16,7 @@ import { useCurrentUrl } from '@/utils/useCurrentUrl';
 import { EditButton, DeleteButton } from '@/components/admin/ui/ActionButton';
 import Badge from '@/components/admin/ui/Badge';
 import { useAuth } from '@/contexts/AdminContext';
-import { useBlogDraftState } from '@/store/useBlogDraftState';
+import { useDraftState } from '@/store/useDraftState';
 import { Switch } from '@/components/admin/Checkbox/Switch';
 import { usePathname, useRouter } from 'next/navigation';
 import { IoChevronDown } from "react-icons/io5";
@@ -55,7 +55,7 @@ const Blog = () => {
     const {
         getAll,
         deleteDraft,
-    } = useBlogDraftState({userId: user?.id ? String(user.id) : "" })
+    } = useDraftState({userId: user?.id ? String(user.id) : "", tableName: "blogs"})
 
     const { deleteData, onChangeStatus, response } = useBlogStore();
     const [progress, setProgress] = useState(false);
@@ -148,7 +148,7 @@ const Blog = () => {
 
     const getAllDraft = async() => {
         const req = await getAll();
-        if(req) setItems(req)
+        if(req) setItems(req as unknown as BlogType[]);
     }
     const handlerClickDraft = (draftId:string) => {
         router.push(`/admin/blog/add?draftId=${draftId}&redirect=${pathname}`);
